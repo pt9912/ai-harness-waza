@@ -1,0 +1,12 @@
+id: should-not-trigger-001
+name: Kein Trigger bei allgemeiner Programmierfrage
+description: Der Skill darf bei Fragen ohne Harness-Bezug nicht aktiv werden.
+tags: [anti-trigger, negative-test]
+inputs:
+  prompt: "Schreibe eine Python-Funktion, die eine Liste von Zahlen sortiert."
+expected:
+  output_not_contains:
+    - "Regelwerk"
+    - "Carveout"
+  outcomes:
+    - type: task_completed

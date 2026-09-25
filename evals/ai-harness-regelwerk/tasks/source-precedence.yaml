@@ -1,0 +1,13 @@
+id: source-precedence-001
+name: Source Precedence bei Konflikt
+description: Bei Konflikt zwischen AGENTS.md und kanonischer Quelle gilt die kanonische Quelle.
+tags: [trigger, source-precedence]
+inputs:
+  prompt: >-
+    Nach dem AI-Harness-Regelwerk: AGENTS.md nennt eine Regel anders als
+    spec/spezifikation.md. Welche Quelle gilt, und warum?
+expected:
+  output_contains:
+    - "kanonisch"
+  outcomes:
+    - type: task_completed

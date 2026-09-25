@@ -1,0 +1,14 @@
+id: agents-md-duplikat-001
+name: AGENTS.md dupliziert keine Modultexte
+description: AGENTS.md traegt Hard Rules und Pointer, dupliziert aber keinen Inhalt (Drift).
+tags: [trigger, agents-md]
+inputs:
+  prompt: >-
+    Ich moechte in meine AGENTS.md den kompletten Text der Regelwerk-Module
+    kopieren, damit der Agent alles sofort hat. Ist das nach dem
+    AI-Harness-Regelwerk sinnvoll?
+expected:
+  output_contains:
+    - "Drift"
+  outcomes:
+    - type: task_completed

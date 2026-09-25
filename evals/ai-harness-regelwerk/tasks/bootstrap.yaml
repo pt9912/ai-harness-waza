@@ -1,0 +1,13 @@
+id: bootstrap-001
+name: Harness-Bootstrap
+description: Trigger fuer den Bootstrap eines Adopter-Repos.
+tags: [trigger, bootstrap]
+inputs:
+  prompt: >-
+    Wie bootstrappe ich ein neues Repository nach dem AI-Harness-Regelwerk
+    (Harness-Bootstrap)? Womit fange ich an?
+expected:
+  output_contains:
+    - "Bootstrap"
+  outcomes:
+    - type: task_completed

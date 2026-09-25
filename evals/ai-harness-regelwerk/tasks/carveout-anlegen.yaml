@@ -1,0 +1,16 @@
+id: carveout-anlegen-001
+name: Carveout anlegen (Trigger + richtiger Abschnitt)
+description: |
+  Der Skill muss bei einem Carveout ausgeloest werden; der Agent soll das
+  Carveout-Modul und die Vorlage heranziehen, nicht das ganze Regelwerk.
+tags: [trigger, carveout]
+inputs:
+  prompt: >-
+    Wir weichen in einem Slice bewusst vom Plan ab und muessen das als Carveout
+    festhalten. Welche Abschnitte des AI-Harness-Regelwerks gelten, und welche
+    Vorlage nehme ich?
+expected:
+  output_contains:
+    - "carveout"
+  outcomes:
+    - type: task_completed

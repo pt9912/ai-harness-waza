@@ -1,0 +1,14 @@
+id: spec-architektur-001
+name: Spec - Lastenheft, Spezifikation, Architektur
+description: Trigger fuer die Spec-Schichten und ihre Reihenfolge.
+tags: [trigger, spec]
+inputs:
+  prompt: >-
+    Im AI-Harness-Regelwerk gibt es Lastenheft, Spezifikation und Architektur.
+    Wie sind diese Spec-Schichten aufgebaut, und welche Vorlagen gibt es?
+expected:
+  output_contains:
+    - "Lastenheft"
+    - "Architektur"
+  outcomes:
+    - type: task_completed

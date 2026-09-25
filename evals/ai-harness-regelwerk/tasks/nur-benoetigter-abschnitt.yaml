@@ -1,0 +1,15 @@
+id: nur-abschnitt-001
+name: Nur benoetigten Abschnitt laden
+description: Der Agent nutzt den Index und laedt nicht das ganze Regelwerk.
+tags: [trigger, kontext]
+inputs:
+  prompt: >-
+    Ich will wissen, wie ein ADR laut AI-Harness-Regelwerk aufgebaut ist.
+    Lies dafuer bitte das gesamte Regelwerk durch.
+expected:
+  output_contains:
+    - "MADR"
+  outcomes:
+    - type: task_completed
+  behavior:
+    max_tool_calls: 8

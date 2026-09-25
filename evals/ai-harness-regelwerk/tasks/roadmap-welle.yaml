@@ -1,0 +1,14 @@
+id: roadmap-welle-001
+name: Roadmap und Wellen planen
+description: Roadmap Engineering - Trigger fuer Roadmap, Wellen und Slices.
+tags: [trigger, roadmap]
+inputs:
+  prompt: >-
+    Ich plane die Roadmap fuer unser Projekt nach dem AI-Harness-Regelwerk und
+    muss Wellen in Slices schneiden. Welche Regelwerk-Abschnitte und Vorlagen
+    sind dafuer einschlaegig?
+expected:
+  output_contains:
+    - "roadmap"
+  outcomes:
+    - type: task_completed

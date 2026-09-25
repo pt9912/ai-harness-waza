@@ -1,0 +1,14 @@
+id: review-verification-001
+name: Review- und Verification-Harness
+description: Trigger fuer Reviewer-Skill und Verification.
+tags: [trigger, review, verification]
+inputs:
+  prompt: >-
+    Ich will nach dem AI-Harness-Regelwerk einen Review-Harness und einen
+    Verification-Harness aufsetzen. Welche Abschnitte und Vorlagen brauche ich?
+expected:
+  output_contains:
+    - "Review"
+    - "Verification"
+  outcomes:
+    - type: task_completed

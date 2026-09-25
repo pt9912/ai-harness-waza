@@ -1,0 +1,12 @@
+id: should-not-trigger-002
+name: Kein Trigger bei Alltagsfrage
+description: Alltagsfragen ohne Bezug zum Regelwerk duerfen den Skill nicht aktivieren.
+tags: [anti-trigger, negative-test]
+inputs:
+  prompt: "Gib mir ein einfaches Rezept fuer Pfannkuchen."
+expected:
+  output_not_contains:
+    - "Regelwerk"
+    - "Harness"
+  outcomes:
+    - type: task_completed

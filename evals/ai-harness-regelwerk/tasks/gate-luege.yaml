@@ -1,0 +1,15 @@
+id: gate-luege-001
+name: Gate-Luege - Block aktiv, Modul nicht in modules
+description: Ein entkommentierter Block ohne Eintrag in `modules` ist gueltig, aber wirkungslos.
+tags: [trigger, quality-gates]
+inputs:
+  prompt: >-
+    Nach dem AI-Harness-Regelwerk: In d-check-modul-nicht-aktiv.yml ist der
+    ids-Block aktiv. Greift die ID-Pruefung? Begruende.
+  files:
+    - path: d-check-modul-nicht-aktiv.yml
+expected:
+  output_contains:
+    - "modules"
+  outcomes:
+    - type: task_completed

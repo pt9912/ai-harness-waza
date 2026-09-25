@@ -1,0 +1,16 @@
+id: referenz-richtung-001
+name: Referenz-Richtung (SDP) - Spec verweist auf ADR
+description: Die Spec darf weder ADRs noch Slices nennen (Decken-Regel).
+tags: [trigger, sdp, review]
+inputs:
+  prompt: >-
+    Pruefe spec-mit-adr-link.md nach der Referenz-Richtung des AI-Harness-Regelwerks.
+    Gibt es Verstoesse? Nenne sie.
+  files:
+    - path: spec-mit-adr-link.md
+expected:
+  output_contains:
+    - "ADR"
+    - "slice"
+  outcomes:
+    - type: task_completed
