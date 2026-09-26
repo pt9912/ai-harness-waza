@@ -56,9 +56,9 @@ run-copilot: image ## Evals mit echtem Modell (braucht GITHUB_TOKEN)
 	@test -n "$$GITHUB_TOKEN" || { echo "GITHUB_TOKEN nicht gesetzt"; exit 1; }
 	@$(call RUN_WITH_RESULTS,-e GITHUB_TOKEN,run $(EVAL_YAML) --context-dir $(FIXTURES) -v --output results/copilot.json)
 
-run-ollama: image ## Evals mit Ollama: make run-ollama OLLAMA_MODEL=<name> [TASK="<glob> ..."]
+run-ollama: image ## Evals mit Ollama: make run-ollama OLLAMA_MODEL=<name> [TASK="<glob> ..."] [EXTRA="<waza-Flags>"] [SUFFIX=<Dateisuffix>]
 	@test -n "$(OLLAMA_MODEL)" || { echo "Aufruf: make run-ollama OLLAMA_MODEL=<name> [TASK=\"<glob> ...\"]  (Modelle: ollama list)"; exit 1; }
-	@$(call RUN_WITH_RESULTS,--network host $(OLLAMA_ENV),run $(EVAL_YAML) --context-dir $(FIXTURES) -v --model '$(OLLAMA_MODEL)' --judge-model '$(OLLAMA_JUDGE)' $(foreach t,$(TASK),--task '$(t)') --output results/ollama-$(subst /,_,$(subst :,_,$(OLLAMA_MODEL))).json)
+	@$(call RUN_WITH_RESULTS,--network host $(OLLAMA_ENV),run $(EVAL_YAML) --context-dir $(FIXTURES) -v --model '$(OLLAMA_MODEL)' --judge-model '$(OLLAMA_JUDGE)' $(foreach t,$(TASK),--task '$(t)') $(EXTRA) --output results/ollama-$(subst /,_,$(subst :,_,$(OLLAMA_MODEL)))$(SUFFIX).json)
 
 compare: image ## Ergebnisse vergleichen: make compare A=results/a.json B=results/b.json
 	@test -f "$(A)" -a -f "$(B)" || { echo "Aufruf: make compare A=<datei> B=<datei>"; exit 1; }

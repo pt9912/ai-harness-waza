@@ -1,7 +1,7 @@
 # waza-Evals für das AI-Harness-Regelwerk
 
 Verhaltenstests für einen dünnen Skill (`skills/ai-harness-regelwerk/SKILL.md`), der auf das
-[AI-Harness-Regelwerk](https://github.com/pt9912/ai-harness-course) (`lab-regelwerk.zip`, v6.9.0) verweist.
+[AI-Harness-Regelwerk](https://github.com/pt9912/ai-harness-course) (`lab-regelwerk.zip`, v6.10.0) verweist.
 Getestet wird mit [waza](https://github.com/microsoft/waza) (v0.38.7).
 
 Auf dem Host werden nur `make` und `docker` gebraucht. waza läuft im Container, es gibt keinen Bind-Mount.
@@ -84,7 +84,8 @@ evals/ai-harness-regelwerk/
 - Die übrigen Tasks prüfen mit `expected.output_contains` (case-insensitiv).
 - Die Regexes wurden mit `waza grade` gegen Beispielantworten geprüft (richtig besteht, falsch fällt durch) und
   nach einem Lauf mit GLM (`glm-5.3-flash:cloud`, Judge Kimi, ein Trial: 73/85 bestanden) an den echten Antworten
-  nachjustiert (8 Tasks). Mit mehr Modellen und Trials sind weitere Anpassungen zu erwarten.
+  nachjustiert (8 Tasks). Mit v6.10.0 (Judge Deepseek): 78/85 bestanden, alle 42 Judges bestanden; die vier vorher
+  bemängelten Stellen des Regelwerks (v6.9.0) sind korrigiert und die zugehörigen Tasks `bg-01`, `hd-13`, `rr-13` bestehen jetzt. Mit mehr Modellen und Trials sind weitere Anpassungen zu erwarten.
 - `make schema-check` prüft die Regex-Syntax nur mit Pythons `re` und einer Liste bekannter RE2-Unterschiede; ob Go sie akzeptiert, zeigt erst ein Waza-Lauf (`waza grade`).
 - `waza grade` funktioniert nicht mit `prompt`-Gradern ("requires an execution engine"); für eine Nachprüfung
   von Regexes muss man die Judges aus einer Kopie der Tasks entfernen.

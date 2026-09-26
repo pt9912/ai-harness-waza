@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1
 
 ARG WAZA_VERSION=v0.38.7
-ARG REGELWERK_URL=https://github.com/pt9912/ai-harness-course/releases/download/v6.9.0/lab-regelwerk.zip
+ARG REGELWERK_URL=https://github.com/pt9912/ai-harness-course/releases/download/v6.10.0/lab-regelwerk.zip
 # SHA256 des ZIP beim ersten Download ermittelt (kein unabhaengig veroeffentlichter Wert geprueft).
-ARG REGELWERK_SHA256=8a4e0aaf597a9c67404cb7a350a6fba992f0c98195e011e025c073660ee55cce
+ARG REGELWERK_SHA256=5457c1923d2b84b2da9e180643a3df01773b0bda57641f2b421001ebbccbcdf9
 
 # ---- Regelwerk-Bundle laden und verifizieren ---------------------------------
 FROM alpine:3.21 AS regelwerk-fetch
