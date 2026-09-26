@@ -3,12 +3,12 @@ name: Slice-Closure im Repo ohne Wellen
 description: |
   Prueft Regel M06-08 (modul-06-roadmap.md, Stufe 3): Wellenlos heisst nicht
   waechterlos. Zaehler, Lese-Schritt (Anker seit slice-<Kennung>) und
-  Trigger-Audit laufen bei der Slice-Closure vor dem git mv; die Paarungen
-  danach; das Archiv als slice-<Kennung>-archiv.zip nach den Paarungen.
-  Die Regexes pruefen (1) Zaehler/Lese-Schritt/Trigger-Audit vor dem git mv,
-  (2) Paarungen nach dem git mv, (3) Archiv nach den Paarungen, (4) den
-  Archivnamen slice-<Kennung>-archiv.zip und (5) flache Ablage neben dem Stub
-  in done/.
+  Trigger-Audit laufen bei der Slice-Closure; Zaehler und Lese-Schritt vor dem git mv
+  (modul-06 Z. 45-46), das Trigger-Audit "bei jeder Closure, zusammen mit dem Lese-Schritt"
+  (Z. 48; die Lage vor dem git mv ist daraus abgeleitet); die Paarungen danach; das Archiv als
+  slice-<Kennung>-archiv.zip nach den Paarungen.
+  Die verbleibende Regex prueft nur, dass Zaehler/Lese-Schritt/Trigger-Audit zeitlich vor dem git mv
+  genannt werden; alles Weitere entscheidet der Judge.
     Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
 tags:
 - m06-08
@@ -32,8 +32,8 @@ graders:
     continue_session: true
     prompt: |
       Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-      Referenz (laut Regelwerk): Vor dem git mv: Zaehler und Lese-Schritt (Anker `seit slice-<Kennung>`) sowie Trigger-Audit; nach dem git mv: alle drei Paarungen; danach Archivieren nach `done/slice-<Kennung>-archiv.zip`, flach neben dem Stub (modul-06-roadmap.md §Wann Arbeit eine Welle braucht, Tabelle "Träger im Repo ohne Wellen", Zeilen 45-50; identisch modul-05 Z.89).
-      Beispiel fuer eine RICHTIGE Antwort: Auch ohne Wellen bleibt die Closure nicht wachterlos. Vor dem git mv nach done/ laufen der Zaehler-Eintrag, der Lese-Schritt mit dem Anker "seit slice-<Kennung>" und das Trigger-Audit. Die drei Paarungen kommen erst nach dem git mv, denn sie suchen ja in done/. Danach wird archiviert, also nach den Paarungen, weil diese den Volltext noch lesen muessen. Das Archiv heisst done/slice-<Kennung>-archiv.zip und liegt flach neben dem gekuerzten Stub.
+      Referenz (laut Regelwerk): Vor dem git mv nach done/: Zaehler (Slice-Closure §7) und Lese-Schritt (Anker `seit slice-<Kennung>` statt `seit welle-<Kennung>`); das Trigger-Audit laeuft bei jeder Closure zusammen mit dem Lese-Schritt; nach dem git mv: alle drei Paarungen (sie suchen in done/); danach, nach den Paarungen, Zeitdokumente archivieren nach `done/slice-<Kennung>-archiv.zip`, flach neben dem Stub (modul-06-roadmap.md §Wann Arbeit eine Welle braucht, Tabelle "Träger im Repo ohne Wellen", Zeilen 45-50; Archiv-Name und -Ort bestaetigt modul-05-planning-harness.md Z.88-90).
+      Beispiel fuer eine RICHTIGE Antwort: Auch ohne Wellen bleibt die Closure nicht wachterlos. Vor dem git mv nach done/ laufen der Zaehler-Eintrag und der Lese-Schritt mit dem Anker "seit slice-<Kennung>"; das Trigger-Audit laeuft bei jeder Closure zusammen mit dem Lese-Schritt. Die drei Paarungen kommen erst nach dem git mv, denn sie suchen ja in done/. Danach wird archiviert, also nach den Paarungen, weil diese den Volltext noch lesen muessen. Das Archiv heisst done/slice-<Kennung>-archiv.zip und liegt flach neben dem gekuerzten Stub.
       Beispiel fuer eine FALSCHE Antwort: Ohne Wellen ist die Closure einfacher. Zuerst wird die Datei mit git mv nach done/ verschoben, danach laufen Zaehler, Lese-Schritt und Trigger-Audit. Die Paarungen kommen ganz am Ende. Die Zeitdokumente werden direkt vor dem git mv in ein Archiv gepackt, das nach dem Muster done/welle-<id>/archiv.zip in einem Unterordner abgelegt wird.
       Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
       Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

@@ -3,7 +3,7 @@ name: Slice claimen bei push-geschuetztem Hauptzweig
 description: |
   Prueft Regel M05-02 (modul-05-planning-harness.md, Stufe 3): Der git mv
   next -> in-progress muss vor der Arbeit auf dem Hauptzweig landen; bei
-  push-geschuetztem Hauptzweig deklariert das Repo einen anderen Traeger als MR
+  push-geschuetztem Hauptzweig deklariert das Repo einen anderen Traeger als einen Adaptions-Eintrag (MR)
   (Claim-Ausnahme oder sofort gemergter Anspruchs-PR). Mitreisen im Arbeits-PR
   ist zweigelokal und nicht zulaessig.
   Graders (Regex): (1) Entscheidung: nicht regelkonform (Nein/nicht zulaessig);
@@ -33,8 +33,8 @@ graders:
     continue_session: true
     prompt: |
       Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-      Referenz (laut Regelwerk): Nicht regelkonform: Der Uebergang next -> in-progress muss vor der Arbeit auf dem Hauptzweig landen; Mitreisen im Arbeits-PR ist zweigelokal (in-progress/ fuer alle anderen leer). Bei push-geschuetztem Hauptzweig deklariert das Repo seinen Traeger als MR: Claim-Ausnahme im Schutzregime ODER sofort gemergter Anspruchs-PR; still abweichen ist keines von beidem. modul-05-planning-harness.md §Slice-Lebenszyklus, Absaetze "next -> in-progress landet auf dem Hauptzweig" und "Die Regel traegt die Wirkung, nicht das Mittel".
-      Beispiel fuer eine RICHTIGE Antwort: Nein, das ist nicht regelkonform. Reist der git mv erst im Feature-Branch mit, ist der Anspruch zweigelokal: Für alle anderen bleibt in-progress/ leer, und jemand könnte parallel dieselbe Arbeit beginnen. Der Übergang muss vor der Arbeit auf dem Hauptzweig sichtbar sein. Da der Hauptzweig geschützt ist, deklariert ihr als Träger entweder eine Claim-Ausnahme im Schutzregime oder einen separaten Anspruchs-PR, der sofort gemergt wird.
+      Referenz (laut Regelwerk): Nicht regelkonform: Der Uebergang next -> in-progress muss vor der Arbeit auf dem Hauptzweig landen; Mitreisen im Arbeits-PR ist zweigelokal (in-progress/ fuer alle anderen leer, bis die Arbeit fertig ist). Die Regel traegt die Wirkung, nicht das Mittel: Sichtbar werden muss der Anspruch vor der Arbeit. Wo der Hauptzweig push-geschuetzt ist, scheitert der Direkt-Commit; dann deklariert das Repo seinen Traeger als MR (Adaptions-Eintrag im Konventionsspeicher), etwa eine Claim-Ausnahme im Schutzregime oder einen Anspruchs-PR, der sofort gemergt wird (Beispiele, keine abschliessende Liste); still abweichen ist keiner der beiden. modul-05-planning-harness.md §Lifecycle als State Machine, Absaetze "next -> in-progress landet auf dem Hauptzweig, vor der Arbeit" und "Die Regel traegt die Wirkung, nicht das Mittel".
+      Beispiel fuer eine RICHTIGE Antwort: Nein, das ist nicht regelkonform. Reist der git mv erst im Feature-Branch mit, ist der Anspruch zweigelokal: Für alle anderen bleibt in-progress/ leer, und jemand könnte parallel dieselbe Arbeit beginnen. Der Übergang muss vor der Arbeit auf dem Hauptzweig sichtbar sein. Da der Hauptzweig geschützt ist, deklariert ihr als Träger etwa eine Claim-Ausnahme im Schutzregime oder einen separaten Anspruchs-PR, der sofort gemergt wird.
       Beispiel fuer eine FALSCHE Antwort: Ja, das ist regelkonform. Der git mv liegt im Feature-Branch, und mit dem Merge des Requests erscheint der Slice in in-progress/; so bleibt der Diff an einer Stelle gebündelt und der Reviewer sieht Anspruch und Implementierung zusammen.
       Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
       Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
