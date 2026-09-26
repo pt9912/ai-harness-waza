@@ -10,34 +10,31 @@ description: |
   Aktualitaet (Nein / nicht schliessen / nur Integritaet); (2) Pruefung der
   Release-Liste bzw. auf neuen Tag/Release; (3) Einbau ins Gate wird verneint
   (ausserhalb der Gates / nicht ins Gate / kein Gate).
-tags: [m02-07, stufe-3, modul-02]
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
+tags:
+- m02-07
+- stufe-3
+- modul-02
 inputs:
-  prompt: >-
-    Nach dem AI-Harness-Regelwerk: Unser d-check-Sensor auf die vendored
-    Baseline (gepinnter Tag v6.9.0, sha256 hinterlegt) meldet seit Wochen
-    "kein Drift", und alle Gates sind grün. Können wir daraus schließen, dass
-    unsere Baseline aktuell ist? Und falls nicht: was prüfen wir stattdessen,
-    und bauen wir das am besten als weiteren Schritt in unser Gate ein?
+  prompt: 'Nach dem AI-Harness-Regelwerk: Unser d-check-Sensor auf die vendored Baseline (gepinnter Tag v6.9.0, sha256 hinterlegt) meldet seit Wochen "kein Drift", und alle Gates sind grün. Können wir daraus schließen, dass unsere Baseline aktuell ist? Und falls nicht: was prüfen wir stattdessen, und bauen wir das am besten als weiteren Schritt in unser Gate ein?'
 expected:
   outcomes:
-    - type: task_completed
+  - type: task_completed
 graders:
-  - type: text
-    name: freshness_audit_kern
-    config:
-      regex_match:
-        - '(?i)(\bnein\b|nicht\s+([\wäöüß]+\s+){0,3}(schlie(ß|ss)en|folgern|ableiten|aktuell|belegt|bewiesen)|kein[\wäöüß]*\s+([\wäöüß]+\s+){0,2}(beweis|garantie|nachweis|r(ü|ue)ckschluss|aussage)|reicht\s+nicht|nur\s+(die\s+)?integrit(ä|ae)t|sagt\s+nichts)'
-        - '(?i)(release-?list[\wäöüß]*|release-?liste|liste\s+(der|aller)\s+(neu[\wäöüß]*\s+)?(release|tag)[\wäöüß]*|neu[\wäöüß]*\s+(tag|release|version)|releases?\s+(auf|ab|pr(ü|ue)f)[\wäöüß]*)'
-        - '(?i)(au(ß|ss)erhalb\s+([\wäöüß]+\s+){0,3}gates?|nicht\s+([\wäöüß]+\s+){0,5}gates?|kein[\wäöüß]*\s+([\wäöüß]+\s+){0,4}gates?|gates?\s+([\wäöüß]+\s+){0,3}(bleib[\wäöüß]*|sind|ist)\s+([\wäöüß]+\s+){0,1}netzlos)'
-  - type: prompt
-    name: judge_m02_07_001
-    config:
-      model: deepseek-v4.1-flash:cloud
-      continue_session: true
-      prompt: |
-        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): Nein, "kein Drift" (Hash-Check auf gepinntes Asset) beweist keine Aktualitaet; geprueft wird die Release-Liste auf einen neueren Tag. Der Audit ist eine Netz-Operation ausserhalb der netzlosen Gates (Wartung, kein Feedback-Gate), also NICHT als Gate-Schritt einbauen. modul-02-harness-bootstrap.md §Freshness-Audit der vendored Baseline, Bullets "Netz-Operation, ausserhalb der Gates" und "Release-Liste pruefen, nicht das Asset".
-        Beispiel fuer eine RICHTIGE Antwort: Nein, das lässt sich daraus nicht schließen. Der Hash-Check auf das gepinnte Asset prüft nur die Integrität der lokalen Kopie; ein neuer Upstream-Tag fällt dabei nie auf. Ob die Baseline aktuell ist, klären wir, indem wir die Release-Liste des Kurs-Repos nach einem neueren Tag als v6.9.0 abfragen. Diese Abfrage braucht Netz und gehört deshalb nicht in unsere netzlosen Gates, sondern ist eine Wartungsaufgabe außerhalb der Gates, ausgelöst etwa bei einer Konventions-Änderung.
-        Beispiel fuer eine FALSCHE Antwort: Nein, "kein Drift" beweist keine Aktualität, weil der Hash nur das gepinnte Asset prüft. Wir sollten die Release-Liste nach einem neuen Tag durchsuchen und das am besten als weiteres Target direkt in unser Gate-Makefile einbauen, damit jeder Lauf die Prüfung mitnimmt und die Baseline dauerhaft überwacht ist.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+- type: text
+  name: freshness_audit_kern
+  config:
+    regex_match:
+    - (?i)(\bnein\b|nicht\s+([\wäöüß]+\s+){0,3}(schlie(ß|ss)en|folgern|ableiten|aktuell|belegt|bewiesen)|kein[\wäöüß]*\s+([\wäöüß]+\s+){0,2}(beweis|garantie|nachweis|r(ü|ue)ckschluss|aussage)|reicht\s+nicht|nur\s+(die\s+)?integrit(ä|ae)t|sagt\s+nichts)
+- type: prompt
+  name: judge_m02_07_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Nein, "kein Drift" (Hash-Check auf gepinntes Asset) beweist keine Aktualitaet; geprueft wird die Release-Liste auf einen neueren Tag. Der Audit ist eine Netz-Operation ausserhalb der netzlosen Gates (Wartung, kein Feedback-Gate), also NICHT als Gate-Schritt einbauen. modul-02-harness-bootstrap.md §Freshness-Audit der vendored Baseline, Bullets "Netz-Operation, ausserhalb der Gates" und "Release-Liste pruefen, nicht das Asset".
+      Beispiel fuer eine RICHTIGE Antwort: Nein, das lässt sich daraus nicht schließen. Der Hash-Check auf das gepinnte Asset prüft nur die Integrität der lokalen Kopie; ein neuer Upstream-Tag fällt dabei nie auf. Ob die Baseline aktuell ist, klären wir, indem wir die Release-Liste des Kurs-Repos nach einem neueren Tag als v6.9.0 abfragen. Diese Abfrage braucht Netz und gehört deshalb nicht in unsere netzlosen Gates, sondern ist eine Wartungsaufgabe außerhalb der Gates, ausgelöst etwa bei einer Konventions-Änderung.
+      Beispiel fuer eine FALSCHE Antwort: Nein, "kein Drift" beweist keine Aktualität, weil der Hash nur das gepinnte Asset prüft. Wir sollten die Release-Liste nach einem neuen Tag durchsuchen und das am besten als weiteres Target direkt in unser Gate-Makefile einbauen, damit jeder Lauf die Prüfung mitnimmt und die Baseline dauerhaft überwacht ist.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

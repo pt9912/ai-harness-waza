@@ -12,6 +12,7 @@ description: |
   aufloesendes Artefakt (nicht "alle abgearbeitet"); (3) Register wird erst bei
   Graduation (je Sub-Area) leer. Negativ: "erst alle Zeilen abarbeiten" und
   "noch nicht durch" duerfen nicht als Ergebnis stehen.
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
 tags:
 - bs-11
 - stufe-2
@@ -30,8 +31,6 @@ graders:
   config:
     regex_match:
     - (?i)(bootstrap[^.\n]{0,80}(abgeschlossen|erreicht|beendet|fertig|durch)|(seid|sind) (ihr |wir )?(damit |also |jetzt |bereits |schon )*(mit dem bootstrap )?(durch|fertig)|(k(ö|oe)nnt|k(ö|oe)nnen|darfst|d(ü|ue)rft|d(ü|ue)rfen)[^.\n]{0,60}(weiter|starten|beginnen|fortfahren|inhaltlich))
-    - (?i)((jede|jeder|alle)[^.\n]{0,60}(zeile|fund|eintrag)[^.\n]{0,80}(aufl(ö|oe)sung|aufl(ö|oe)send\w*|artefakt|folge-?slice|reconciliation-?slice|carveout|adr)|(aufl(ö|oe)sung|aufl(ö|oe)send\w*)[^.\n]{0,60}(jede|jeder|alle))
-    - (?i)(?:(leer[^.\n]{0,100}(graduation|graduier\w*)|(graduation|graduier\w*)[^.\n]{0,100}leer)|graduation|graduier\w*)
     regex_not_match:
     - (?i)(m(ü|ue)sst|muss|m(ü|ue)ssen|sollt(et|en)?) (ihr |wir |sie |man |es )?(also |noch |zun(ä|ae)chst )?(erst|zuerst|vorher)( noch)? (alle|s(ä|ae)mtliche)
     - (?i)(seid|sind|ist) (ihr |wir |damit |also |der bootstrap )*noch nicht (durch|fertig|abgeschlossen)

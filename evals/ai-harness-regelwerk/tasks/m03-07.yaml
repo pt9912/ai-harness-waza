@@ -6,34 +6,31 @@ description: |
   Defaults, Schemas, Fehler-Codes usw. tragen SPEC-<NNN>, keine Anforderungs-ID.
   Graders (Regex): (1) Verfeinerungs-Kennung LH-FA-03.<suffix> fuer den
   Sortier-Algorithmus; (2) SPEC-<NNN> fuer den Defaults-Abschnitt.
-tags: [m03-07, stufe-2, modul-03]
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
+tags:
+- m03-07
+- stufe-2
+- modul-03
 inputs:
-  prompt: >-
-    Nach dem AI-Harness-Regelwerk: In unserer spezifikation.md kommen zwei
-    neue Abschnitte dazu. Der erste beschreibt den Sortier-Algorithmus, mit
-    dem Anforderung LH-FA-03 (Ergebnisliste sortieren) technisch umgesetzt
-    wird. Der zweite listet die Default-Werte fuer Timeouts und
-    Seitengroessen, die zu keiner einzelnen Anforderung gehoeren. Welche
-    Kennung bekommt jeder der beiden Abschnitte?
+  prompt: 'Nach dem AI-Harness-Regelwerk: In unserer spezifikation.md kommen zwei neue Abschnitte dazu. Der erste beschreibt den Sortier-Algorithmus, mit dem Anforderung LH-FA-03 (Ergebnisliste sortieren) technisch umgesetzt wird. Der zweite listet die Default-Werte fuer Timeouts und Seitengroessen, die zu keiner einzelnen Anforderung gehoeren. Welche Kennung bekommt jeder der beiden Abschnitte?'
 expected:
   outcomes:
-    - type: task_completed
+  - type: task_completed
 graders:
-  - type: text
-    name: kennungen_kern
-    config:
-      regex_match:
-        - '(?i)LH-FA-03\.[a-z0-9]'
-        - '(?i)SPEC-(<?nnn>?|\d+|x+)'
-  - type: prompt
-    name: judge_m03_07_001
-    config:
-      model: deepseek-v4.1-flash:cloud
-      continue_session: true
-      prompt: |
-        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): Sortier-Algorithmus zu LH-FA-03 -> Verfeinerung LH-FA-03.a; Defaults (Timeouts/Seitengroessen) ohne einzelne Anforderung -> SPEC-<NNN> (keine Anforderungs-ID). modul-03-spec.md §Ziel-Form: Spezifikation, Bullet "Zwei Kennungs-Arten".
-        Beispiel fuer eine RICHTIGE Antwort: Der Sortier-Algorithmus führt eine einzelne Anforderung technisch aus und bekommt deshalb deren Unter-Kennung, also LH-FA-03.a. Der Abschnitt mit den Default-Werten gehört zu keiner einzelnen Anforderung und erhält eine eigene SPEC-001 (fortlaufend je Datei gezählt); eine Anforderungs-ID vergibt man dafür nicht.
-        Beispiel fuer eine FALSCHE Antwort: Beide bekommen eine Kennung aus der Anforderungs-Reihe: Der Sortier-Algorithmus wird LH-FA-03.a, die Default-Werte bekommen LH-NFA-010, weil Timeouts und Seitengrößen nichtfunktionale Anforderungen sind und damit im Lastenheft-Schema geführt werden.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+- type: text
+  name: kennungen_kern
+  config:
+    regex_match:
+    - (?i)LH-FA-03\.[a-z0-9]
+- type: prompt
+  name: judge_m03_07_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Sortier-Algorithmus zu LH-FA-03 -> Verfeinerung LH-FA-03.a; Defaults (Timeouts/Seitengroessen) ohne einzelne Anforderung -> SPEC-<NNN> (keine Anforderungs-ID). modul-03-spec.md §Ziel-Form: Spezifikation, Bullet "Zwei Kennungs-Arten".
+      Beispiel fuer eine RICHTIGE Antwort: Der Sortier-Algorithmus führt eine einzelne Anforderung technisch aus und bekommt deshalb deren Unter-Kennung, also LH-FA-03.a. Der Abschnitt mit den Default-Werten gehört zu keiner einzelnen Anforderung und erhält eine eigene SPEC-001 (fortlaufend je Datei gezählt); eine Anforderungs-ID vergibt man dafür nicht.
+      Beispiel fuer eine FALSCHE Antwort: Beide bekommen eine Kennung aus der Anforderungs-Reihe: Der Sortier-Algorithmus wird LH-FA-03.a, die Default-Werte bekommen LH-NFA-010, weil Timeouts und Seitengrößen nichtfunktionale Anforderungen sind und damit im Lastenheft-Schema geführt werden.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

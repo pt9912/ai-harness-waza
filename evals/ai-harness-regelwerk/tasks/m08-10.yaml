@@ -6,6 +6,7 @@ description: |
   behauptet): Plan-Korrektur mit Plan-Diff und ADR-konforme Neu-
   Implementierung. Herabstufen des Findings ist der falsche vierte Pfad.
     Pruefung: Regex fuer die Kernaussage plus LLM-Judge (statt Vokabel-Abgleich).
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
 tags:
 - m08-10
 - stufe-3
@@ -23,7 +24,6 @@ graders:
   config:
     regex_match:
     - (?i)architect
-    - (?i)plan-?\s?diff|plan-?\s?korrektur
 - type: prompt
   name: judge_m08_10_001
   config:

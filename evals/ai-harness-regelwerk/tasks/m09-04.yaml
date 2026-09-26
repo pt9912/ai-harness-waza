@@ -10,31 +10,33 @@ description: |
   Diagnose Plan-Defekt (Diff falsch geschnitten), (3) die konkrete Korrektur
   ueber eine Schicht-Schnittstelle statt direktem Import (Repository-
   Interface, Adapter, Wrapper, Fassade).
-tags: [m09-04, stufe-3, modul-09]
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
+tags:
+- m09-04
+- stufe-3
+- modul-09
 inputs:
-  prompt: "Nach dem AI-Harness-Regelwerk: Bei meinem Implementierungslauf ist make gates rot (siehe Log und Plan-Auszug in der Datei). Wohin im Ablauf gehe ich zurueck, wie diagnostiziere ich die Ursache, und was aendere ich konkret?"
+  prompt: 'Nach dem AI-Harness-Regelwerk: Bei meinem Implementierungslauf ist make gates rot (siehe Log und Plan-Auszug in der Datei). Wohin im Ablauf gehe ich zurueck, wie diagnostiziere ich die Ursache, und was aendere ich konkret?'
   files:
-    - path: m09-04-gates-log-arch-check.md
+  - path: m09-04-gates-log-arch-check.md
 expected:
   outcomes:
-    - type: task_completed
+  - type: task_completed
 graders:
-  - type: text
-    name: rueckkehr_diagnose_korrektur
-    config:
-      regex_match:
-        - '(?i)(schritt|step)\s?4|(6|sechs)\s*(→|->|-->|=>|nach|zu)\s*4|planschritt|zur(ü|ue)ck\s+(in|zu|zum|zur|auf)\s+(den\s+)?(planungs|plan)'
-        - '(?i)plan-?\s?(defekt|fehler|m(ä|ae)ngel)|(defekt|fehler|ursache|problem)\w*\s+(liegt\s+|steckt\s+|sitzt\s+)?(im|in|am|beim)\s+(slice-?)?plan|(falsch|fehlerhaft)\w*\s+(ge|zu)?schnitten|diff\s+(ist\s+|war\s+)?(falsch|fehlerhaft)'
-        - '(?i)repository|adapter|wrapper|fassade|facade|interface|schnittstelle'
-  - type: prompt
-    name: judge_m09_04_001
-    config:
-      model: deepseek-v4.1-flash:cloud
-      continue_session: true
-      prompt: |
-        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): Rueckkehr zu Schritt 4 (Plan verfeinern, Kante 6->4), nicht zu Schritt 1; Diagnose: ADR im Kontext bekannt = Plan-Defekt (Diff falsch geschnitten), nicht Kontext-Defekt; Korrektur z. B. Adapter-Wrapper statt direktem Import (modul-09-implementierung.md §Rücksprungkanten-Regeln, Punkt "Roter arch-check in Schritt 6").
-        Beispiel fuer eine RICHTIGE Antwort: Gehe zu Schritt 4 zurueck, also in die Planung, nicht zu Schritt 1. Die ADR-0004 steht im Slice-Plan (Abschnitt 2) und war damit bekannt. Die Ursache ist also ein Fehler im Plan: Der Diff wurde falsch geschnitten, weil der Plan in der Dateitabelle den direkten db-Zugriff vom Handler vorsieht. Aendere den Plan so, dass der Handler nur ueber das Repository-Interface auf die Daten zugreift, und passe dann Code und Dateiliste an.
-        Beispiel fuer eine FALSCHE Antwort: Der arch-check ist rot, weil dir die ADR-0004 nicht bekannt war. Das ist ein Kontext-Defekt, also geh zu Schritt 1 zurueck, lies die Grundlagen und die ADRs neu ein und starte den Lauf danach frisch. Am Code musst du vermutlich nichts aendern, den Import kannst du beibehalten und die Regel im Gate als Ausnahme markieren.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+- type: text
+  name: rueckkehr_diagnose_korrektur
+  config:
+    regex_match:
+    - (?i)(schritt|step)\s?4|(6|sechs)\s*(→|->|-->|=>|nach|zu)\s*4|planschritt|zur(ü|ue)ck\s+(in|zu|zum|zur|auf)\s+(den\s+)?(planungs|plan)
+- type: prompt
+  name: judge_m09_04_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Rueckkehr zu Schritt 4 (Plan verfeinern, Kante 6->4), nicht zu Schritt 1; Diagnose: ADR im Kontext bekannt = Plan-Defekt (Diff falsch geschnitten), nicht Kontext-Defekt; Korrektur z. B. Adapter-Wrapper statt direktem Import (modul-09-implementierung.md §Rücksprungkanten-Regeln, Punkt "Roter arch-check in Schritt 6").
+      Beispiel fuer eine RICHTIGE Antwort: Gehe zu Schritt 4 zurueck, also in die Planung, nicht zu Schritt 1. Die ADR-0004 steht im Slice-Plan (Abschnitt 2) und war damit bekannt. Die Ursache ist also ein Fehler im Plan: Der Diff wurde falsch geschnitten, weil der Plan in der Dateitabelle den direkten db-Zugriff vom Handler vorsieht. Aendere den Plan so, dass der Handler nur ueber das Repository-Interface auf die Daten zugreift, und passe dann Code und Dateiliste an.
+      Beispiel fuer eine FALSCHE Antwort: Der arch-check ist rot, weil dir die ADR-0004 nicht bekannt war. Das ist ein Kontext-Defekt, also geh zu Schritt 1 zurueck, lies die Grundlagen und die ADRs neu ein und starte den Lauf danach frisch. Am Code musst du vermutlich nichts aendern, den Import kannst du beibehalten und die Regel im Gate als Ausnahme markieren.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

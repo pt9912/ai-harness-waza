@@ -8,35 +8,31 @@ description: |
   Graders (Regex, case-insensitiv): (1) die MR-000-Aussage wird als falsch/nicht
   mehr haltbar bewertet bzw. korrigiert; (2) der Korrekturweg: Regeln uebernehmen
   oder Abweichungen als MR-Eintraege deklarieren.
-tags: [m02-13, stufe-3, modul-02]
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
+tags:
+- m02-13
+- stufe-3
+- modul-02
 inputs:
-  prompt: >-
-    Nach dem AI-Harness-Regelwerk: Beim Baseline-Audit haben wir
-    stichprobenartig einen Abschnitt der Baseline geprueft, der sich seit
-    unserem Tag nie geaendert hat. Zwei Regeln daraus stehen weder in unseren
-    ausgefuellten Artefakten, noch haben wir sie als Abweichung deklariert. In
-    unserer Konventionsdatei steht bisher die Aussage "keine inhaltlichen
-    Adaptionen gegenueber dem Baseline-Default". Was bedeutet der Fund fuer
-    diese Aussage, und wie geht es weiter?
+  prompt: 'Nach dem AI-Harness-Regelwerk: Beim Baseline-Audit haben wir stichprobenartig einen Abschnitt der Baseline geprueft, der sich seit unserem Tag nie geaendert hat. Zwei Regeln daraus stehen weder in unseren ausgefuellten Artefakten, noch haben wir sie als Abweichung deklariert. In unserer Konventionsdatei steht bisher die Aussage "keine inhaltlichen Adaptionen gegenueber dem Baseline-Default". Was bedeutet der Fund fuer diese Aussage, und wie geht es weiter?'
 expected:
   outcomes:
-    - type: task_completed
+  - type: task_completed
 graders:
-  - type: text
-    name: mr000_aussage_kern
-    config:
-      regex_match:
-        - '(?i)(mr-?000[^.]{0,120}(falsch|nicht\s+(mehr\s+)?(zutreffend|korrekt|haltbar|wahr)|stimmt\s+(so\s+)?nicht|unwahr|korrigier[\wäöüß]*|angepasst|anzupassen|widerlegt|unhaltbar|revidier[\wäöüß]*)|(falsch|korrigier[\wäöüß]*|stimmt\s+(so\s+)?nicht|nicht\s+mehr\s+(haltbar|wahr|zutreffend)|widerlegt|unhaltbar)[^.]{0,120}mr-?000|(aussage|behauptung|erkl(ä|ae)rung)[^.]{0,100}(falsch|nicht\s+(mehr\s+)?(zutreffend|korrekt|haltbar|wahr)|stimmt\s+nicht|widerlegt|unhaltbar))'
-        - '(?i)(mr-?eintr(ä|ae)g[\wäöüß]*|mr-?eintrag|deklarier[\wäöüß]*|abweichung[\wäöüß]*[^.]{0,80}(eintrag|eintr(ä|ae)g[\wäöüß]*|dokumentier[\wäöüß]*|festhalt[\wäöüß]*|erfass[\wäöüß]*)|(eintrag|eintr(ä|ae)g[\wäöüß]*|dokumentier[\wäöüß]*|festhalt[\wäöüß]*|erfass[\wäöüß]*)[^.]{0,80}abweichung[\wäöüß]*|(ü|ue)bernahme|(ü|ue)bernehm[\wäöüß]*)'
-  - type: prompt
-    name: judge_m02_13_001
-    config:
-      model: deepseek-v4.1-flash:cloud
-      continue_session: true
-      prompt: |
-        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): Mehrere Funde treffen nicht die einzelne Regel, sondern die MR-000-Aussage: sie ist dann falsch und wird korrigiert, durch Uebernahme der Regeln oder durch MR-Eintraege, die die Abweichungen deklarieren. BF-Markierung ist nicht die Antwort; Umfang ein Abschnitt pro Audit, keine Vollinventur. modul-02-harness-bootstrap.md §Freshness-Audit, letzter Bullet "Eine Stichprobe gegen den Bestand"; ergaenzt modul-07-carveouts.md (Diskrepanz-Klasse ausserhalb des Trichters).
-        Beispiel fuer eine RICHTIGE Antwort: Zwei nie übernommene Regeln sind kein Einzelfund, sondern treffen die MR-000-Aussage selbst: Die Behauptung "keine inhaltlichen Adaptionen" ist damit falsch und muss korrigiert werden. Entweder übernehmen wir die beiden Regeln in unsere Artefakte, oder wir legen für die Abweichungen eigene MR-Eintraege an, die sie deklarieren. Eine BF-Markierung der Sub-Area hilft dabei nicht, und eine Vollinventur ist nicht nötig, pro Audit reicht ein Abschnitt.
-        Beispiel fuer eine FALSCHE Antwort: Beide Funde behandeln wir einzeln: Jeder wird als eigener Carveout mit Auflösungs-Trigger erfasst und im nächsten Slice angegangen. Die MR-000-Aussage bleibt davon unberührt und gilt weiter, denn es handelt sich nur um zwei Ausreißer. Zusätzlich markieren wir die betroffene Sub-Area als BF, damit die Abweichung sichtbar ist.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+- type: text
+  name: mr000_aussage_kern
+  config:
+    regex_match:
+    - (?i)(mr-?000[^.]{0,120}(falsch|nicht\s+(mehr\s+)?(zutreffend|korrekt|haltbar|wahr)|stimmt\s+(so\s+)?nicht|unwahr|korrigier[\wäöüß]*|angepasst|anzupassen|widerlegt|unhaltbar|revidier[\wäöüß]*)|(falsch|korrigier[\wäöüß]*|stimmt\s+(so\s+)?nicht|nicht\s+mehr\s+(haltbar|wahr|zutreffend)|widerlegt|unhaltbar)[^.]{0,120}mr-?000|(aussage|behauptung|erkl(ä|ae)rung)[^.]{0,100}(falsch|nicht\s+(mehr\s+)?(zutreffend|korrekt|haltbar|wahr)|stimmt\s+nicht|widerlegt|unhaltbar))
+- type: prompt
+  name: judge_m02_13_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Mehrere Funde treffen nicht die einzelne Regel, sondern die MR-000-Aussage: sie ist dann falsch und wird korrigiert, durch Uebernahme der Regeln oder durch MR-Eintraege, die die Abweichungen deklarieren. BF-Markierung ist nicht die Antwort; Umfang ein Abschnitt pro Audit, keine Vollinventur. modul-02-harness-bootstrap.md §Freshness-Audit, letzter Bullet "Eine Stichprobe gegen den Bestand"; ergaenzt modul-07-carveouts.md (Diskrepanz-Klasse ausserhalb des Trichters).
+      Beispiel fuer eine RICHTIGE Antwort: Zwei nie übernommene Regeln sind kein Einzelfund, sondern treffen die MR-000-Aussage selbst: Die Behauptung "keine inhaltlichen Adaptionen" ist damit falsch und muss korrigiert werden. Entweder übernehmen wir die beiden Regeln in unsere Artefakte, oder wir legen für die Abweichungen eigene MR-Eintraege an, die sie deklarieren. Eine BF-Markierung der Sub-Area hilft dabei nicht, und eine Vollinventur ist nicht nötig, pro Audit reicht ein Abschnitt.
+      Beispiel fuer eine FALSCHE Antwort: Beide Funde behandeln wir einzeln: Jeder wird als eigener Carveout mit Auflösungs-Trigger erfasst und im nächsten Slice angegangen. Die MR-000-Aussage bleibt davon unberührt und gilt weiter, denn es handelt sich nur um zwei Ausreißer. Zusätzlich markieren wir die betroffene Sub-Area als BF, damit die Abweichung sichtbar ist.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

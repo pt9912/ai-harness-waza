@@ -6,28 +6,31 @@ description: |
   Die Rangliste hat neun Raenge.
   Grader (Regex): (1) kein Konflikt (bzw. Zustaendigkeit), (2) conventions.md steht auf keinem Rang /
   ausserhalb der Rang-Zaehlung (neun Raenge). Eine Antwort "Rang 10, Konflikt" faellt durch.
-tags: [sp-03, stufe-3, source-precedence]
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
+tags:
+- sp-03
+- stufe-3
+- source-precedence
 inputs:
-  prompt: "Nach dem AI-Harness-Regelwerk: In unserem Repo legt harness/conventions.md das ID-Schema fuer ADRs fest, AGENTS.md sagt dazu nichts. Ist das ein Konflikt in der Rangliste der Quellen, und auf welchem Rang steht harness/conventions.md?"
+  prompt: 'Nach dem AI-Harness-Regelwerk: In unserem Repo legt harness/conventions.md das ID-Schema fuer ADRs fest, AGENTS.md sagt dazu nichts. Ist das ein Konflikt in der Rangliste der Quellen, und auf welchem Rang steht harness/conventions.md?'
 expected:
   outcomes:
-    - type: task_completed
+  - type: task_completed
 graders:
-  - type: text
-    name: kein_konflikt_kein_rang
-    config:
-      regex_match:
-        - '(?i)(kein[^\s.,;:()]*\s+([^\s.,;:()]+\s+){0,2}konflikt|nicht\s+([^\s.,;:()]+\s+){0,3}konflikt|zust(ä|ae)ndigkeit)'
-        - '(?i)(kein[^\s.,;:()]*\s+([^\s.,;:()]+\s+){0,2}rang|ohne\s+(eigenen\s+)?rang|au(ß|ss)erhalb[^.\n]{0,60}rang|nicht\s+([^\s.,;:()]+\s+){0,3}(in|auf)\s+der\s+rang(liste|folge)|neun\s+r(ä|ae)nge|9\s+r(ä|ae)nge)'
-  - type: prompt
-    name: judge_sp_03_001
-    config:
-      model: deepseek-v4.1-flash:cloud
-      continue_session: true
-      prompt: |
-        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): Kein Konflikt, sondern eine Zustaendigkeit; harness/conventions.md steht auf keinem Rang (ausserhalb der Rang-Zaehlung; die Rangliste hat neun Raenge), sie ist der Konventionsspeicher fuer Form/Struktur wie ID-Schemata (SP §Source Precedence, Absatz "Die Harness-Schicht darunter").
-        Beispiel fuer eine RICHTIGE Antwort: Das ist kein Konflikt, sondern schlicht eine Zustaendigkeit. harness/conventions.md steht auf gar keinem Rang: Die Rangliste hat neun Plaetze und die Datei liegt ausserhalb dieser Zaehlung. Sie ist der Konventionsspeicher fuer Form und Struktur, etwa ID-Schemata; AGENTS.md und harness/README.md treten solche Fragen dorthin ab. Schweigt AGENTS.md dazu, muss also nichts angepasst werden.
-        Beispiel fuer eine FALSCHE Antwort: Ja, das ist ein Konflikt in der Rangliste. harness/conventions.md steht als Konventionsspeicher auf Rang 10, direkt unterhalb von harness/README.md. Da AGENTS.md auf Rang 8 hoeher steht, muss AGENTS.md das ID-Schema fuer ADRs ergaenzen, und die conventions.md wird danach angepasst.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+- type: text
+  name: kein_konflikt_kein_rang
+  config:
+    regex_match:
+    - (?i)(kein[^\s.,;:()]*\s+([^\s.,;:()]+\s+){0,2}konflikt|nicht\s+([^\s.,;:()]+\s+){0,3}konflikt|zust(ä|ae)ndigkeit)
+- type: prompt
+  name: judge_sp_03_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Kein Konflikt, sondern eine Zustaendigkeit; harness/conventions.md steht auf keinem Rang (ausserhalb der Rang-Zaehlung; die Rangliste hat neun Raenge), sie ist der Konventionsspeicher fuer Form/Struktur wie ID-Schemata (SP §Source Precedence, Absatz "Die Harness-Schicht darunter").
+      Beispiel fuer eine RICHTIGE Antwort: Das ist kein Konflikt, sondern schlicht eine Zustaendigkeit. harness/conventions.md steht auf gar keinem Rang: Die Rangliste hat neun Plaetze und die Datei liegt ausserhalb dieser Zaehlung. Sie ist der Konventionsspeicher fuer Form und Struktur, etwa ID-Schemata; AGENTS.md und harness/README.md treten solche Fragen dorthin ab. Schweigt AGENTS.md dazu, muss also nichts angepasst werden.
+      Beispiel fuer eine FALSCHE Antwort: Ja, das ist ein Konflikt in der Rangliste. harness/conventions.md steht als Konventionsspeicher auf Rang 10, direkt unterhalb von harness/README.md. Da AGENTS.md auf Rang 8 hoeher steht, muss AGENTS.md das ID-Schema fuer ADRs ergaenzen, und die conventions.md wird danach angepasst.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

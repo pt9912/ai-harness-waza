@@ -10,6 +10,7 @@ description: |
   Anforderung bleibt Waise/unbelegt/rot, nicht als belegt markieren; (3) ADR
   begruendet ("warum") und belegt/entlastet nicht. Negativ: "keine Waise
   (mehr)".
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
 tags:
 - tr-04
 - stufe-3
@@ -25,8 +26,6 @@ graders:
   config:
     regex_match:
     - (?i)(slice[^\n]{0,120}(zusage|verpflicht\w*|gebaut|umgesetzt|umsetzung|bauen|umsetzen|wann|dass)|(zusage|verpflicht\w*|gebaut|umgesetzt|umsetzung)[^\n]{0,120}slice)
-    - (?i)(?:(waise\w*|unbelegt|nicht (als )?belegt|nicht entlastet|nicht (als )?erf(ü|ue)llt|offen bleibt|bleibt offen|rot bleib\w*|bleibt rot)|ungebaut|schummel\w*|wegdr(ü|ue)ck\w*|nicht\s+(als\s+)?gr(ü|ue)n)
-    - (?i)(adr[^\n]{0,100}(warum|begr(ü|ue)nd\w*|grund|rationale|nicht[^\n]{0,20}(gebaut|umgesetzt|umsetzung|zusage))|(warum|begr(ü|ue)nd\w*)[^\n]{0,80}adr)
     regex_not_match:
     - (?i)(keine waise|nicht mehr (als )?waise|waise (mehr )?nicht)
 - type: prompt

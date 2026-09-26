@@ -4,14 +4,26 @@ description: |
   Prueft M13-01 (modul-13-quality-gates.md, Stufe 2): `|| true` gehoert an den
   Beleg-Lauf, nie an den Gate-Lauf; das Beleg-Target haengt nicht am Gate.
   Die Fixture hat beides vertauscht.
-tags: [m13-01, stufe-2, modul-13]
+    Bewertung: LLM-Judge (statt Vokabel-Abgleich).
+tags:
+- m13-01
+- stufe-2
+- modul-13
 inputs:
-  prompt: "Nach dem AI-Harness-Regelwerk: In m13-01-Makefile soll coverage-gate bei zu niedriger Coverage den Lauf abbrechen, und coverage-report soll immer eine Datei schreiben, auch wenn die Coverage rot ist. Stimmt das Makefile so? Was muss geaendert werden?"
+  prompt: 'Nach dem AI-Harness-Regelwerk: In m13-01-Makefile soll coverage-gate bei zu niedriger Coverage den Lauf abbrechen, und coverage-report soll immer eine Datei schreiben, auch wenn die Coverage rot ist. Stimmt das Makefile so? Was muss geaendert werden?'
   files:
-    - path: m13-01-Makefile
+  - path: m13-01-Makefile
 expected:
-  output_contains:
-    - "Beleg-Lauf"
-    - "Gate-Lauf"
   outcomes:
-    - type: task_completed
+  - type: task_completed
+graders:
+- type: prompt
+  name: judge_m13_01_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |-
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Nein. `|| true` gehoert an den Beleg-Lauf, nie an den Gate-Lauf; der Beleg-Lauf haengt nicht am Gate-Target (modul-13 §Gate und Beleg — zwei Rollen derselben Prüfung).
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

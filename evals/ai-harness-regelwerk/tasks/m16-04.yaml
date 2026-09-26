@@ -6,31 +6,31 @@ description: |
   Replay-Manifest mit mindestens 3 Faellen gruen.
   Grader (text, regex): (1) Entscheidung: nicht abhaken; (2) frischer Klon/Clone/
   Checkout; (3) im CI plus Image-Hash; (4) mindestens 3 (drei) Faelle im Replay-Manifest.
-tags: [m16-04, stufe-3, modul-16]
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
+tags:
+- m16-04
+- stufe-3
+- modul-16
 inputs:
-  prompt: "Nach dem AI-Harness-Regelwerk: Fuer die Produktionsfreigabe steht beim Qualitaets-Item: 'make gates lokal auf meinem Rechner gruen, Replay-Set mit 2 Faellen gruen'. Darf ich das Item abhaken?"
+  prompt: 'Nach dem AI-Harness-Regelwerk: Fuer die Produktionsfreigabe steht beim Qualitaets-Item: ''make gates lokal auf meinem Rechner gruen, Replay-Set mit 2 Faellen gruen''. Darf ich das Item abhaken?'
 expected:
   outcomes:
-    - type: task_completed
+  - type: task_completed
 graders:
-  - type: text
-    name: qualitaets_item_vollstaendig
-    config:
-      regex_match:
-        - "(?i)\\bnein\\b|nicht\\s+(\\w+\\s+){0,2}(ab|aus|erf(ü|ue)llt|ausreichend|genug|vollst)|reicht\\w*\\s+(so\\s+|damit\\s+)?nicht|noch\\s+nicht|darfst\\s+(du\\s+)?(das\\s+|es\\s+|dieses\\s+)?(item\\s+)?(so\\s+)?nicht"
-        - "(?i)(frisch|sauber|neu|leer)\\w*\\s+(klon|clone|checkout)|fresh\\s+clone|(klon|clone)\\w*\\s+(frisch|neu)"
-        - "(?i)\\bCI\\b"
-        - "(?i)image[ -]?hash"
-        - "(?i)(≥|>=|mindestens|wenigstens|zumindest|mind\\.|min\\.)\\s*(3|drei)\\b|\\b(3|drei)\\s+(f(ä|ae)lle|cases)"
-  - type: prompt
-    name: judge_m16_04_001
-    config:
-      model: deepseek-v4.1-flash:cloud
-      continue_session: true
-      prompt: |
-        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): Nein: Qualitaets-Item verlangt `make gates` gruen auf frischem Klon und im CI mit identischem Image-Hash sowie Replay-Manifest mit mindestens 3 Faellen gruen; jedes Item braucht einen Beleg (CI-Run-Link + Image-Hash, Replay-Manifest-Link) (modul-16 §Produktionsfreigabe-Checkliste, "Ein Pflicht-Item pro Phase" und "Kein Haekchen ohne Beleg-Slot").
-        Beispiel fuer eine RICHTIGE Antwort: Nein, so darfst du das Item nicht abhaken. Verlangt ist, dass make gates auf einem frischen Clone gruen laeuft und ausserdem in der CI mit demselben Image-Hash wie lokal. Lokal auf deinem Rechner reicht nicht, weil dort Altlasten und abweichende Werkzeugstaende mitspielen. Das Replay-Manifest braucht zudem mindestens drei Faelle, zwei sind zu wenig. Ausserdem gehoert an das Item ein Beleg, etwa der CI-Run-Link samt Image-Hash.
-        Beispiel fuer eine FALSCHE Antwort: Ja, du darfst abhaken. make gates ist lokal gruen und das Replay-Set mit zwei Faellen laeuft durch, damit ist das Qualitaets-Item erfuellt. Der Image-Hash im CI ist Sache der Release-Pipeline und muss hier nicht gesondert nachgewiesen werden.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+- type: text
+  name: qualitaets_item_vollstaendig
+  config:
+    regex_match:
+    - (?i)\bnein\b|nicht\s+(\w+\s+){0,2}(ab|aus|erf(ü|ue)llt|ausreichend|genug|vollst)|reicht\w*\s+(so\s+|damit\s+)?nicht|noch\s+nicht|darfst\s+(du\s+)?(das\s+|es\s+|dieses\s+)?(item\s+)?(so\s+)?nicht
+- type: prompt
+  name: judge_m16_04_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Nein: Qualitaets-Item verlangt `make gates` gruen auf frischem Klon und im CI mit identischem Image-Hash sowie Replay-Manifest mit mindestens 3 Faellen gruen; jedes Item braucht einen Beleg (CI-Run-Link + Image-Hash, Replay-Manifest-Link) (modul-16 §Produktionsfreigabe-Checkliste, "Ein Pflicht-Item pro Phase" und "Kein Haekchen ohne Beleg-Slot").
+      Beispiel fuer eine RICHTIGE Antwort: Nein, so darfst du das Item nicht abhaken. Verlangt ist, dass make gates auf einem frischen Clone gruen laeuft und ausserdem in der CI mit demselben Image-Hash wie lokal. Lokal auf deinem Rechner reicht nicht, weil dort Altlasten und abweichende Werkzeugstaende mitspielen. Das Replay-Manifest braucht zudem mindestens drei Faelle, zwei sind zu wenig. Ausserdem gehoert an das Item ein Beleg, etwa der CI-Run-Link samt Image-Hash.
+      Beispiel fuer eine FALSCHE Antwort: Ja, du darfst abhaken. make gates ist lokal gruen und das Replay-Set mit zwei Faellen laeuft durch, damit ist das Qualitaets-Item erfuellt. Der Image-Hash im CI ist Sache der Release-Pipeline und muss hier nicht gesondert nachgewiesen werden.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

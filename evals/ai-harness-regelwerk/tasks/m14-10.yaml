@@ -5,6 +5,7 @@ description: |
   Reproduzierbarkeits-Anker, nicht Deployment; fuer ein Replay braucht man den
   Image-Hash von damals (image-hash.txt), nicht das aktuelle Deployment.
     Pruefung: Regex fuer die Kernaussage plus LLM-Judge (statt Vokabel-Abgleich).
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
 tags:
 - m14-10
 - stufe-3
@@ -20,8 +21,6 @@ graders:
   config:
     regex_match:
     - (?i)image[- ]?hash
-    - (?i)\bnein\b|stimmt\s+nicht|falsch
-    - (?i)damals|sechs\s+monat|golden[- ]?set|manifest|recorded_at|aufgenommen
 - type: prompt
   name: judge_m14_10_001
   config:

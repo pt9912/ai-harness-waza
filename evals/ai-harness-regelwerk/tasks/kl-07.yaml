@@ -7,28 +7,31 @@ description: |
   Grader (Regex): (1) Trigger-Audit als Massnahme, (2) Ort/Zeitpunkt: Closure der Welle (beide
   Schreibweisen Welle-/Wellen-Closure). Prompt praezisiert, dass das Repo in Wellen arbeitet
   (ohne Wellen liefe das Audit bei jeder Slice-Closure).
-tags: [kl-07, stufe-2, klassifikation]
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
+tags:
+- kl-07
+- stufe-2
+- klassifikation
 inputs:
   prompt: 'Nach dem AI-Harness-Regelwerk: Wir arbeiten in Wellen. Bei ADR-0012 ist der dort festgelegte Re-Evaluierungs-Trigger längst eingetreten (Latenz über 200 ms), die ADR wird aber unbesehen weiter befolgt. Mit welcher Maßnahme fängt der Harness solche Fälle systematisch ein, und wann läuft sie?'
 expected:
   outcomes:
-    - type: task_completed
+  - type: task_completed
 graders:
-  - type: text
-    name: trigger_audit_in_closure
-    config:
-      regex_match:
-        - '(?i)trigger[- ]?audit'
-        - '(?i)(wellen?[- ]?closure|closure[^.\n]{0,25}(der|einer|jeder|von)\s+welle|welle[^.\n]{0,40}(abschluss|schlie(ß|ss)|closure|abgeschlossen)|abschluss[^.\n]{0,25}welle)'
-  - type: prompt
-    name: judge_kl_07_001
-    config:
-      model: deepseek-v4.1-flash:cloud
-      continue_session: true
-      prompt: |
-        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): Ein Trigger-Audit in der Welle-Closure (Abgelaufene Entscheidung: ADR mit eingetretenem Re-Evaluierungs-Trigger -> bestaetigen oder Folge-ADR mit supersedes); kein Konsistenz-Agent in CI (KL §Entropy Management, Punkt "Abgelaufene Entscheidung"; modul-04 "Geprueft im Trigger-Audit der Welle-Closure"; modul-06 Closure Schritt 2).
-        Beispiel fuer eine RICHTIGE Antwort: Der Harness faengt das mit einem Trigger-Audit ein. Es prueft alle Artefakte mit Trigger, also auch ADRs, deren Re-Evaluierungs-Trigger eingetreten ist, und verlangt dann Bestaetigung oder eine Folge-ADR mit supersedes. Es laeuft beim Abschluss jeder Welle, als Schritt 2 der Closure der Welle. Ein Konsistenz-Agent in CI ist dafuer nicht vorgesehen.
-        Beispiel fuer eine FALSCHE Antwort: Dafuer setzt der Harness einen Konsistenz-Agenten in CI ein, der ADRs bei jedem Pull Request gegen die aktuellen Messwerte abgleicht. Bei Latenz ueber 200 ms schlaegt er Alarm. Zusaetzlich sollte das Team die ADR beim naechsten Sprint-Review neu bewerten.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+- type: text
+  name: trigger_audit_in_closure
+  config:
+    regex_match:
+    - (?i)trigger[- ]?audit
+- type: prompt
+  name: judge_kl_07_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Ein Trigger-Audit in der Welle-Closure (Abgelaufene Entscheidung: ADR mit eingetretenem Re-Evaluierungs-Trigger -> bestaetigen oder Folge-ADR mit supersedes); kein Konsistenz-Agent in CI (KL §Entropy Management, Punkt "Abgelaufene Entscheidung"; modul-04 "Geprueft im Trigger-Audit der Welle-Closure"; modul-06 Closure Schritt 2).
+      Beispiel fuer eine RICHTIGE Antwort: Der Harness faengt das mit einem Trigger-Audit ein. Es prueft alle Artefakte mit Trigger, also auch ADRs, deren Re-Evaluierungs-Trigger eingetreten ist, und verlangt dann Bestaetigung oder eine Folge-ADR mit supersedes. Es laeuft beim Abschluss jeder Welle, als Schritt 2 der Closure der Welle. Ein Konsistenz-Agent in CI ist dafuer nicht vorgesehen.
+      Beispiel fuer eine FALSCHE Antwort: Dafuer setzt der Harness einen Konsistenz-Agenten in CI ein, der ADRs bei jedem Pull Request gegen die aktuellen Messwerte abgleicht. Bei Latenz ueber 200 ms schlaegt er Alarm. Zusaetzlich sollte das Team die ADR beim naechsten Sprint-Review neu bewerten.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

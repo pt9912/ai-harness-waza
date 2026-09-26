@@ -4,11 +4,24 @@ description: |
   Prueft M0-02 (modul-00-einfuehrung.md, Stufe 2): Was in jedem Lauf relevant
   ist, gehoert in AGENTS.md oder eine Fitness Function, nicht in den Prompt
   (der sonst zur Anti-Spec wird).
-tags: [m0-02, stufe-2, modul-00]
+    Bewertung: LLM-Judge (statt Vokabel-Abgleich).
+tags:
+- m0-02
+- stufe-2
+- modul-00
 inputs:
-  prompt: "Nach dem AI-Harness-Regelwerk: Bei jedem Auftrag an den Agenten schreiben wir dieselben Sätze in den Prompt: 'Nutze immer make test' und 'Ändere nie das Datenbankschema ohne Migration'. Das wird lästig und wir vergessen es manchmal. Wohin gehört so etwas stattdessen?"
+  prompt: 'Nach dem AI-Harness-Regelwerk: Bei jedem Auftrag an den Agenten schreiben wir dieselben Sätze in den Prompt: ''Nutze immer make test'' und ''Ändere nie das Datenbankschema ohne Migration''. Das wird lästig und wir vergessen es manchmal. Wohin gehört so etwas stattdessen?'
 expected:
-  output_contains:
-    - "Fitness Function"
   outcomes:
-    - type: task_completed
+  - type: task_completed
+graders:
+- type: prompt
+  name: judge_m0_02_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |-
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Was in jedem Lauf relevant ist, gehoert in AGENTS.md oder eine Fitness Function, nicht in den Prompt (der sonst zur Anti-Spec wird). modul-00-einfuehrung.md §Regeln gegen typische Fehlannahmen, 2. Punkt.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

@@ -8,29 +8,31 @@ description: |
   Grader (text/regex): (1) Gate in der ADR als `make verify-slice`; (2) Slice in
   der ADR als blosse Kennung slice-audit-log-hardening (nicht nur als
   .md-Pfad); (3) AGENTS.md verlinkt direkt auf harness/sensors/verify-slice.md.
-tags: [hd-13, stufe-3, hd]
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
+tags:
+- hd-13
+- stufe-3
+- hd
 inputs:
-  prompt: "Nach dem AI-Harness-Regelwerk: Ich schreibe eine ADR, die akzeptiert werden soll. Sie stützt sich auf das Gate verify-slice (harness/sensors/verify-slice.md) und auf den Slice docs/plan/planning/in-progress/slice-audit-log-hardening.md. Wie nenne ich beides in der ADR? Und wie verweise ich in der AGENTS.md auf das Gate?"
+  prompt: 'Nach dem AI-Harness-Regelwerk: Ich schreibe eine ADR, die akzeptiert werden soll. Sie stützt sich auf das Gate verify-slice (harness/sensors/verify-slice.md) und auf den Slice docs/plan/planning/in-progress/slice-audit-log-hardening.md. Wie nenne ich beides in der ADR? Und wie verweise ich in der AGENTS.md auf das Gate?'
 expected:
   outcomes:
-    - type: task_completed
+  - type: task_completed
 graders:
-  - type: text
-    name: kennung_statt_pfad
-    config:
-      regex_match:
-        - '(?i)make[ -]verify-slice'
-        - '(?i)slice-audit-log-hardening(`|\s|,|;|:|\)|\.\s|\.$|$)'
-        - '(?i)(agents\.md[^\n]{0,250}(verlink\w*|link\w*|direkt\w*)[^\n]{0,250}harness/sensors/verify-slice\.md|(verlink\w*|link\w*|direkt\w*)[^\n]{0,120}harness/sensors/verify-slice\.md[^\n]{0,200}agents\.md)'
-  - type: prompt
-    name: judge_hd_13_001
-    config:
-      model: deepseek-v4.1-flash:cloud
-      continue_session: true
-      prompt: |
-        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): In der Accepted-ADR (einfrierend) nennt man das Gate als Token `make verify-slice` (nicht als Pfad auf harness/sensors/verify-slice.md) und den Slice als `slice-audit-log-hardening` (nicht als docs/plan/planning/in-progress/...md-Pfad). In der AGENTS.md (lebendes Artefakt) wird weiter direkt auf `harness/sensors/verify-slice.md` verlinkt. grundlagen-harness-dateien.md, Absaetze "Deshalb wird die Datei direkt adressiert" und "Ein einfrierendes Artefakt nennt ein prozess-bewegtes bei seiner Kennung" (Z. 303-344).
-        Beispiel fuer eine RICHTIGE Antwort: In der Accepted-ADR nennst du das Gate als Kennung `make verify-slice` und den Slice als `slice-audit-log-hardening`, jeweils ohne Pfad, denn die ADR friert ein und der Slice wandert später durch die Verzeichnisse. In der AGENTS.md, die lebt und nachgezogen wird, verlinkst du dagegen direkt auf `harness/sensors/verify-slice.md`. Bricht der Link, ist das gewollt.
-        Beispiel fuer eine FALSCHE Antwort: In der ADR nennst du das Gate als `make verify-slice`. Den Slice verlinkst du mit vollem Pfad docs/plan/planning/in-progress/slice-audit-log-hardening.md, damit Leser ihn direkt finden. In der AGENTS.md verlinkst du auf harness/sensors/verify-slice.md.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+- type: text
+  name: kennung_statt_pfad
+  config:
+    regex_match:
+    - (?i)make[ -]verify-slice
+- type: prompt
+  name: judge_hd_13_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): In der Accepted-ADR (einfrierend) nennt man das Gate als Token `make verify-slice` (nicht als Pfad auf harness/sensors/verify-slice.md) und den Slice als `slice-audit-log-hardening` (nicht als docs/plan/planning/in-progress/...md-Pfad). In der AGENTS.md (lebendes Artefakt) wird weiter direkt auf `harness/sensors/verify-slice.md` verlinkt. grundlagen-harness-dateien.md, Absaetze "Deshalb wird die Datei direkt adressiert" und "Ein einfrierendes Artefakt nennt ein prozess-bewegtes bei seiner Kennung" (Z. 303-344).
+      Beispiel fuer eine RICHTIGE Antwort: In der Accepted-ADR nennst du das Gate als Kennung `make verify-slice` und den Slice als `slice-audit-log-hardening`, jeweils ohne Pfad, denn die ADR friert ein und der Slice wandert später durch die Verzeichnisse. In der AGENTS.md, die lebt und nachgezogen wird, verlinkst du dagegen direkt auf `harness/sensors/verify-slice.md`. Bricht der Link, ist das gewollt.
+      Beispiel fuer eine FALSCHE Antwort: In der ADR nennst du das Gate als `make verify-slice`. Den Slice verlinkst du mit vollem Pfad docs/plan/planning/in-progress/slice-audit-log-hardening.md, damit Leser ihn direkt finden. In der AGENTS.md verlinkst du auf harness/sensors/verify-slice.md.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

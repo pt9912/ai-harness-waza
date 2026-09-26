@@ -6,6 +6,7 @@ description: |
   bewegt den Zaehler nicht (benannt, nicht gezaehlt). Die Fixture enthaelt
   vier Funde, aber nur zwei abgeschlossene Vorgaenge.
     Pruefung: Regex fuer die Kernaussage plus LLM-Judge (statt Vokabel-Abgleich).
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
 tags:
 - m06-11
 - stufe-2
@@ -23,7 +24,6 @@ graders:
   config:
     regex_match:
     - (?i)z(ä|ae)hler[\s\S]{0,150}(\b2\b|zwei)|(\b2\b|zwei)[\s\S]{0,80}z(ä|ae)hl
-    - (?i)(noch\s+)?nicht\s+regelreif|kein\w*\s+regelreif|unter\s+(der\s+)?(3|drei)|weniger\s+als\s+(3|drei)
 - type: prompt
   name: judge_m06_11_001
   config:

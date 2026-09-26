@@ -7,29 +7,30 @@ description: |
   Grader (Regex): (1) nicht zulaessig, (2) eigener/getrennter Commit fuer die Lastenheft-Aenderung,
   (3) dieser Commit liegt vor dem umsetzenden Slice bzw. der Umsetzung. "Review-Griff" wird nicht mehr
   verlangt, da der Prompt die Durchsetzungsfrage nicht stellt.
-tags: [sp-11, stufe-3, source-precedence]
+tags:
+- sp-11
+- stufe-3
+- source-precedence
 inputs:
-  prompt: "Nach dem AI-Harness-Regelwerk: Ich bin Solo-Entwickler und zugleich mein eigener Auftraggeber, es gibt kein Ticketsystem. Das Lastenheft steht auf Accepted. Ich will LH-FA-07 aendern und die Umsetzung im Code gleich im selben Commit mitliefern, weil ich ja niemandem Rechenschaft schulde. Ist das so zulaessig, und wie sieht das saubere Vorgehen aus?"
+  prompt: 'Nach dem AI-Harness-Regelwerk: Ich bin Solo-Entwickler und zugleich mein eigener Auftraggeber, es gibt kein Ticketsystem. Das Lastenheft steht auf Accepted. Ich will LH-FA-07 aendern und die Umsetzung im Code gleich im selben Commit mitliefern, weil ich ja niemandem Rechenschaft schulde. Ist das so zulaessig, und wie sieht das saubere Vorgehen aus?'
 expected:
   outcomes:
-    - type: task_completed
+  - type: task_completed
 graders:
-  - type: text
-    name: trennung_per_commit
-    config:
-      regex_match:
-        - '(?i)(nicht\s+([^\s.,;:()]+\s+){0,2}zul(ä|ae)ssig|unzul(ä|ae)ssig|\bnein\b|nicht\s+(so\s+)?(erlaubt|m(ö|oe)glich|sauber|konform|regelkonform)|geht\s+nicht|nicht\s+(im\s+)?selben\s+commit)'
-        - '(?i)(eigene[nm]?\s+([^\s.,;:()]+\s+){0,2}commit|separate[nm]?\s+([^\s.,;:()]+\s+){0,2}commit|getrennte[nm]?\s+([^\s.,;:()]+\s+){0,2}commit|zwei\s+(\w+\s+)?commits|zwei\s+getrennte)'
-        - '(?i)(vor\s+(dem|der|den)\s+([^\s.,;:()]+\s+){0,3}(slice|umsetz|code|implementier)|(zuerst|zun(ä|ae)chst|vorher|davor|vorausgehen|vorangehen|vorgelagert)[^.\n]{0,80}(lastenheft|commit)|(lastenheft|change[ -]?request|cr\b)[^.\n]{0,80}(zuerst|zun(ä|ae)chst|vorher|davor|vorab)|erst\s+([^\s.,;:()]+\s+){0,3}(lastenheft|lh-|change|cr\b)|(danach|anschlie(ß|ss)end|dann|folgt|nachgelagert|nachher)[^.\n]{0,60}(slice|umsetz|code|implementier))'
-  - type: prompt
-    name: judge_sp_11_001
-    config:
-      model: deepseek-v4.1-flash:cloud
-      continue_session: true
-      prompt: |
-        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): Nicht zulaessig. Trennung von Entscheidung und Umsetzung bleibt auch ohne Ticket: Der angenommene CR aendert in einem eigenen Commit ausschliesslich das Lastenheft und liegt vor dem umsetzenden Slice; Verweis-Spalte nennt diesen Vorgang statt Ticket. Ein Sensor dafuer existiert nicht, es bleibt ein Review-Griff (SP §Spec-Stratifizierung, Absatz "Fallen Auftraggeber- und Entwickler-Rolle zusammen"; Status Accepted -> jede Aenderung ist Vertragsaenderung).
-        Beispiel fuer eine RICHTIGE Antwort: Nein, so ist das nicht zulaessig. Dass du selbst der Auftraggeber bist, hebt die Trennung von Entscheidung und Umsetzung nicht auf, es fehlt nur die Ticket-Form. Erst kommt die Aenderung an LH-FA-07 als eigener Commit, der ausschliesslich das Lastenheft beruehrt, samt Historie-Zeile und Version-Bump. Danach folgt in einem separaten Commit der Slice, der die Aenderung im Code umsetzt.
-        Beispiel fuer eine FALSCHE Antwort: Ja, das ist zulaessig. Wenn du Auftraggeber und Entwickler zugleich bist, gibt es niemanden, dem du Rechenschaft schuldest, und ein Change Request waere reine Buerokratie. Du kannst LH-FA-07 und die Umsetzung in einem einzigen Commit liefern und die Aenderung in der Commit-Message beschreiben.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+- type: text
+  name: trennung_per_commit
+  config:
+    regex_match:
+    - (?i)(nicht\s+([^\s.,;:()]+\s+){0,2}zul(ä|ae)ssig|unzul(ä|ae)ssig|\bnein\b|nicht\s+(so\s+)?(erlaubt|m(ö|oe)glich|sauber|konform|regelkonform)|geht\s+nicht|nicht\s+(im\s+)?selben\s+commit)
+- type: prompt
+  name: judge_sp_11_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Nicht zulaessig. Trennung von Entscheidung und Umsetzung bleibt auch ohne Ticket: Der angenommene CR aendert in einem eigenen Commit ausschliesslich das Lastenheft und liegt vor dem umsetzenden Slice; Verweis-Spalte nennt diesen Vorgang statt Ticket. Ein Sensor dafuer existiert nicht, es bleibt ein Review-Griff (SP §Spec-Stratifizierung, Absatz "Fallen Auftraggeber- und Entwickler-Rolle zusammen"; Status Accepted -> jede Aenderung ist Vertragsaenderung).
+      Beispiel fuer eine RICHTIGE Antwort: Nein, so ist das nicht zulaessig. Dass du selbst der Auftraggeber bist, hebt die Trennung von Entscheidung und Umsetzung nicht auf, es fehlt nur die Ticket-Form. Erst kommt die Aenderung an LH-FA-07 als eigener Commit, der ausschliesslich das Lastenheft beruehrt, samt Historie-Zeile und Version-Bump. Danach folgt in einem separaten Commit der Slice, der die Aenderung im Code umsetzt.
+      Beispiel fuer eine FALSCHE Antwort: Ja, das ist zulaessig. Wenn du Auftraggeber und Entwickler zugleich bist, gibt es niemanden, dem du Rechenschaft schuldest, und ein Change Request waere reine Buerokratie. Du kannst LH-FA-07 und die Umsetzung in einem einzigen Commit liefern und die Aenderung in der Commit-Message beschreiben.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

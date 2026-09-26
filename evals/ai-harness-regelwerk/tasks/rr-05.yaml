@@ -7,30 +7,33 @@ description: |
   Grader (Regex): (1) die Datei faellt durch (Gate schlaegt fehl), (2) ohne Ausnahme fuer die Historie
   (kein ausgenommener Abschnitt / ganzes Dokument / auch in der Historie). "ausgenommene" allein wird
   nicht mehr verlangt, da die Fehlantwort "Historie ist ausgenommene Sektion" den Begriff enthaelt.
-tags: [rr-05, stufe-3, referenz-richtung]
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
+tags:
+- rr-05
+- stufe-3
+- referenz-richtung
 inputs:
-  prompt: "Nach dem AI-Harness-Regelwerk: Ich will lastenheft.md so committen. Die ADR-Nummer steht ja nur ganz unten in der Historie-Tabelle am Dokumentrand. Geht die Datei so durch die Pruefungen des Harness, oder gibt es ein Problem?"
+  prompt: 'Nach dem AI-Harness-Regelwerk: Ich will lastenheft.md so committen. Die ADR-Nummer steht ja nur ganz unten in der Historie-Tabelle am Dokumentrand. Geht die Datei so durch die Pruefungen des Harness, oder gibt es ein Problem?'
   files:
-    - path: rr-05-lastenheft.md
+  - path: rr-05-lastenheft.md
 expected:
   outcomes:
-    - type: task_completed
+  - type: task_completed
 graders:
-  - type: text
-    name: gate_faellt_durch_ohne_ausnahme
-    config:
-      regex_match:
-        - '(?i)(f(ä|ae)llt\s+([^\s.,;:()]+\s+){0,2}durch|schl(ä|ae)gt\s+fehl|\bfail|bricht\s+ab|nicht\s+([^\s.,;:()]+\s+){0,2}(durch|bestehen|bestanden)|scheitert|geht\s+nicht\s+durch|(wird|w(ü|ue)rde)\s+([^\s.,;:()]+\s+){0,3}(abgelehnt|blockiert|gestoppt|beanstandet)|ist\s+ein\s+problem|gibt\s+ein\s+problem)'
-        - '(?i)(kein[^\s.,;:()]*\s+([^\s.,;:()]+\s+){0,2}(ausnahme|ausgenommen)|nicht\s+([^\s.,;:()]+\s+){0,3}ausgenommen|ohne\s+(ausnahme|ausgenommene)|ganze[ns]?\s+(dokument|datei)|gesamte[ns]?\s+(dokument|datei)|(auch|ebenfalls)[^.\n]{0,40}historie|historie[^.\n]{0,40}(eingeschlossen|mit\s+erfasst|mitgepr(ü|ue)ft|miterfasst))'
-  - type: prompt
-    name: judge_rr_05_001
-    config:
-      model: deepseek-v4.1-flash:cloud
-      continue_session: true
-      prompt: |
-        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): Datei faellt durch. Der maschinelle Gate (fail-closed in make verify) laesst ein Spec-Stratum durchfallen, das `ADR-` oder `slice-` enthaelt, ohne ausgenommene Sektion; er laeuft ueber das ganze Dokument, also auch ueber die Historie-Tabelle. Provenance in der Historie gilt nur auf der Planungs-Ebene; die Verweis-Spalte des Vertrags traegt nur den externen CR (RR Regel 5; RR §Pruefung, "Maschineller Gate").
-        Beispiel fuer eine RICHTIGE Antwort: Nein, die Datei geht so nicht durch. Das maschinelle Gate in make verify laeuft ueber das ganze Dokument und laesst ein Spec-Stratum durchfallen, sobald dort ADR- oder slice- steht, auch in der Historie-Tabelle. Fuer Lastenhefte gibt es keine Ausnahme fuer die Historie. Die Verweis-Spalte darf nur den externen Change Request nennen, die ADR-0003 muss aus der Zeile raus.
-        Beispiel fuer eine FALSCHE Antwort: Die Datei geht durch die Pruefungen. Die ADR-Nummer steht nur in der Historie-Tabelle am Dokumentrand, und das ist nach Regel 5 als Provenance erlaubt, die Historie ist eine ausgenommene Sektion. Das Gate prueft ADR- und slice-Verweise nur im Koerper des Dokuments, es gibt also kein Problem beim Commit.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+- type: text
+  name: gate_faellt_durch_ohne_ausnahme
+  config:
+    regex_match:
+    - (?i)(f(ä|ae)llt\s+([^\s.,;:()]+\s+){0,2}durch|schl(ä|ae)gt\s+fehl|\bfail|bricht\s+ab|nicht\s+([^\s.,;:()]+\s+){0,2}(durch|bestehen|bestanden)|scheitert|geht\s+nicht\s+durch|(wird|w(ü|ue)rde)\s+([^\s.,;:()]+\s+){0,3}(abgelehnt|blockiert|gestoppt|beanstandet)|ist\s+ein\s+problem|gibt\s+ein\s+problem)
+- type: prompt
+  name: judge_rr_05_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Datei faellt durch. Der maschinelle Gate (fail-closed in make verify) laesst ein Spec-Stratum durchfallen, das `ADR-` oder `slice-` enthaelt, ohne ausgenommene Sektion; er laeuft ueber das ganze Dokument, also auch ueber die Historie-Tabelle. Provenance in der Historie gilt nur auf der Planungs-Ebene; die Verweis-Spalte des Vertrags traegt nur den externen CR (RR Regel 5; RR §Pruefung, "Maschineller Gate").
+      Beispiel fuer eine RICHTIGE Antwort: Nein, die Datei geht so nicht durch. Das maschinelle Gate in make verify laeuft ueber das ganze Dokument und laesst ein Spec-Stratum durchfallen, sobald dort ADR- oder slice- steht, auch in der Historie-Tabelle. Fuer Lastenhefte gibt es keine Ausnahme fuer die Historie. Die Verweis-Spalte darf nur den externen Change Request nennen, die ADR-0003 muss aus der Zeile raus.
+      Beispiel fuer eine FALSCHE Antwort: Die Datei geht durch die Pruefungen. Die ADR-Nummer steht nur in der Historie-Tabelle am Dokumentrand, und das ist nach Regel 5 als Provenance erlaubt, die Historie ist eine ausgenommene Sektion. Das Gate prueft ADR- und slice-Verweise nur im Koerper des Dokuments, es gibt also kein Problem beim Commit.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

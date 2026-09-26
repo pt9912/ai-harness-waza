@@ -8,34 +8,33 @@ description: |
   Graders (Regex, ae/ue-tolerant): (1) der Slice-Verweis (slice-031) wird entfernt
   bzw. als unzulaessig benannt; (2) die Anforderung wird nicht kopiert, nur
   referenziert; (3) Begruendung Referenz-Richtung aufwaerts/stabilere Quelle.
-tags: [m04-06, stufe-3, modul-04]
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
+tags:
+- m04-06
+- stufe-3
+- modul-04
 inputs:
-  prompt: >-
-    Nach dem AI-Harness-Regelwerk: Bitte pruefe den ADR-Entwurf (siehe Datei)
-    auf den Abschnitt "Kontext" und sag mir konkret, was dort zu aendern ist
-    und warum. Die uebrigen Abschnitte sind bereits abgestimmt.
+  prompt: 'Nach dem AI-Harness-Regelwerk: Bitte pruefe den ADR-Entwurf (siehe Datei) auf den Abschnitt "Kontext" und sag mir konkret, was dort zu aendern ist und warum. Die uebrigen Abschnitte sind bereits abgestimmt.'
   files:
-    - path: m04-06-adr-entwurf.md
+  - path: m04-06-adr-entwurf.md
 expected:
   outcomes:
-    - type: task_completed
+  - type: task_completed
 graders:
-  - type: text
-    name: adr_kontext_kern
-    config:
-      regex_match:
-        - '(?i)(slice-?0?31[^.]{0,150}(entfern[\wäöüß]*|streich[\wäöüß]*|l(ö|oe)sch[\wäöüß]*|raus|weglass[\wäöüß]*|abw(ä|ae)rts|geh(ö|oe)rt\s+([\wäöüß]+\s+){0,2}nicht|darf\s+([\wäöüß]+\s+){0,3}nicht|nicht\s+(in|im|hier|dort)|kein[\wäöüß]*\s+([\wäöüß]+\s+){0,1}(verweis|bezug|referenz))|(entfern[\wäöüß]*|streich[\wäöüß]*|l(ö|oe)sch[\wäöüß]*|weglass[\wäöüß]*|kein[\wäöüß]*\s+([\wäöüß]+\s+){0,1}(verweis|bezug|referenz))[^.]{0,100}slice|slice-?verweis[^.]{0,80}(entfern[\wäöüß]*|streich[\wäöüß]*|l(ö|oe)sch[\wäöüß]*|weglass[\wäöüß]*|abw(ä|ae)rts|geh(ö|oe)rt\s+([\wäöüß]+\s+){0,2}nicht|darf\s+([\wäöüß]+\s+){0,3}nicht))'
-        - '(?i)((nicht|kein[\wäöüß]*|statt)[^.]{0,60}(kopier[\wäöüß]*|wiederhol[\wäöüß]*|zitier[\wäöüß]*|wortw(ö|oe)rtlich|abschreib[\wäöüß]*|duplizier[\wäöüß]*)|(kopier[\wäöüß]*|wiederhol[\wäöüß]*|zitier[\wäöüß]*|duplizier[\wäöüß]*|wortw(ö|oe)rtlich)[^.]{0,80}(nicht|entfern[\wäöüß]*|streich[\wäöüß]*|l(ö|oe)sch[\wäöüß]*|ersetz[\wäöüß]*)|(nur|lediglich)[^.]{0,40}(verweis|referenz|verlink[\wäöüß]*|referenzier[\wäöüß]*))'
-        - '(?i)(aufw(ä|ae)rts|stabil(er|ere|eren|ste|sten)?\s+(quelle|ebene|stratum|schicht)|nach\s+oben|referenz-?richtung|\bSDP\b|(stabilit(ä|ae)ts-?rang))'
-  - type: prompt
-    name: judge_m04_06_001
-    config:
-      model: deepseek-v4.1-flash:cloud
-      continue_session: true
-      prompt: |
-        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): Der Kontext soll die Anforderung (LH-FA-020) nur referenzieren, nicht wortwoertlich kopieren, und aufwaerts auf die stabilere Quelle zeigen, nie abwaerts auf einen Slice (slice-031-csv-export entfernen). modul-04-adrs.md §Ziel-Form: ADR (MADR), erster Bullet; grundlagen-referenz-richtung.md.
-        Beispiel fuer eine RICHTIGE Antwort: Im Kontext ist die Anforderung LH-FA-020 wörtlich kopiert. Das sollte entfallen: Der Kontext referenziert nur die Anforderung (Bezug LH-FA-020) und wiederholt sie nicht. Außerdem muss der Verweis auf slice-031-csv-export raus. Referenzen laufen nur aufwärts zur stabileren Quelle, das Lastenheft ist stabiler als ein Slice; ein Verweis auf den Slice wäre eine Abwärts-Referenz.
-        Beispiel fuer eine FALSCHE Antwort: Der Kontext ist zu lang: Kürze die Anforderung auf den Kern. Der Verweis auf slice-031-csv-export ist dagegen gut, denn er zeigt, wo die Entscheidung umgesetzt wird, und bleibt stehen. Verweise gehen aufwaerts zum Lastenheft, deshalb bleibt der Bezug LH-FA-020 im Kopf.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+- type: text
+  name: adr_kontext_kern
+  config:
+    regex_match:
+    - (?i)(slice-?0?31[^.]{0,150}(entfern[\wäöüß]*|streich[\wäöüß]*|l(ö|oe)sch[\wäöüß]*|raus|weglass[\wäöüß]*|abw(ä|ae)rts|geh(ö|oe)rt\s+([\wäöüß]+\s+){0,2}nicht|darf\s+([\wäöüß]+\s+){0,3}nicht|nicht\s+(in|im|hier|dort)|kein[\wäöüß]*\s+([\wäöüß]+\s+){0,1}(verweis|bezug|referenz))|(entfern[\wäöüß]*|streich[\wäöüß]*|l(ö|oe)sch[\wäöüß]*|weglass[\wäöüß]*|kein[\wäöüß]*\s+([\wäöüß]+\s+){0,1}(verweis|bezug|referenz))[^.]{0,100}slice|slice-?verweis[^.]{0,80}(entfern[\wäöüß]*|streich[\wäöüß]*|l(ö|oe)sch[\wäöüß]*|weglass[\wäöüß]*|abw(ä|ae)rts|geh(ö|oe)rt\s+([\wäöüß]+\s+){0,2}nicht|darf\s+([\wäöüß]+\s+){0,3}nicht))
+- type: prompt
+  name: judge_m04_06_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Der Kontext soll die Anforderung (LH-FA-020) nur referenzieren, nicht wortwoertlich kopieren, und aufwaerts auf die stabilere Quelle zeigen, nie abwaerts auf einen Slice (slice-031-csv-export entfernen). modul-04-adrs.md §Ziel-Form: ADR (MADR), erster Bullet; grundlagen-referenz-richtung.md.
+      Beispiel fuer eine RICHTIGE Antwort: Im Kontext ist die Anforderung LH-FA-020 wörtlich kopiert. Das sollte entfallen: Der Kontext referenziert nur die Anforderung (Bezug LH-FA-020) und wiederholt sie nicht. Außerdem muss der Verweis auf slice-031-csv-export raus. Referenzen laufen nur aufwärts zur stabileren Quelle, das Lastenheft ist stabiler als ein Slice; ein Verweis auf den Slice wäre eine Abwärts-Referenz.
+      Beispiel fuer eine FALSCHE Antwort: Der Kontext ist zu lang: Kürze die Anforderung auf den Kern. Der Verweis auf slice-031-csv-export ist dagegen gut, denn er zeigt, wo die Entscheidung umgesetzt wird, und bleibt stehen. Verweise gehen aufwaerts zum Lastenheft, deshalb bleibt der Bezug LH-FA-020 im Kopf.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

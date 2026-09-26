@@ -8,6 +8,7 @@ description: |
   Die Regexes pruefen (1) das Nein zum Merge, (2) die Schwellen-Senkung
   (80 -> 70 / fail_under / Coverage) braucht ein ADR, (3) Inline-noqa ist
   verboten bzw. bricht das noqa-Gate.
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
 tags:
 - m09-10
 - stufe-3
@@ -25,8 +26,6 @@ graders:
   config:
     regex_match:
     - (?i)\bnein\b|nicht\s+(so\s+)?(mergen|gemergt|merge?bar|merge?f(ä|ae)hig)|(darf|d(ü|ue)rfen|sollte|sollten|kann|k(ö|oe)nnen)\s+(\w+\s+){0,3}nicht\s+(so\s+)?(gemergt|gemerged|gemergt\s+werden|mergen)|(kein|nicht)\s+merge|blockier|zur(ü|ue)ckweisen|ablehnen
-    - (?i)(schwelle\w*|fail[_ -]?under|coverage\w*|(ü|ue)berdeckung|abdeckung|senkung|lockerung|gate\w*|80|70)[^.\n]{0,250}(\badrs?\b|carveout\w*)|(\badrs?\b|carveout\w*)[^.\n]{0,250}(schwelle\w*|fail[_ -]?under|coverage\w*|abdeckung|senkung|lockerung|gate\w*|80|70)
-    - (?i)(?:noqa[^.\n]{0,200}(verbot\w*|verboten|unzul(ä|ae)ssig|nicht\s+(erlaubt|zul(ä|ae)ssig)|darf\s+nicht|bricht|entfern\w*|raus|weg|untersag\w*)|(verbot\w*|verboten|unzul(ä|ae)ssig|untersag\w*)[^.\n]{0,120}noqa|noqa-?\s?gate|noqa[^.\n]{0,200}(streich\w*|l(ö|oe)sch\w*|beseitig\w*|ersetz\w*)|(streich\w*|entfern\w*|l(ö|oe)sch\w*)[^.\n]{0,120}noqa)
 - type: prompt
   name: judge_m09_10_001
   config:

@@ -9,6 +9,7 @@ description: |
   (2) Paarungen nach dem git mv, (3) Archiv nach den Paarungen, (4) den
   Archivnamen slice-<Kennung>-archiv.zip und (5) flache Ablage neben dem Stub
   in done/.
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
 tags:
 - m06-08
 - stufe-3
@@ -24,10 +25,6 @@ graders:
   config:
     regex_match:
     - (?i)(?:(z(ä|ae)hler|lese-?\s?schritt|trigger-?\s?audit)[\s\S]{0,400}(vor\s+dem|bevor|vorher|davor|vorab|zuerst|zun(ä|ae)chst)|(vor\s+dem|bevor|vorher|davor|vorab)[\s\S]{0,300}(z(ä|ae)hler|lese-?\s?schritt|trigger-?\s?audit))
-    - (?i)(?:paarung\w*[\s\S]{0,300}(nach\s+dem|danach|nachher|anschlie(ß|ss)end|erst\s+nach|hinterher|erst\s+jetzt)|(nach\s+dem|danach|nachher|anschlie(ß|ss)end)\s+\W{0,3}(git\s+)?(mv|move)[\s\S]{0,300}paarung)
-    - (?i)archiv\w*[^.]{0,160}(nach|hinter)\s+(den\s+|allen\s+)?paarung|paarung\w*[^.]{0,140}(dann|danach|zuletzt|anschlie(ß|ss)end|vor\s+dem\s+archiv\w*|vor\s+archiv\w*)[^.]{0,80}archiv
-    - (?i)slice-[^\s]{0,40}-archiv\.zip
-    - (?i)flach|neben\s+dem\s+(gek(ü|ue)rzten\s+)?stub|neben\s+(der|dem)\s+(slice-?)?(datei|stub)|direkt\s+(in|unter)\s+`?done
 - type: prompt
   name: judge_m06_08_001
   config:

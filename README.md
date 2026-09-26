@@ -78,10 +78,12 @@ evals/ai-harness-regelwerk/
 ### Prüfung der Tasks
 
 - Jeder der 73 regelbasierten Tasks nennt im `description`-Feld Regel-ID und Quelldatei.
-- Die 39 im Review beanstandeten Tasks haben pro Task `graders:` mit einem `text`-Grader (Regex: Wortstamm,
-  Umlaut-/ASCII-Varianten, Kernaussage) und einem `prompt`-Grader (LLM-Judge, `continue_session: true`,
-  Referenzantwort plus je eine richtige und falsche Beispielantwort). Beide müssen bestehen.
-- Die übrigen Tasks prüfen mit `expected.output_contains` (case-insensitiv).
+- 42 Tasks haben pro Task `graders:` mit einem `prompt`-Grader (LLM-Judge, `continue_session: true`, Referenzantwort,
+  bei den überarbeiteten Tasks zusätzlich je eine richtige und falsche Beispielantwort). **Der Judge entscheidet.** Der
+  `text`-Grader (höchstens die Kernaussage-Regex plus `regex_not_match`) ist nur eine Plausibilitätsprüfung; alle
+  Regexes bestehen auf sämtlichen vom Judge bestandenen echten Antworten aus den Läufen mit v6.9.0 und v6.10.0.
+  Beide Grader müssen bestehen.
+- Die übrigen 43 Tasks prüfen mit `expected.output_contains` (case-insensitiv) bzw. haben keinen Judge.
 - Die Regexes wurden mit `waza grade` gegen Beispielantworten geprüft (richtig besteht, falsch fällt durch) und
   nach einem Lauf mit GLM (`glm-5.3-flash:cloud`, Judge Kimi, ein Trial: 73/85 bestanden) an den echten Antworten
   nachjustiert (8 Tasks). Mit v6.10.0 (Judge Deepseek): 78/85 bestanden, alle 42 Judges bestanden; die vier vorher

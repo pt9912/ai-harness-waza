@@ -10,34 +10,31 @@ description: |
   (2) Begruendung: Anspruch nur zweiglokal/fuer andere unsichtbar bzw. muss vor
   der Arbeit auf dem Hauptzweig sichtbar sein; (3) Ausweg: Claim-Ausnahme oder
   sofort gemergter Anspruchs-PR/-MR.
-tags: [m05-02, stufe-3, modul-05]
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
+tags:
+- m05-02
+- stufe-3
+- modul-05
 inputs:
-  prompt: >-
-    Nach dem AI-Harness-Regelwerk: Unser Hauptzweig ist push-geschuetzt, nur
-    Merge-Requests sind moeglich. Ich will slice-042 uebernehmen. Ich wuerde
-    einen Feature-Branch anlegen und die Datei dort zusammen mit meiner ersten
-    Implementierung von next/ nach in-progress/ verschieben. Ist das
-    regelkonform? Falls nicht, wie geht es richtig?
+  prompt: 'Nach dem AI-Harness-Regelwerk: Unser Hauptzweig ist push-geschuetzt, nur Merge-Requests sind moeglich. Ich will slice-042 uebernehmen. Ich wuerde einen Feature-Branch anlegen und die Datei dort zusammen mit meiner ersten Implementierung von next/ nach in-progress/ verschieben. Ist das regelkonform? Falls nicht, wie geht es richtig?'
 expected:
   outcomes:
-    - type: task_completed
+  - type: task_completed
 graders:
-  - type: text
-    name: claim_hauptzweig_kern
-    config:
-      regex_match:
-        - '(?i)(\bnein\b|nicht\s+([\wäöüß]+\s+){0,2}(regelkonform|konform|zul(ä|ae)ssig|erlaubt|richtig|in\s+ordnung)|regelwidrig|verst(ö|oe)(ß|ss)t|widerspricht)'
-        - '(?i)(zweige?-?lokal|branch-?lokal|(auf|in)\s+(dem\s+)?(feature-?)?(branch|zweig)\s+([\wäöüß]+\s+){0,2}(lokal|isoliert)|nur\s+(auf|im|in)\s+(dem\s+|deinem\s+|eurem\s+)?(feature-?)?(branch|zweig)|(andere|anderen|alle|niemand|team)[^.]{0,100}(nicht|leer|kein[\wäöüß]*)[^.]{0,80}(sichtbar|sehen|in-?progress|claim|anspruch)|(hauptzweig|main|master)[^.]{0,80}(vor|bevor)[^.]{0,40}(arbeit|implementier[\wäöüß]*|beginn[\wäöüß]*))'
-        - '(?i)((anspruch[\wäöüß]*|claim[\wäöüß]*)[^.]{0,80}(pr\b|mr\b|merge|ausnahme|schutz[\wäöüß]*|deklarier[\wäöüß]*|sofort|vorab|separat[\wäöüß]*)|(sofort[\wäöüß]*|vorab|separat[\wäöüß]*|eigen[\wäöüß]*)[^.]{0,60}(gemergt|merge)|claim-?ausnahme)'
-  - type: prompt
-    name: judge_m05_02_001
-    config:
-      model: deepseek-v4.1-flash:cloud
-      continue_session: true
-      prompt: |
-        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): Nicht regelkonform: Der Uebergang next -> in-progress muss vor der Arbeit auf dem Hauptzweig landen; Mitreisen im Arbeits-PR ist zweigelokal (in-progress/ fuer alle anderen leer). Bei push-geschuetztem Hauptzweig deklariert das Repo seinen Traeger als MR: Claim-Ausnahme im Schutzregime ODER sofort gemergter Anspruchs-PR; still abweichen ist keines von beidem. modul-05-planning-harness.md §Slice-Lebenszyklus, Absaetze "next -> in-progress landet auf dem Hauptzweig" und "Die Regel traegt die Wirkung, nicht das Mittel".
-        Beispiel fuer eine RICHTIGE Antwort: Nein, das ist nicht regelkonform. Reist der git mv erst im Feature-Branch mit, ist der Anspruch zweigelokal: Für alle anderen bleibt in-progress/ leer, und jemand könnte parallel dieselbe Arbeit beginnen. Der Übergang muss vor der Arbeit auf dem Hauptzweig sichtbar sein. Da der Hauptzweig geschützt ist, deklariert ihr als Träger entweder eine Claim-Ausnahme im Schutzregime oder einen separaten Anspruchs-PR, der sofort gemergt wird.
-        Beispiel fuer eine FALSCHE Antwort: Ja, das ist regelkonform. Der git mv liegt im Feature-Branch, und mit dem Merge des Requests erscheint der Slice in in-progress/; so bleibt der Diff an einer Stelle gebündelt und der Reviewer sieht Anspruch und Implementierung zusammen.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+- type: text
+  name: claim_hauptzweig_kern
+  config:
+    regex_match:
+    - (?i)(\bnein\b|nicht\s+([\wäöüß]+\s+){0,2}(regelkonform|konform|zul(ä|ae)ssig|erlaubt|richtig|in\s+ordnung)|regelwidrig|verst(ö|oe)(ß|ss)t|widerspricht)
+- type: prompt
+  name: judge_m05_02_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Nicht regelkonform: Der Uebergang next -> in-progress muss vor der Arbeit auf dem Hauptzweig landen; Mitreisen im Arbeits-PR ist zweigelokal (in-progress/ fuer alle anderen leer). Bei push-geschuetztem Hauptzweig deklariert das Repo seinen Traeger als MR: Claim-Ausnahme im Schutzregime ODER sofort gemergter Anspruchs-PR; still abweichen ist keines von beidem. modul-05-planning-harness.md §Slice-Lebenszyklus, Absaetze "next -> in-progress landet auf dem Hauptzweig" und "Die Regel traegt die Wirkung, nicht das Mittel".
+      Beispiel fuer eine RICHTIGE Antwort: Nein, das ist nicht regelkonform. Reist der git mv erst im Feature-Branch mit, ist der Anspruch zweigelokal: Für alle anderen bleibt in-progress/ leer, und jemand könnte parallel dieselbe Arbeit beginnen. Der Übergang muss vor der Arbeit auf dem Hauptzweig sichtbar sein. Da der Hauptzweig geschützt ist, deklariert ihr als Träger entweder eine Claim-Ausnahme im Schutzregime oder einen separaten Anspruchs-PR, der sofort gemergt wird.
+      Beispiel fuer eine FALSCHE Antwort: Ja, das ist regelkonform. Der git mv liegt im Feature-Branch, und mit dem Merge des Requests erscheint der Slice in in-progress/; so bleibt der Diff an einer Stelle gebündelt und der Reviewer sieht Anspruch und Implementierung zusammen.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

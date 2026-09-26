@@ -8,32 +8,33 @@ description: |
   (2) make gates ist nicht der Ort bzw. gehoert zu Code-Architektur-Fragen;
   (3) Antwort auf Teilfrage 2: nicht vollstaendig abgedeckt; (4) Semantik wird
   inferentiell/per closure-note-reviewer geprueft.
-tags: [m11-05, stufe-2, modul-11]
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
+tags:
+- m11-05
+- stufe-2
+- modul-11
 inputs:
-  prompt: "Nach dem AI-Harness-Regelwerk: Ein ADR verlangt 'Closure-Note mit mindestens zwei Saetzen'. Ich habe ein Skript geschrieben, das Satzendezeichen zaehlt. Wo im Makefile verdrahte ich es, und ist die Anforderung damit schon vollstaendig abgedeckt? Eine Closure-Note 'war ganz okay, laeuft jetzt' besteht das Skript."
+  prompt: 'Nach dem AI-Harness-Regelwerk: Ein ADR verlangt ''Closure-Note mit mindestens zwei Saetzen''. Ich habe ein Skript geschrieben, das Satzendezeichen zaehlt. Wo im Makefile verdrahte ich es, und ist die Anforderung damit schon vollstaendig abgedeckt? Eine Closure-Note ''war ganz okay, laeuft jetzt'' besteht das Skript.'
 expected:
   outcomes:
-    - type: task_completed
+  - type: task_completed
 graders:
-  - type: text
-    name: verify_statt_gates_und_inferentiell
-    config:
-      regex_match:
-        - "(?i)\\bverify\\b"
-        - "(?i)(nicht|statt|anstatt|kein\\w*)\\s+(in\\s+|im\\s+|an\\s+|unter\\s+)?(den\\s+|dem\\s+)?[`\"„]?make[ -]?gates|make[ -]?gates[^.\\n]{0,80}(code-?architektur|architektur-?frage|architektur)"
-        - "(?i)\\bnein\\b|nicht\\s+(vollst(ä|ae)ndig|ausreichend|abgedeckt|gepr(ü|ue)ft|erfasst|erkannt|erf(ä|ae)ngt|gen(ü|ue)gend|hinreichend|ganz)|reicht\\w*\\s+(so\\s+|damit\\s+|allein\\s+)?nicht|l(ü|ue)cke|unvollst|nur\\s+(die\\s+)?(struktur|syntax|form)"
-        - "(?i)inferentiell|semantik|semantisch|closure-?note-?reviewer|\\bLLM\\b|modell-?basiert"
-      regex_not_match:
-        - "(?i)(statt|anstatt|nicht)\\s+(in\\s+|im\\s+|an\\s+)?(dem\\s+|den\\s+)?[`\"„]?verify"
-  - type: prompt
-    name: judge_m11_05_001
-    config:
-      model: deepseek-v4.1-flash:cloud
-      continue_session: true
-      prompt: |
-        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): Verdrahtung im `verify:`-Block, nicht in `make gates` (das ist fuer Code-Architektur-Fragen); die Anforderung ist nicht vollstaendig abgedeckt, weil die Semantik (Inhalt vs. Floskel) inferentiell geprueft werden muss (closure-note-reviewer.md) (modul-11 §Fitness Function ohne Standard-Tool).
-        Beispiel fuer eine RICHTIGE Antwort: Haenge das Skript in den verify-Block des Makefiles, denn eine Closure- oder DoD-Frage gehoert dorthin; make gates ist fuer Fragen der Code-Architektur gedacht. Vollstaendig abgedeckt ist die Anforderung damit aber nicht: Das Skript prueft nur die Struktur, also ob Satzendezeichen vorhanden sind. Ein Floskel-Satz wie "war ganz okay, laeuft jetzt" besteht diese Pruefung, weil er syntaktisch zwei Saetze ergibt. Die inhaltliche Seite muss inferentiell von einem Reviewer-Skill (closure-note-reviewer) beurteilt werden, waehrend die Struktur weiterhin deterministisch gecheckt wird.
-        Beispiel fuer eine FALSCHE Antwort: Verdrahte das Skript als Make-Target im make gates-Block, dann laeuft es lokal und im CI mit. Damit ist die Anforderung abgedeckt, denn das Skript zaehlt die Satzendezeichen zuverlaessig. Fuer die Floskel-Erkennung kann man optional den closure-note-reviewer als inferentielle Schicht ergaenzen, aber das ist Kuer.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+- type: text
+  name: verify_statt_gates_und_inferentiell
+  config:
+    regex_match:
+    - (?i)\bverify\b
+    regex_not_match:
+    - (?i)(statt|anstatt|nicht)\s+(in\s+|im\s+|an\s+)?(dem\s+|den\s+)?[`"„]?verify
+- type: prompt
+  name: judge_m11_05_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Verdrahtung im `verify:`-Block, nicht in `make gates` (das ist fuer Code-Architektur-Fragen); die Anforderung ist nicht vollstaendig abgedeckt, weil die Semantik (Inhalt vs. Floskel) inferentiell geprueft werden muss (closure-note-reviewer.md) (modul-11 §Fitness Function ohne Standard-Tool).
+      Beispiel fuer eine RICHTIGE Antwort: Haenge das Skript in den verify-Block des Makefiles, denn eine Closure- oder DoD-Frage gehoert dorthin; make gates ist fuer Fragen der Code-Architektur gedacht. Vollstaendig abgedeckt ist die Anforderung damit aber nicht: Das Skript prueft nur die Struktur, also ob Satzendezeichen vorhanden sind. Ein Floskel-Satz wie "war ganz okay, laeuft jetzt" besteht diese Pruefung, weil er syntaktisch zwei Saetze ergibt. Die inhaltliche Seite muss inferentiell von einem Reviewer-Skill (closure-note-reviewer) beurteilt werden, waehrend die Struktur weiterhin deterministisch gecheckt wird.
+      Beispiel fuer eine FALSCHE Antwort: Verdrahte das Skript als Make-Target im make gates-Block, dann laeuft es lokal und im CI mit. Damit ist die Anforderung abgedeckt, denn das Skript zaehlt die Satzendezeichen zuverlaessig. Fuer die Floskel-Erkennung kann man optional den closure-note-reviewer als inferentielle Schicht ergaenzen, aber das ist Kuer.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

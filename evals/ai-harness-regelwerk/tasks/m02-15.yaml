@@ -7,6 +7,7 @@ description: |
   Graders (Regex, case-insensitiv): (1) Entscheidung: Ja/abgeschlossen bzw. das
   Register muss nicht leer sein / nicht warten; (2) leer wird das Register erst
   bei der Graduation (Sub-Area).
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
 tags:
 - m02-15
 - stufe-2
@@ -22,7 +23,6 @@ graders:
   config:
     regex_match:
     - (?i)(?:(\bja\b|nicht\s+([\wäöüß]+\s+){0,2}(leer|geleert|leeren)[\wäöüß]*\s+(sein|werden)|(muss[\wäöüß]*|m(ü|ue)ss[\wäöüß]*|brauch[\wäöüß]*|notwendig|n(ö|oe)tig|erforderlich)\s+([\wäöüß]+\s+){0,4}nicht\s+([\wäöüß]+\s+){0,3}(warten|abwarten|leer|geleert|leeren)|nicht\s+([\wäöüß]+\s+){0,2}(warten|abwarten))|nein[^.\n]{0,60}(warten|leer)|nicht\s+(mehr\s+)?warten|warten\s+(ist\s+)?nicht\s+(n(ö|oe)tig|erforderlich)|kein\w*\s+warten)
-    - (?i)(graduation[^.]{0,120}(leer|null|keine\s+offene)|(leer|null|keine\s+offene)[^.]{0,120}graduation)
 - type: prompt
   name: judge_m02_15_001
   config:

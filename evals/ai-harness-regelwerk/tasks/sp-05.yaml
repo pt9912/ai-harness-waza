@@ -7,30 +7,33 @@ description: |
   die Zeile "make verify" verweist auf AGENTS.md und ist keine Waise.
   Grader (Regex): (1) Urteil "nicht in Ordnung / muss geaendert werden", (2) die Regeln sind Waisen
   bzw. gehoeren nach AGENTS.md (umziehen/verschieben/uebernehmen).
-tags: [sp-05, stufe-3, source-precedence]
+    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
+tags:
+- sp-05
+- stufe-3
+- source-precedence
 inputs:
-  prompt: "Nach dem AI-Harness-Regelwerk: Pruefe die CLAUDE.md in unserem Repo. AGENTS.md enthaelt nur den Projektueberblick und die Make-Targets. Ist der Inhalt der CLAUDE.md so in Ordnung, oder muss etwas geaendert werden?"
+  prompt: 'Nach dem AI-Harness-Regelwerk: Pruefe die CLAUDE.md in unserem Repo. AGENTS.md enthaelt nur den Projektueberblick und die Make-Targets. Ist der Inhalt der CLAUDE.md so in Ordnung, oder muss etwas geaendert werden?'
   files:
-    - path: sp-05-claude.md
+  - path: sp-05-claude.md
 expected:
   outcomes:
-    - type: task_completed
+  - type: task_completed
 graders:
-  - type: text
-    name: claude_md_regeln_umziehen
-    config:
-      regex_match:
-        - '(?i)(nicht\s+(so\s+)?(in\s+ordnung|ok\b|korrekt|richtig|zul(ä|ae)ssig|konform)|\bnein\b|muss\s+([^\s.,;:()]+\s+){0,2}ge(ä|ae)ndert|ge(ä|ae)ndert\s+werden|(ü|ue)berarbeit|angepasst\s+werden|umgezogen|umzuziehen|umziehen|verschoben)'
-        - '(?i)(waise|verwaist|nirgends\s+([^\s.,;:()]+\s+){0,3}(steh|gerankt|festgelegt|belegt)|in\s+keiner\s+([^\s.,;:()]+\s+){0,2}(quelle|datei)|((umzieh|umzuz|umgezogen|verschieb|verlager|(ü|ue)bertrag|(ü|ue)bernehm|(ü|ue)berf(ü|ue)hr|aufnehm|aufgenommen|geh(ö|oe)r|geh(ö|oe)ren)[^.\n]{0,80}agents\.md)|agents\.md[^.\n]{0,60}(aufnehm|aufgenommen|(ü|ue)bernommen|verschoben|geh(ö|oe)ren|hin(ein)?\s*(zu)?))'
-  - type: prompt
-    name: judge_sp_05_001
-    config:
-      model: deepseek-v4.1-flash:cloud
-      continue_session: true
-      prompt: |
-        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): Nein, nicht in Ordnung: CLAUDE.md ist der Werkzeug-Einstieg, hat keinen Rang, verweist nur und legt nichts fest. Regeln, die in keiner gerankten Quelle stehen, sind Waisen und werden nach AGENTS.md umgezogen (Reihenfolge: belegen, umziehen, erst dann kuerzen); kein Sensor, Review-Griff (SP §Source Precedence "Das Dritte ist der Werkzeug-Einstieg", "Vollstaendigkeit", "Pruefffrage", "Reihenfolge beim Aufraeumen"; durchsetzungsschicht §Artefakt-Set nennt es "Wurzel-Einstiegsdatei").
-        Beispiel fuer eine RICHTIGE Antwort: Nein, so ist die CLAUDE.md nicht in Ordnung. Sie ist nur der Einstieg des Werkzeugs, hat keinen Rang und darf verweisen, aber nichts festlegen. Die drei Regeln zu force-push, pathlib und Sprache stehen in keiner gerankten Quelle, es sind Waisen. Sie muessen zuerst belegt und dann nach AGENTS.md umgezogen werden; erst danach darf die CLAUDE.md gekuerzt werden.
-        Beispiel fuer eine FALSCHE Antwort: Ja, die CLAUDE.md ist in Ordnung. Sie ist der Werkzeug-Einstieg und darf ruhig eigene Regeln enthalten, etwa das force-push-Verbot und die pathlib-Vorgabe. Sie verweist ausserdem sauber auf AGENTS.md. Es muss nichts geaendert werden, hoechstens kann man die Regeln ergaenzend dort dokumentieren.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+- type: text
+  name: claude_md_regeln_umziehen
+  config:
+    regex_match:
+    - (?i)(nicht\s+(so\s+)?(in\s+ordnung|ok\b|korrekt|richtig|zul(ä|ae)ssig|konform)|\bnein\b|muss\s+([^\s.,;:()]+\s+){0,2}ge(ä|ae)ndert|ge(ä|ae)ndert\s+werden|(ü|ue)berarbeit|angepasst\s+werden|umgezogen|umzuziehen|umziehen|verschoben)
+- type: prompt
+  name: judge_sp_05_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Nein, nicht in Ordnung: CLAUDE.md ist der Werkzeug-Einstieg, hat keinen Rang, verweist nur und legt nichts fest. Regeln, die in keiner gerankten Quelle stehen, sind Waisen und werden nach AGENTS.md umgezogen (Reihenfolge: belegen, umziehen, erst dann kuerzen); kein Sensor, Review-Griff (SP §Source Precedence "Das Dritte ist der Werkzeug-Einstieg", "Vollstaendigkeit", "Pruefffrage", "Reihenfolge beim Aufraeumen"; durchsetzungsschicht §Artefakt-Set nennt es "Wurzel-Einstiegsdatei").
+      Beispiel fuer eine RICHTIGE Antwort: Nein, so ist die CLAUDE.md nicht in Ordnung. Sie ist nur der Einstieg des Werkzeugs, hat keinen Rang und darf verweisen, aber nichts festlegen. Die drei Regeln zu force-push, pathlib und Sprache stehen in keiner gerankten Quelle, es sind Waisen. Sie muessen zuerst belegt und dann nach AGENTS.md umgezogen werden; erst danach darf die CLAUDE.md gekuerzt werden.
+      Beispiel fuer eine FALSCHE Antwort: Ja, die CLAUDE.md ist in Ordnung. Sie ist der Werkzeug-Einstieg und darf ruhig eigene Regeln enthalten, etwa das force-push-Verbot und die pathlib-Vorgabe. Sie verweist ausserdem sauber auf AGENTS.md. Es muss nichts geaendert werden, hoechstens kann man die Regeln ergaenzend dort dokumentieren.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
