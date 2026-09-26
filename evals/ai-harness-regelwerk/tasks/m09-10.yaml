@@ -8,31 +8,34 @@ description: |
   Die Regexes pruefen (1) das Nein zum Merge, (2) die Schwellen-Senkung
   (80 -> 70 / fail_under / Coverage) braucht ein ADR, (3) Inline-noqa ist
   verboten bzw. bricht das noqa-Gate.
-tags: [m09-10, stufe-3, modul-09]
+tags:
+- m09-10
+- stufe-3
+- modul-09
 inputs:
-  prompt: "Nach dem AI-Harness-Regelwerk: Duerfen wir den PR in der Datei so mergen, weil zwei Reviewer zugestimmt haben und die Begruendung im PR-Kommentar steht? Falls nicht, was muss konkret geaendert werden?"
+  prompt: 'Nach dem AI-Harness-Regelwerk: Duerfen wir den PR in der Datei so mergen, weil zwei Reviewer zugestimmt haben und die Begruendung im PR-Kommentar steht? Falls nicht, was muss konkret geaendert werden?'
   files:
-    - path: m09-10-pr-212-coverage-gate.md
+  - path: m09-10-pr-212-coverage-gate.md
 expected:
   outcomes:
-    - type: task_completed
+  - type: task_completed
 graders:
-  - type: text
-    name: gate_lockerung_und_noqa
-    config:
-      regex_match:
-        - '(?i)\bnein\b|nicht\s+(so\s+)?(mergen|gemergt|merge?bar|merge?f(ä|ae)hig)|(darf|d(ü|ue)rfen|sollte|sollten|kann|k(ö|oe)nnen)\s+(\w+\s+){0,3}nicht\s+(so\s+)?(gemergt|gemerged|gemergt\s+werden|mergen)|(kein|nicht)\s+merge|blockier|zur(ü|ue)ckweisen|ablehnen'
-        - '(?i)(schwelle\w*|fail[_ -]?under|coverage\w*|(ü|ue)berdeckung|abdeckung|senkung|lockerung|gate\w*|80|70)[^.\n]{0,200}\badrs?\b|\badrs?\b[^.\n]{0,200}(schwelle\w*|fail[_ -]?under|coverage\w*|abdeckung|senkung|lockerung|gate\w*|80|70)'
-        - '(?i)noqa[^.\n]{0,200}(verbot\w*|verboten|unzul(ä|ae)ssig|nicht\s+(erlaubt|zul(ä|ae)ssig)|darf\s+nicht|bricht|entfern\w*|raus|weg|untersag\w*)|(verbot\w*|verboten|unzul(ä|ae)ssig|untersag\w*)[^.\n]{0,120}noqa|noqa-?\s?gate'
-  - type: prompt
-    name: judge_m09_10_001
-    config:
-      model: kimi-k2.7-code:cloud
-      continue_session: true
-      prompt: |
-        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): Nein: (1) Inline-`# noqa` ist verboten und bricht das `noqa-gate`; Ausnahmen werden mit Begruendung in zentraler Konfiguration (Python: `pyproject.toml`) dokumentiert; (2) Gates duerfen nicht ohne ADR gelockert werden: Schwellen-Senkung 80 -> 70 ist ein ADR, kein PR-Kommentar; Reviewer-Zustimmung ersetzt das nicht (modul-09-implementierung.md §Hard Rules, Punkte "`# noqa` ist verboten", "Suppression-Verbot pro Sprache", "Gates dürfen nicht ohne ADR gelockert werden").
-        Beispiel fuer eine RICHTIGE Antwort: Nein, so darf der PR nicht gemergt werden. Die Senkung von fail_under von 80 auf 70 lockert ein Gate, und das braucht ein ADR. Ein PR-Kommentar und die Zustimmung der Reviewer ersetzen das nicht. Ausserdem ist das Inline-noqa in exporter.py verboten und wird vom noqa-Gate abgelehnt. Das noqa muss raus, und eine echte Ausnahme gehoert mit Begruendung in die zentrale Konfiguration.
-        Beispiel fuer eine FALSCHE Antwort: Fast. Das Inline-noqa in exporter.py ist unschoen, das sollte ein Reviewer noch pruefen und nach Moeglichkeit durch eine sauberere Loesung ersetzen. Die Senkung von fail_under auf 70 ist dagegen unproblematisch, weil sie im PR-Kommentar von @mila begruendet ist und zwei Reviewer zugestimmt haben. Nach dem Aufraeumen kann der PR gemergt werden, ein ADR ist dafuer nicht noetig.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+- type: text
+  name: gate_lockerung_und_noqa
+  config:
+    regex_match:
+    - (?i)\bnein\b|nicht\s+(so\s+)?(mergen|gemergt|merge?bar|merge?f(ä|ae)hig)|(darf|d(ü|ue)rfen|sollte|sollten|kann|k(ö|oe)nnen)\s+(\w+\s+){0,3}nicht\s+(so\s+)?(gemergt|gemerged|gemergt\s+werden|mergen)|(kein|nicht)\s+merge|blockier|zur(ü|ue)ckweisen|ablehnen
+    - (?i)(schwelle\w*|fail[_ -]?under|coverage\w*|(ü|ue)berdeckung|abdeckung|senkung|lockerung|gate\w*|80|70)[^.\n]{0,250}(\badrs?\b|carveout\w*)|(\badrs?\b|carveout\w*)[^.\n]{0,250}(schwelle\w*|fail[_ -]?under|coverage\w*|abdeckung|senkung|lockerung|gate\w*|80|70)
+    - (?i)(?:noqa[^.\n]{0,200}(verbot\w*|verboten|unzul(ä|ae)ssig|nicht\s+(erlaubt|zul(ä|ae)ssig)|darf\s+nicht|bricht|entfern\w*|raus|weg|untersag\w*)|(verbot\w*|verboten|unzul(ä|ae)ssig|untersag\w*)[^.\n]{0,120}noqa|noqa-?\s?gate|noqa[^.\n]{0,200}(streich\w*|l(ö|oe)sch\w*|beseitig\w*|ersetz\w*)|(streich\w*|entfern\w*|l(ö|oe)sch\w*)[^.\n]{0,120}noqa)
+- type: prompt
+  name: judge_m09_10_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Nein: (1) Inline-`# noqa` ist verboten (bricht das `noqa-gate`) und muss entfernt werden; Ausnahmen gehoeren mit Begruendung in zentrale Konfiguration (Python: `pyproject.toml`); (2) die Schwellen-Senkung 80 -> 70 darf nicht per PR-Kommentar mit Reviewer-Zustimmung erfolgen: modul-09 verlangt dafuer eine ADR, modul-07 unterscheidet: als Uebergang ein Carveout mit Aufloesungs-Trigger und Folge-Slice, bei ehrlich nie erreichbarem Trigger eine ADR (permanent). Carveout mit Folge-Slice oder ADR sind beide zulaessig, ein PR-Kommentar reicht in keinem Fall (modul-09-implementierung.md §Hard Rules; modul-07-carveouts.md, Tabelle Aufloesungsformen).
+      Beispiel fuer eine RICHTIGE Antwort: Nein, so darf der PR nicht gemergt werden. Die Senkung von fail_under von 80 auf 70 lockert ein Gate, und das braucht ein ADR. Ein PR-Kommentar und die Zustimmung der Reviewer ersetzen das nicht. Ausserdem ist das Inline-noqa in exporter.py verboten und wird vom noqa-Gate abgelehnt. Das noqa muss raus, und eine echte Ausnahme gehoert mit Begruendung in die zentrale Konfiguration.
+      Beispiel fuer eine FALSCHE Antwort: Fast. Das Inline-noqa in exporter.py ist unschoen, das sollte ein Reviewer noch pruefen und nach Moeglichkeit durch eine sauberere Loesung ersetzen. Die Senkung von fail_under auf 70 ist dagegen unproblematisch, weil sie im PR-Kommentar von @mila begruendet ist und zwei Reviewer zugestimmt haben. Nach dem Aufraeumen kann der PR gemergt werden, ein ADR ist dafuer nicht noetig.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

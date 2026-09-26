@@ -5,14 +5,32 @@ description: |
   legitimen Verdikten trifft hier das erste zu (ADR gilt, Plan hat falsch
   behauptet): Plan-Korrektur mit Plan-Diff und ADR-konforme Neu-
   Implementierung. Herabstufen des Findings ist der falsche vierte Pfad.
-tags: [m08-10, stufe-3, modul-08]
+    Pruefung: Regex fuer die Kernaussage plus LLM-Judge (statt Vokabel-Abgleich).
+tags:
+- m08-10
+- stufe-3
+- modul-08
 inputs:
-  prompt: "Nach dem AI-Harness-Regelwerk: Reviewer und Implementer sind sich im PR-Thread (Datei) nicht einig. Der Implementer sagt, das HIGH sei zu hart und wuerde am besten auf MEDIUM gesetzt, damit gemergt werden kann. Wie wird der Konflikt richtig aufgeloest, und welches Artefakt wird dabei uebergeben?"
+  prompt: 'Nach dem AI-Harness-Regelwerk: Reviewer und Implementer sind sich im PR-Thread (Datei) nicht einig. Der Implementer sagt, das HIGH sei zu hart und wuerde am besten auf MEDIUM gesetzt, damit gemergt werden kann. Wie wird der Konflikt richtig aufgeloest, und welches Artefakt wird dabei uebergeben?'
   files:
-    - path: m08-10-review-thread-adr-0001.md
+  - path: m08-10-review-thread-adr-0001.md
 expected:
-  output_contains:
-    - "Plan-Diff"
-    - "Plan-Korrektur"
   outcomes:
-    - type: task_completed
+  - type: task_completed
+graders:
+- type: text
+  name: m08_10_kern
+  config:
+    regex_match:
+    - (?i)architect
+    - (?i)plan-?\s?diff|plan-?\s?korrektur
+- type: prompt
+  name: judge_m08_10_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |-
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Verdikt 1 (ADR-0001 ist Accepted, "Ausnahmen: keine"; der Slice-Plan hat falsch behauptet): Architect -> Planner Plan-Korrektur, Planner -> Implementer neuer Plan, ADR-konforme Neu-Implementierung; Uebergabe-Artefakt: Plan-Diff mit Korrektur-Begruendung; Herabstufen ist der falsche vierte Pfad (modul-08-agentenrollen.md §Konflikt-Pfad als Rollen-Sequenz, Tabelle "Drei legitime Verdikte").
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

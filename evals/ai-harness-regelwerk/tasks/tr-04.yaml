@@ -10,31 +10,34 @@ description: |
   Anforderung bleibt Waise/unbelegt/rot, nicht als belegt markieren; (3) ADR
   begruendet ("warum") und belegt/entlastet nicht. Negativ: "keine Waise
   (mehr)".
-tags: [tr-04, stufe-3, tr]
+tags:
+- tr-04
+- stufe-3
+- tr
 inputs:
-  prompt: "Nach dem AI-Harness-Regelwerk: In unserer Traceability-Matrix steht die Anforderung LH-QA-SUP-009. Dazu gibt es eine akzeptierte ADR, aber noch keinen Slice. Ein Kollege möchte sie als belegt markieren, damit der Lauf mit Vollständigkeits-Schalter nicht mehr rot ist. Ist das korrekt?"
+  prompt: 'Nach dem AI-Harness-Regelwerk: In unserer Traceability-Matrix steht die Anforderung LH-QA-SUP-009. Dazu gibt es eine akzeptierte ADR, aber noch keinen Slice. Ein Kollege möchte sie als belegt markieren, damit der Lauf mit Vollständigkeits-Schalter nicht mehr rot ist. Ist das korrekt?'
 expected:
   outcomes:
-    - type: task_completed
+  - type: task_completed
 graders:
-  - type: text
-    name: adr_ohne_slice_bleibt_waise
-    config:
-      regex_match:
-        - '(?i)(slice[^\n]{0,120}(zusage|verpflicht\w*|gebaut|umgesetzt|umsetzung|bauen|umsetzen|wann|dass)|(zusage|verpflicht\w*|gebaut|umgesetzt|umsetzung)[^\n]{0,120}slice)'
-        - '(?i)(waise\w*|unbelegt|nicht (als )?belegt|nicht entlastet|nicht (als )?erf(ü|ue)llt|offen bleibt|bleibt offen|rot bleib\w*|bleibt rot)'
-        - '(?i)(adr[^\n]{0,100}(warum|begr(ü|ue)nd\w*|grund|rationale|nicht[^\n]{0,20}(gebaut|umgesetzt|umsetzung|zusage))|(warum|begr(ü|ue)nd\w*)[^\n]{0,80}adr)'
-      regex_not_match:
-        - '(?i)(keine waise|nicht mehr (als )?waise|waise (mehr )?nicht)'
-  - type: prompt
-    name: judge_tr_04_001
-    config:
-      model: kimi-k2.7-code:cloud
-      continue_session: true
-      prompt: |
-        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): Nein: Nach dem Kurs entlastet der Slice ("dass und wann gebaut wird"), die ADR nur "warum so"; Anforderung mit ADR und ohne Slice ist "begruendet und ungebaut" und bleibt Waise. Ein abweichender Schnitt ist legitim, muss aber deklariert werden. grundlagen-traceability.md §Die zweite Richtung: Anforderung -> Beleg (Z. 36-59).
-        Beispiel fuer eine RICHTIGE Antwort: Nein, das ist nicht korrekt. Eine akzeptierte ADR sagt nur, warum etwas so entschieden wurde; entlastend ist im Kurs der Slice, der zusagt, dass und wann gebaut wird. Die Anforderung LH-QA-SUP-009 bleibt also eine Waise, und der rote Lauf zeigt genau den Zustand, den die Matrix sichtbar machen soll. Ein Repo darf das anders schneiden, muss diese Abweichung aber deklarieren.
-        Beispiel fuer eine FALSCHE Antwort: Ja, das ist korrekt. Die akzeptierte ADR belegt die Anforderung ausreichend, sie ist damit keine Waise mehr und kann als belegt markiert werden. Der Slice folgt später bei der Planung, und der Lauf mit Vollständigkeits-Schalter wird grün.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+- type: text
+  name: adr_ohne_slice_bleibt_waise
+  config:
+    regex_match:
+    - (?i)(slice[^\n]{0,120}(zusage|verpflicht\w*|gebaut|umgesetzt|umsetzung|bauen|umsetzen|wann|dass)|(zusage|verpflicht\w*|gebaut|umgesetzt|umsetzung)[^\n]{0,120}slice)
+    - (?i)(?:(waise\w*|unbelegt|nicht (als )?belegt|nicht entlastet|nicht (als )?erf(ü|ue)llt|offen bleibt|bleibt offen|rot bleib\w*|bleibt rot)|ungebaut|schummel\w*|wegdr(ü|ue)ck\w*|nicht\s+(als\s+)?gr(ü|ue)n)
+    - (?i)(adr[^\n]{0,100}(warum|begr(ü|ue)nd\w*|grund|rationale|nicht[^\n]{0,20}(gebaut|umgesetzt|umsetzung|zusage))|(warum|begr(ü|ue)nd\w*)[^\n]{0,80}adr)
+    regex_not_match:
+    - (?i)(keine waise|nicht mehr (als )?waise|waise (mehr )?nicht)
+- type: prompt
+  name: judge_tr_04_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Nein: Nach dem Kurs entlastet der Slice ("dass und wann gebaut wird"), die ADR nur "warum so"; Anforderung mit ADR und ohne Slice ist "begruendet und ungebaut" und bleibt Waise. Ein abweichender Schnitt ist legitim, muss aber deklariert werden. grundlagen-traceability.md §Die zweite Richtung: Anforderung -> Beleg (Z. 36-59).
+      Beispiel fuer eine RICHTIGE Antwort: Nein, das ist nicht korrekt. Eine akzeptierte ADR sagt nur, warum etwas so entschieden wurde; entlastend ist im Kurs der Slice, der zusagt, dass und wann gebaut wird. Die Anforderung LH-QA-SUP-009 bleibt also eine Waise, und der rote Lauf zeigt genau den Zustand, den die Matrix sichtbar machen soll. Ein Repo darf das anders schneiden, muss diese Abweichung aber deklarieren.
+      Beispiel fuer eine FALSCHE Antwort: Ja, das ist korrekt. Die akzeptierte ADR belegt die Anforderung ausreichend, sie ist damit keine Waise mehr und kann als belegt markiert werden. Der Slice folgt später bei der Planung, und der Lauf mit Vollständigkeits-Schalter wird grün.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

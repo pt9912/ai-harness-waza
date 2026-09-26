@@ -15,7 +15,7 @@ WAZA        = docker run --rm $(IMAGE)
 OLLAMA_URL      ?= http://localhost:11434/v1
 OLLAMA_PROVIDER ?= openai
 # Fester Judge fuer die prompt-Grader (unabhaengig vom getesteten Modell).
-OLLAMA_JUDGE    ?= kimi-k2.7-code:cloud
+OLLAMA_JUDGE    ?= deepseek-v4.1-flash:cloud
 OLLAMA_ENV       = -e COPILOT_PROVIDER=$(OLLAMA_PROVIDER) -e COPILOT_BASE_URL=$(OLLAMA_URL) \
                    -e COPILOT_WIRE_API=completions -e COPILOT_API_KEY=ollama
 

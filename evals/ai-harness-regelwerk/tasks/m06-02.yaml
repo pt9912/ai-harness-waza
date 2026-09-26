@@ -26,7 +26,7 @@ graders:
   - type: prompt
     name: judge_m06_02_001
     config:
-      model: kimi-k2.7-code:cloud
+      model: deepseek-v4.1-flash:cloud
       continue_session: true
       prompt: |
         Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.

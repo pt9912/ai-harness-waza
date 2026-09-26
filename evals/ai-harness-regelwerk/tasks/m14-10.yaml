@@ -4,12 +4,31 @@ description: |
   Prueft M14-10 (modul-14-docker-harness.md, Stufe 3): Der Container ist primaer
   Reproduzierbarkeits-Anker, nicht Deployment; fuer ein Replay braucht man den
   Image-Hash von damals (image-hash.txt), nicht das aktuelle Deployment.
-tags: [m14-10, stufe-3, modul-14]
+    Pruefung: Regex fuer die Kernaussage plus LLM-Judge (statt Vokabel-Abgleich).
+tags:
+- m14-10
+- stufe-3
+- modul-14
 inputs:
-  prompt: "Nach dem AI-Harness-Regelwerk: Wir wollen ein Golden Set von vor sechs Monaten erneut abspielen. Ein Kollege sagt, wir sollen einfach das Image nehmen, das gerade in Produktion laeuft, ein Container sei ja ohnehin nur fuer die Auslieferung da. Stimmt das, und welches Image nehmen wir?"
+  prompt: 'Nach dem AI-Harness-Regelwerk: Wir wollen ein Golden Set von vor sechs Monaten erneut abspielen. Ein Kollege sagt, wir sollen einfach das Image nehmen, das gerade in Produktion laeuft, ein Container sei ja ohnehin nur fuer die Auslieferung da. Stimmt das, und welches Image nehmen wir?'
 expected:
-  output_contains:
-    - "image-hash.txt"
-    - "Reproduzierbarkeits-Anker"
   outcomes:
-    - type: task_completed
+  - type: task_completed
+graders:
+- type: text
+  name: m14_10_kern
+  config:
+    regex_match:
+    - (?i)image[- ]?hash
+    - (?i)\bnein\b|stimmt\s+nicht|falsch
+    - (?i)damals|sechs\s+monat|golden[- ]?set|manifest|recorded_at|aufgenommen
+- type: prompt
+  name: judge_m14_10_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |-
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Nein: Der Container ist primaer Reproduzierbarkeits-Anker, nicht nur Deployment. Fuer das Replay gegen das alte Golden Set nimmt man den Image-Hash von damals (`harness/image-hash.txt` bzw. der im Golden-Set-Manifest festgehaltene `runtime.image_hash`, modul-12), nicht das aktuelle Produktions-Image. Das Image muss aufbewahrt sein (Archiv-Form), sonst bleibt die Rezept-Form (modul-14).
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

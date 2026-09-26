@@ -5,14 +5,32 @@ description: |
   Vorgang sind eine Gelegenheit; ein Vorkommen ohne abgeschlossenen Vorgang
   bewegt den Zaehler nicht (benannt, nicht gezaehlt). Die Fixture enthaelt
   vier Funde, aber nur zwei abgeschlossene Vorgaenge.
-tags: [m06-11, stufe-2, modul-06]
+    Pruefung: Regex fuer die Kernaussage plus LLM-Judge (statt Vokabel-Abgleich).
+tags:
+- m06-11
+- stufe-2
+- modul-06
 inputs:
-  prompt: "Nach dem AI-Harness-Regelwerk: Wir haben das Beobachtungs-Register-Verzeichnis fuer die Parser-Fehlermeldungen (siehe Datei) und die Welle schliesst bald. Wie hoch ist der Zaehler dieser Beobachtung, und muss sie beim Lese-Schritt der Closure schon als regelreif behandelt werden?"
+  prompt: 'Nach dem AI-Harness-Regelwerk: Wir haben das Beobachtungs-Register-Verzeichnis fuer die Parser-Fehlermeldungen (siehe Datei) und die Welle schliesst bald. Wie hoch ist der Zaehler dieser Beobachtung, und muss sie beim Lese-Schritt der Closure schon als regelreif behandelt werden?'
   files:
-    - path: m06-11-beobachtung-fehler-ohne-kontext.md
+  - path: m06-11-beobachtung-fehler-ohne-kontext.md
 expected:
-  output_contains:
-    - "Gelegenheit"
-    - "benannt"
   outcomes:
-    - type: task_completed
+  - type: task_completed
+graders:
+- type: text
+  name: m06_11_kern
+  config:
+    regex_match:
+    - (?i)z(ä|ae)hler[\s\S]{0,150}(\b2\b|zwei)|(\b2\b|zwei)[\s\S]{0,80}z(ä|ae)hl
+    - (?i)(noch\s+)?nicht\s+regelreif|kein\w*\s+regelreif|unter\s+(der\s+)?(3|drei)|weniger\s+als\s+(3|drei)
+- type: prompt
+  name: judge_m06_11_001
+  config:
+    model: deepseek-v4.1-flash:cloud
+    continue_session: true
+    prompt: |-
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Zaehler = 2 (slice-041 mit zwei Funden = eine Gelegenheit, slice-047 = zweiter Vorgang); slice-052 ist nicht abgeschlossen (in-progress, keine Closure-Notiz) und wird "benannt, nicht gezaehlt"; unter 3x, daher beim Lese-Schritt noch nicht regelreif (modul-06-roadmap.md §Das Beobachtungs-Register, Punkt "Ein Vorgang zählt einmal — und was keinen hat, zählt gar nicht", Z.117-123; Bei 3x Z.124).
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

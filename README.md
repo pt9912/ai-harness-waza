@@ -50,7 +50,7 @@ make run-ollama OLLAMA_MODEL='kimi-k2.7-code:cloud' TASK='source-precedence*'   
 make run-ollama OLLAMA_MODEL='glm-5.3-flash:cloud' TASK="m09-08* m02-11*"       # mehrere Muster
 ```
 
-Die `prompt`-Grader (LLM-Judge) nutzen `OLLAMA_JUDGE` (Standard `kimi-k2.7-code:cloud`), unabhängig vom
+Die `prompt`-Grader (LLM-Judge) nutzen `OLLAMA_JUDGE` (Standard `deepseek-v4.1-flash:cloud`), unabhängig vom
 getesteten Modell (`--judge-model`).
 
 - Bei `:cloud`-Modellen gehen Prompts und gelesene Regelwerk-Auszüge an ollama.com.
@@ -80,8 +80,11 @@ evals/ai-harness-regelwerk/
   Umlaut-/ASCII-Varianten, Kernaussage) und einem `prompt`-Grader (LLM-Judge, `continue_session: true`,
   Referenzantwort plus je eine richtige und falsche Beispielantwort). Beide müssen bestehen.
 - Die übrigen Tasks prüfen mit `expected.output_contains` (case-insensitiv).
-- Die Regexes wurden mit `waza grade` gegen Beispielantworten geprüft (richtig besteht, falsch fällt durch).
-  Gegen echte Modellantworten sind sie noch nicht kalibriert.
+- Die Regexes wurden mit `waza grade` gegen Beispielantworten geprüft (richtig besteht, falsch fällt durch) und
+  nach einem Lauf mit GLM (`glm-5.3-flash:cloud`, Judge Kimi, ein Trial: 73/85 bestanden) an den echten Antworten
+  nachjustiert (8 Tasks). Mit mehr Modellen und Trials sind weitere Anpassungen zu erwarten.
+- `waza grade` funktioniert nicht mit `prompt`-Gradern ("requires an execution engine"); für eine Nachprüfung
+  von Regexes muss man die Judges aus einer Kopie der Tasks entfernen.
 
 `regelwerk/` und `templates/` liegen nicht im Repo. Sie werden beim Build aus dem ZIP entpackt
 und stehen im Image unter `/workspace/skills/ai-harness-regelwerk/`.
