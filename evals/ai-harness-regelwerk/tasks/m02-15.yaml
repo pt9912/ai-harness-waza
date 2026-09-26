@@ -1,0 +1,40 @@
+id: m02-15-001
+name: Bootstrap-Ende bei vollem Reconciliation-Register
+description: |
+  Prueft Regel M02-15 (modul-02-harness-bootstrap.md, Stufe 2): Der
+  Reconciliation-Backlog "steht", wenn jede Zeile ihre Aufloesung traegt, nicht
+  wenn das Register leer ist; leer wird es je Sub-Area erst bei der Graduation.
+  Graders (Regex, case-insensitiv): (1) Entscheidung: Ja/abgeschlossen bzw. das
+  Register muss nicht leer sein / nicht warten; (2) leer wird das Register erst
+  bei der Graduation (Sub-Area).
+tags: [m02-15, stufe-2, modul-02]
+inputs:
+  prompt: >-
+    Nach dem AI-Harness-Regelwerk: Wir bootstrappen ein bestehendes Repo (viel
+    Altcode) und sind bei der Inventur-Nacharbeit. In unserer Registerdatei
+    für Funde stehen noch 14 offene Zeilen. Jede davon nennt bereits ihre
+    Auflösung (ein Carveout mit Folge-Slice oder ein Reconciliation-Slice).
+    Ist damit die Bootstrap-Phase abgeschlossen, oder müssen wir warten, bis
+    die Datei geleert ist?
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: bootstrap_ende_kern
+    config:
+      regex_match:
+        - '(?i)(\bja\b|nicht\s+([\wäöüß]+\s+){0,2}(leer|geleert|leeren)[\wäöüß]*\s+(sein|werden)|(muss[\wäöüß]*|m(ü|ue)ss[\wäöüß]*|brauch[\wäöüß]*|notwendig|n(ö|oe)tig|erforderlich)\s+([\wäöüß]+\s+){0,4}nicht\s+([\wäöüß]+\s+){0,3}(warten|abwarten|leer|geleert|leeren)|nicht\s+([\wäöüß]+\s+){0,2}(warten|abwarten))'
+        - '(?i)(graduation[^.]{0,120}(leer|null|keine\s+offene)|(leer|null|keine\s+offene)[^.]{0,120}graduation)'
+  - type: prompt
+    name: judge_m02_15_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Ja, abgeschlossen: der Backlog "steht", wenn jede Zeile ihre Aufloesung traegt (Carveout mit Folge-Slice, Reconciliation-Slice oder retroaktive ADR), nicht wenn das Register leer ist; leer wird es je Sub-Area erst bei der Graduation. modul-02-harness-bootstrap.md §Das Reconciliation-Register (Absatz "Der Backlog steht") und Tabelle Bootstrap-Ende; grundlagen-bootstrap.md §Bootstrap-Ende.
+        Beispiel fuer eine RICHTIGE Antwort: Ja, die Bootstrap-Phase ist damit abgeschlossen. Entscheidend ist nicht, dass die Registerdatei leer sein muss, sondern dass jede Zeile ihre Auflösung trägt; beim Bootstrap-Ende ist das Register sogar voll. Leer wird es erst, wenn eine Sub-Area graduiert; die Graduation-Bedingung ist genau, dass keine offene Zeile für sie mehr existiert.
+        Beispiel fuer eine FALSCHE Antwort: Nein, noch nicht. Das Register muss zuerst geleert werden, bevor die Bootstrap-Phase als abgeschlossen gilt, auch wenn jede Zeile schon eine Auflösung nennt. Erst danach starten wir mit der Graduation je Sub-Area und den ersten regulären Slices.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

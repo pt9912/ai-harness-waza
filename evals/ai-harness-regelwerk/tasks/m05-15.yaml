@@ -1,0 +1,20 @@
+id: m05-15-001
+name: Dritter Treffer im Beobachtungs-Register
+description: |
+  Prueft Regel M05-15 (modul-05-planning-harness.md, Stufe 3): Erreicht ein
+  Beobachtungs-Register-Eintrag mit diesem Slice den dritten Treffer, ist er keine
+  Notiz mehr, sondern eine Luecke und braucht einen eigenen Folge-Slice; der
+  Zaehler-Stand gehoert ins Kriterium Evidenz-/Diskrepanz-Risiko.
+tags: [m05-15, stufe-3, modul-05]
+inputs:
+  prompt: >-
+    Nach dem AI-Harness-Regelwerk: Im Beobachtungs-Register steht ein Eintrag
+    zur Sub-Area "Export", der bisher zweimal von frueheren Slices getroffen
+    wurde. Der Slice, den ich gerade plane, beruehrt "Export" ebenfalls. Was
+    bedeutet das fuer meinen Slice-Plan, und was muss zusaetzlich passieren?
+expected:
+  output_contains:
+    - "Folge-Slice"
+    - "Lücke"
+  outcomes:
+    - type: task_completed

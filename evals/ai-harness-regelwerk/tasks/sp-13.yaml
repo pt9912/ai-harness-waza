@@ -1,0 +1,44 @@
+id: sp-13-001
+name: Aenderungen am Accepted-Lastenheft
+description: |
+  Prueft SP-13 (grundlagen-source-precedence.md, Stufe 3; beruehrt SP-12): Ab Status Accepted ist jede
+  Aenderung Vertragsaenderung; einzige Ausnahme ist die Tatsachenberichtigung (in der Historie als solche
+  ausgewiesen, beruehrt keine Aussage einer Anforderung, Verweis-Spalte mit Gedankenstrich).
+  Fixture: Lastenheft Status Accepted mit Tippfehler in einer Ueberschrift und LH-FA-04 mit 2 Sekunden.
+  Grader (Regex): (1) Tippfehler-Korrektur = Tatsachenberichtigung bzw. ohne Change Request, (2) die
+  Aenderung an LH-FA-04 ist Vertragsaenderung mit Change Request, (3) Historie-Zeile, (4) Version-Bump.
+  regex_not_match faengt "LH-FA-04 braucht keinen CR" ab. Hinweis: Die Einstufung des Ueberschrift-
+  Tippfehlers als Tatsachenberichtigung ist eine sinngemaesse Anwendung der Quellen-Definition.
+tags: [sp-13, stufe-3, source-precedence]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Ich habe zwei Aenderungen an lastenheft.md vor. Erstens hat die Ueberschrift von Abschnitt 3 einen Tippfehler. Zweitens soll bei LH-FA-04 die zugesagte Antwortzeit von 2 auf 5 Sekunden steigen. Was ist bei jeder der beiden Aenderungen zu tun, was ist jeweils im Dokument festzuhalten?"
+  files:
+    - path: sp-13-lastenheft.md
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: tippfehler_vs_change_request
+    config:
+      regex_match:
+        - '(?i)(tatsachenberichtigung|berichtigung|(tippfehler|(ü|ue)berschrift|erste[^\s.,;:()]*)[^.\n]{0,150}(kein[^\s.,;:()]*\s+([^\s.,;:()]+\s+){0,2}(change[ -]?request|cr\b)|ohne\s+(change[ -]?request|cr\b)))'
+        - '(?i)((lh-fa-04|antwortzeit|zweite[^\s.,;:()]*|2\s*(auf|zu|->)\s*5|5\s*sekunden)[^.\n]{0,200}(change[ -]?request|\bcr\b|vertrags(ä|ae)nderung)|(change[ -]?request|\bcr\b|vertrags(ä|ae)nderung)[^.\n]{0,200}(lh-fa-04|antwortzeit|zweite[^\s.,;:()]*|2\s*(auf|zu|->)\s*5|5\s*sekunden))'
+        - '(?i)historie'
+        - '(?i)(version[^.\n]{0,40}(bump|erh(ö|oe)h|hochz(ä|ae)hl|anheb|steig|inkrement|aktualisier|hoch)|(bump|erh(ö|oe)h|hochz(ä|ae)hl|anheb|inkrement)[^.\n]{0,40}version)'
+      regex_not_match:
+        - '(?i)(lh-fa-04|antwortzeit|zweite[^\s.,;:()]*)[^.\n]{0,100}(kein[^\s.,;:()]*\s+([^\s.,;:()]+\s+){0,2}(change[ -]?request|cr\b)|ohne\s+(change[ -]?request|cr\b))'
+        - '(?i)(lh-fa-04|antwortzeit|zweite[^\s.,;:()]*)[^.\n]{0,150}(nicht|kein[^\s.,;:()]*)\s+([^\s.,;:()]+\s+){0,2}(n(ö|oe)tig|erforderlich|notwendig)'
+        - '(?i)(change[ -]?request|cr\b)\s+(ist\s+)?(bei|f(ü|ue)r|zu)\s+(lh-fa-04|(der\s+)?antwortzeit|der\s+zweiten)[^.\n]{0,40}(nicht|kein)'
+  - type: prompt
+    name: judge_sp_13_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Lastenheft ist Accepted, damit ist jede Aenderung Vertragsaenderung; einzige Ausnahme ist die Tatsachenberichtigung (Stelle behauptete anderes als vereinbart, in der Historie als solche ausgewiesen, beruehrt keine Anforderungs-Aussage). Ihr Fussabdruck: Version-Bump + Historie-Zeile, Spalte "Verweis" = Gedankenstrich, kein CR. Die Aenderung 2 s -> 5 s an LH-FA-04 ist Vertragsaenderung: Change Request (extern), Version-Bump, Historie-Zeile mit Verweis auf den CR, LH-FA-04 (samt Akzeptanz) geaendert (SP §Spec-Stratifizierung, Absaetze "Wann die CR-Pflicht beginnt" und "Die eine Ausnahme ...").
+        Beispiel fuer eine RICHTIGE Antwort: Der Tippfehler in der Ueberschrift von Abschnitt 3 ist eine Tatsachenberichtigung: Er braucht keinen Change Request, muss aber in der Historie als solche ausgewiesen werden, mit Gedankenstrich in der Verweis-Spalte. Die Erhoehung der Antwortzeit bei LH-FA-04 von 2 auf 5 Sekunden ist dagegen eine Vertragsaenderung, weil das Lastenheft Accepted ist. Dafuer braucht es einen (externen) Change Request, die Version wird hochgezaehlt, in der Historie steht eine Zeile mit Verweis auf den CR, und LH-FA-04 samt Akzeptanzkriterium wird angepasst.
+        Beispiel fuer eine FALSCHE Antwort: Beide Aenderungen sind Tatsachenberichtigungen: Der Tippfehler ist offensichtlich, und die Antwortzeit steht nur falsch im Dokument. Es genuegt, sie in der Historie als Tatsachenberichtigung auszuweisen, die Version hochzuzaehlen und in der Verweis-Spalte einen Gedankenstrich einzutragen. Ein Change Request ist bei LH-FA-04 nicht noetig.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

@@ -1,0 +1,18 @@
+id: m15-03-001
+name: Audit-Span-Schema pruefen
+description: |
+  Prueft M15-03 (modul-15-observability.md, Stufe 2): Jedes Attribut ist
+  Pflicht/Optional markiert und traegt eine Incident-Frage; Pflicht-Minimum
+  (Slice-ID, Agent-Rolle, Cache-Status, requirement.id); Attribute ohne
+  Incident-Frage fliegen raus.
+tags: [m15-03, stufe-2, modul-15]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Wir wollen das Audit-Span-Schema in m15-03-span-schema.yaml so einfuehren. Passt das, oder soll ich etwas aendern?"
+  files:
+    - path: m15-03-span-schema.yaml
+expected:
+  output_contains:
+    - "Incident-Frage"
+    - "Pflicht-Minimum"
+  outcomes:
+    - type: task_completed

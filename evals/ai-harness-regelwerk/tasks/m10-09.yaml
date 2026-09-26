@@ -1,0 +1,15 @@
+id: m10-09-001
+name: Dreimal gleiches Finding - wo wird gezaehlt
+description: |
+  Prueft M10-09 (modul-10-review-harness.md, Stufe 3): Der Reviewer-Skill
+  zaehlt nicht selbst; gezaehlt wird ueber Finding-Klasse -> Slice-Closure §7
+  -> Beobachtungs-Register. Die Skill-Datei wird versioniert, nicht ueberschrieben.
+tags: [m10-09, stufe-3, modul-10]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Im dritten Review-Lauf hintereinander taucht dasselbe Fehlermuster auf (fehlendes Context-Timeout bei HTTP-Calls). Wo wird das mitgezaehlt, und was passiert mit der Skill-Datei des Reviewers, wenn wir daraus lernen?"
+expected:
+  output_contains:
+    - "Beobachtungs-Register"
+    - "versioniert"
+  outcomes:
+    - type: task_completed

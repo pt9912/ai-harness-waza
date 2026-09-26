@@ -1,0 +1,44 @@
+id: m02-11-001
+name: Permanent-MR bei verschaerfter neuer Baseline
+description: |
+  Prueft Regel M02-11 (modul-02-harness-bootstrap.md, Stufe 3): `permanent` heisst
+  nur "kein automatischer Aufloesungs-Trigger", nicht "unaufloesbar". War die
+  Adaption eine Lockerung und verschaerft die neue Baseline, ist die richtige
+  Antwort ein Carveout mit Aufloesungs-Trigger und Folge-Slice, keine stille
+  Dauer-MR. Fixture: Konventionsdatei mit MR-002 (permanent, Lockerung).
+  Graders (Regex, case-insensitiv, ae/ue/oe/ss-tolerant): (1) "stehen lassen"
+  wird verneint; (2) Carveout wird genannt; (3) Trigger/Frist/Folge-Slice.
+tags: [m02-11, stufe-3, modul-02]
+inputs:
+  prompt: >-
+    Nach dem AI-Harness-Regelwerk: Wir haben die vendored Baseline von v6.9.0
+    auf v6.10.0 gehoben und gehen jetzt die Einträge in unserer
+    Konventionsdatei durch (siehe Datei). v6.10.0 verschärft genau die
+    Link-Prüfung, die MR-002 bei uns abgeschwächt hat. MR-002 ist als
+    permanent eingetragen, wir würden ihn deshalb einfach so stehen lassen.
+    Ist das in Ordnung, und wenn nicht: was ist stattdessen zu tun?
+  files:
+    - path: m02-11-conventions.md
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: permanent_mr_kern
+    config:
+      regex_match:
+        - '(?i)(\bnein\b|nicht\s+([\wäöüß]+\s+){0,2}(in\s+ordnung|ok|okay|richtig|sinnvoll|ausreichend|stehen|belassen|lassen|bleiben)|nicht\s+einfach)'
+        - '(?i)carve-?outs?'
+        - '(?i)(folge-?\s?slice|aufl(ö|oe)sungs-?\s?trigger|befrist[\wäöüß]*|trigger|frist)'
+  - type: prompt
+    name: judge_m02_11_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Nicht in Ordnung. "permanent" heisst nur "kein automatischer Aufloesungs-Trigger", nicht "unaufloesbar". Lockerung + verschaerfende neue Baseline -> Carveout mit Aufloesungs-Trigger und Folge-Slice statt stiller Dauer-MR (Rueckbau/Nachfolge als neuer Eintrag, kein Edit). modul-02-harness-bootstrap.md §Freshness-Audit, Bullet "Der Review geht durch die Adaptions-Liste ... Auch permanent-Eintraege werden mitgeprueft".
+        Beispiel fuer eine RICHTIGE Antwort: Nein, das reicht so nicht. "permanent" bedeutet nur, dass es keinen automatischen Auflösungs-Trigger gibt, nicht dass der Eintrag unauflösbar wäre. Weil MR-002 eine Lockerung war und v6.10.0 die Prüfung jetzt verschärft, sollte aus dem Eintrag ein befristeter Carveout werden, mit einem beobachtbaren Aufloesungstrigger und einem Folgeslice, der die Link-Prüfung auf das neue Niveau hebt.
+        Beispiel fuer eine FALSCHE Antwort: Ja, das ist in Ordnung. MR-002 ist als permanent eingetragen, also gilt die Lockerung dauerhaft, und die neue Baseline ändert an der Adaption selbst nichts. Wir lassen den Eintrag stehen und vermerken nur den Versions-Bump auf v6.10.0 in der Konventionsdatei.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

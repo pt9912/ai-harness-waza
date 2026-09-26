@@ -1,0 +1,38 @@
+id: hd-12-001
+name: Gate abschaffen - Sensor-Datei und Zeile
+description: |
+  Prueft HD-12 (grundlagen-harness-dateien.md, Stufe 3): Ein retiriertes Gate
+  ist weg (Zeile und Datei loeschen); kein sensors/done/, die Sensor-Datei
+  traegt kein Status- und kein Datumsfeld (Zustand = CI-Lauf, Datum = git).
+  Gegenprobe: aufgeloeste MR-Eintraege wandern nach conventions/done/.
+  Grader (text/regex): (1) Zeile und/oder Datei werden geloescht/entfernt;
+  (2) es gibt kein sensors/done bzw. kein Ablegen/Archiv; (3) kein Status- und
+  kein (Stilllegungs-)Datum vermerken; (4) Historie/Datum liegt in git bzw.
+  Versionsverwaltung.
+tags: [hd-12, stufe-3, hd]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Wir schaffen das Gate old-lint ab. Es hat eine Zeile in der Sensors-Tabelle der harness/README.md und eine eigene Datei harness/sensors/old-lint.md. Was machen wir mit beidem? Sollen wir in der Datei vorher noch Status und Stilllegungsdatum vermerken und sie dann zu den erledigten Sachen ablegen?"
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: retiriertes_gate_loeschen
+    config:
+      regex_match:
+        - '(?i)((l(ö|oe)sch\w*|entfern\w*|streich\w*|wegwerfen|weg)[^\n]{0,80}(zeile|tabelle|datei|old-lint)|(zeile|datei)[^\n]{0,60}(l(ö|oe)sch\w*|entfern\w*|verschwind\w*|gel(ö|oe)scht|entfernt))'
+        - '(?i)((kein\w*|nicht)[^\n]{0,25}sensors/done|(kein\w*|nicht)[^\n]{0,25}\bdone\b|(kein\w*|nicht)[^\n]{0,25}(archiv\w*|ablegen|ablage)|(sensors/done|\bdone\b|ablegen|ablage|archiv\w*)[^\n]{0,40}(gibt es nicht|existiert nicht|entf(ä|ae)llt|unn(ö|oe)tig|nicht (vorgesehen|sinnvoll|n(ö|oe)tig)))'
+        - '(?i)((kein\w*|nicht|ohne)[^\n]{0,40}(status|datum|stilllegung\w*)|(status|datum|stilllegung\w*)[^\n]{0,40}(unn(ö|oe)tig|nicht n(ö|oe)tig|entf(ä|ae)llt|nicht (vermerken|notieren|eintragen|pflegen)))'
+        - '(?i)(\bgit\b|versionsverwaltung|versionskontrolle|historie|history)'
+  - type: prompt
+    name: judge_hd_12_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Nein zur Idee: Ein retiriertes Gate ist weg - Zeile aus der Tabelle und Datei loeschen. Es gibt kein sensors/done/; die Sensor-Datei traegt kein Status- und kein Datumsfeld (Zustand = CI-Lauf, Aenderungsdatum = git). grundlagen-harness-dateien.md, Absatz "Kein Verzeichnis-Lifecycle: ein retiriertes Gate ist weg" (Z. 293-301).
+        Beispiel fuer eine RICHTIGE Antwort: Beides wird einfach gelöscht: die Zeile in der Sensors-Tabelle und die Datei harness/sensors/old-lint.md. Ein Ablegen unter sensors/done gibt es nicht, denn ein retiriertes Gate erklärt nichts, was die Versionsverwaltung nicht ohnehin festhält. Auch Status oder Stilllegungsdatum solltet ihr nicht in der Datei vermerken: der Zustand eines Gates ist sein CI-Lauf, das Datum steht in git.
+        Beispiel fuer eine FALSCHE Antwort: Ja, das ist sinnvoll. Tragt in old-lint.md den Status "retiriert" und das Stilllegungsdatum ein und verschiebt die Datei anschließend nach harness/sensors/done/. Die Zeile in der Sensors-Tabelle kann bestehen bleiben, mit dem Vermerk "abgeschafft", damit die Historie nachvollziehbar bleibt.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

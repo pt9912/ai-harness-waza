@@ -1,0 +1,16 @@
+id: tr-09-001
+name: Was loest die Anker-Pruefung aus
+description: |
+  Prueft TR-09 (grundlagen-traceability.md, Stufe 3): Sensor 1 (Anker-Paarung)
+  laeuft von der Closure-Notiz nach aussen und wird nur durch das Pflichtfeld
+  `liegt in <Zielort>` ausgeloest, und dieses gilt nur in `## Steering-Loop-
+  Eintraege` der welle-<Kennung>-results.md und in §7 der done/slice-<Kennung>.md.
+  Fliesstext in einer Roadmap loest nichts aus.
+tags: [tr-09, stufe-3, tr]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Wir haben einen Sensor, der prüft, ob verkörperte Steering-Loop-Regeln ihren 'seit welle-…'-Anker tragen. In unserer Roadmap steht im Fließtext der Satz 'slice-audit-log-hardening liegt in done/'. Startet das die Prüfung für diesen Slice? Und wo genau muss etwas stehen, damit der Sensor überhaupt anspringt?"
+expected:
+  output_contains:
+    - "results.md"
+  outcomes:
+    - type: task_completed

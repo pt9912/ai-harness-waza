@@ -1,0 +1,15 @@
+id: m14-10-001
+name: Replay gegen altes Golden Set - welches Image
+description: |
+  Prueft M14-10 (modul-14-docker-harness.md, Stufe 3): Der Container ist primaer
+  Reproduzierbarkeits-Anker, nicht Deployment; fuer ein Replay braucht man den
+  Image-Hash von damals (image-hash.txt), nicht das aktuelle Deployment.
+tags: [m14-10, stufe-3, modul-14]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Wir wollen ein Golden Set von vor sechs Monaten erneut abspielen. Ein Kollege sagt, wir sollen einfach das Image nehmen, das gerade in Produktion laeuft, ein Container sei ja ohnehin nur fuer die Auslieferung da. Stimmt das, und welches Image nehmen wir?"
+expected:
+  output_contains:
+    - "image-hash.txt"
+    - "Reproduzierbarkeits-Anker"
+  outcomes:
+    - type: task_completed

@@ -1,0 +1,39 @@
+id: bg-09-001
+name: Wann steht der Reconciliation-Backlog
+description: |
+  Prueft BG-09 (grundlagen-begriffe.md, Stufe 2): Der Reconciliation-Backlog steht, wenn jeder Fund
+  eine Zeile mit Aufloesung traegt, nicht wenn das Register leer ist; leer wird es je Sub-Area
+  erst bei der Graduation. Fixture: Register nach Vorlage mit 5 offenen Zeilen (alle mit
+  aufloesendem Artefakt) und einer aufgeloesten Zeile.
+  Grader (Regex): (1) Verneinung der Reviewer-Aussage, (2) Graduation als Zeitpunkt der Leere,
+  (3) je Sub-Area, (4) Steh-Kriterium: jede Zeile traegt ihre Aufloesung. Fixture folgt der
+  Vorlage reconciliation.template.md (RC-Kennungen, drei Klassen, Stand, Aufgeloeste Eintraege).
+tags: [bg-09, stufe-2, begriffe]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Bei unserem Brownfield-Repo meint der Reviewer, der Reconciliation-Backlog stehe noch nicht, weil in reconciliation.md noch Zeilen stehen. Stimmt das? Schau dir die Datei an und sag, ab wann das Register leer sein muss."
+  files:
+    - path: bg-09-reconciliation.md
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: backlog_steht_kriterium
+    config:
+      regex_match:
+        - '(?i)(nein|irrt|unrecht|falsch|stimmt\s+(so\s+)?nicht|trifft\s+nicht\s+zu|nicht\s+zutreffend|nicht\s+(ganz\s+)?(korrekt|richtig)|nicht\s+recht|liegt\s+(damit\s+)?(nicht\s+richtig|daneben))'
+        - '(?i)graduat'
+        - '(?i)(sub[ -]?area|je\s+(teil)?bereich|pro\s+(teil)?bereich)'
+        - '(?i)((jede|jeder|alle|jeweils|ausnahmslos)[^.\n]{0,80}aufl(ö|oe)s|aufl(ö|oe)sung[^.\n]{0,60}(tr(ä|ae)gt|hat|steht|benannt|zugeordnet|vorhanden|enth(ä|ae)lt))'
+  - type: prompt
+    name: judge_bg_09_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Nein, der Reviewer irrt. Der Backlog "steht", wenn jeder Fund eine Zeile mit Aufloesung traegt; beim Bootstrap-Ende ist das Register im Gegenteil voll; leer wird es erst je Sub-Area bei der Graduation (BEG "Reconciliation-Backlog"; BOOT §Harness-Bootstrap-Ende vs Workflow-Beginn; modul-02 §Das Reconciliation-Register).
+        Beispiel fuer eine RICHTIGE Antwort: Nein, der Reviewer liegt hier falsch. Das Register muss beim Bootstrap-Ende gar nicht leer sein, im Gegenteil, es ist dann voll. Der Backlog gilt als fertig aufgestellt, sobald jede Zeile ihre Aufloesung traegt, und das ist in reconciliation.md der Fall: alle fuenf offenen Funde verweisen auf einen Carveout mit Folge-Slice oder einen Reconciliation-Slice, und der sechste ist bereits aufgeloest. Leer sein muss das Register erst spaeter, und zwar je Sub-Area bei deren Graduation.
+        Beispiel fuer eine FALSCHE Antwort: Ja, der Reviewer hat Recht. Der Reconciliation-Backlog steht erst, wenn das Register leer ist, solange dort noch offene Zeilen stehen, ist der Brownfield-Rueckbau nicht abgeschlossen. Alle Funde muessen also erst aufgeloest und in die Tabelle der aufgeloesten Eintraege verschoben sein. Danach kann die Sub-Area graduieren und der Workflow beginnen.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

@@ -1,0 +1,14 @@
+id: bg-05-001
+name: Aenderungswunsch des Kunden im Repo abbilden
+description: |
+  Prueft BG-05 (grundlagen-begriffe.md, Stufe 2): Change Request ist bewusst kein Harness-Konstrukt
+  (kein ID-Schema, keine eigene Datei, kein Gate); im Repo bleibt nur ein Fussabdruck
+  (Version-Bump, Historie-Zeile mit Verweis, geaenderte LH-*).
+tags: [bg-05, stufe-2, begriffe]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Unser Kunde hat eine Aenderung an einer Anforderung im Lastenheft beauftragt. Ich moechte dafuer pro Aenderungswunsch eine Datei CR-042.md anlegen, mit fortlaufender Nummer und einem eigenen Gate, das prueft, dass sie existiert. Passt das so, und was gehoert stattdessen ins Repo?"
+expected:
+  output_contains:
+    - "Version-Bump"
+  outcomes:
+    - type: task_completed

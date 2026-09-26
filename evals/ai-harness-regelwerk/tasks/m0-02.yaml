@@ -1,0 +1,14 @@
+id: m0-02-001
+name: Wiederkehrende Anweisungen im Prompt
+description: |
+  Prueft M0-02 (modul-00-einfuehrung.md, Stufe 2): Was in jedem Lauf relevant
+  ist, gehoert in AGENTS.md oder eine Fitness Function, nicht in den Prompt
+  (der sonst zur Anti-Spec wird).
+tags: [m0-02, stufe-2, modul-00]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Bei jedem Auftrag an den Agenten schreiben wir dieselben Sätze in den Prompt: 'Nutze immer make test' und 'Ändere nie das Datenbankschema ohne Migration'. Das wird lästig und wir vergessen es manchmal. Wohin gehört so etwas stattdessen?"
+expected:
+  output_contains:
+    - "Fitness Function"
+  outcomes:
+    - type: task_completed

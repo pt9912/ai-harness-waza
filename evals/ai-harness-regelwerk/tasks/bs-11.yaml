@@ -1,0 +1,45 @@
+id: bs-11-001
+name: Brownfield-Bootstrap - Backlog gefuellt, fertig?
+description: |
+  Prueft BS-11 (grundlagen-bootstrap.md, Stufe 2): "Der Backlog steht" heisst,
+  jeder Fund hat eine Zeile und jede Zeile traegt ihre Aufloesung (Carveout mit
+  Folge-Slice, Reconciliation-Slice oder retroaktive ADR) - nicht, dass das
+  Register leer ist. Leer wird es erst bei der Graduation je Sub-Area.
+  Fixture: alle 5 Zeilen haben ein aufloesendes Artefakt, Stand ueberwiegend
+  'offen' -> Bootstrap-Ende ist erreicht.
+  Grader (text/regex): (1) Entscheidung "Bootstrap-Ende erreicht / ihr koennt
+  weitermachen"; (2) Begruendung: jede Zeile traegt eine Aufloesung/ein
+  aufloesendes Artefakt (nicht "alle abgearbeitet"); (3) Register wird erst bei
+  Graduation (je Sub-Area) leer. Negativ: "erst alle Zeilen abarbeiten" und
+  "noch nicht durch" duerfen nicht als Ergebnis stehen.
+tags: [bs-11, stufe-2, bs, fixture]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Wir bootstrappen ein Brownfield-Repo. Die Datei bs-11-reconciliation.md ist unser aktueller Stand der Inventur-Ergebnisse. Vier von fünf Zeilen stehen noch auf 'offen'. Sind wir mit dem Bootstrap durch und können mit den inhaltlichen Slices weitermachen, oder müssen erst alle Zeilen abgearbeitet sein?"
+  files:
+    - path: bs-11-reconciliation.md
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: bootstrap_ende_entscheidung
+    config:
+      regex_match:
+        - '(?i)(bootstrap[^.\n]{0,80}(abgeschlossen|erreicht|beendet|fertig|durch)|(seid|sind) (ihr |wir )?(damit |also |jetzt |bereits |schon )*(mit dem bootstrap )?(durch|fertig)|(k(ö|oe)nnt|k(ö|oe)nnen|darfst|d(ü|ue)rft|d(ü|ue)rfen)[^.\n]{0,60}(weiter|starten|beginnen|fortfahren|inhaltlich))'
+        - '(?i)((jede|jeder|alle)[^.\n]{0,60}(zeile|fund|eintrag)[^.\n]{0,80}(aufl(ö|oe)sung|aufl(ö|oe)send\w*|artefakt|folge-?slice|reconciliation-?slice|carveout|adr)|(aufl(ö|oe)sung|aufl(ö|oe)send\w*)[^.\n]{0,60}(jede|jeder|alle))'
+        - '(?i)(leer[^.\n]{0,100}(graduation|graduier\w*)|(graduation|graduier\w*)[^.\n]{0,100}leer)'
+      regex_not_match:
+        - '(?i)(m(ü|ue)sst|muss|m(ü|ue)ssen|sollt(et|en)?) (ihr |wir |sie |man |es )?(also |noch |zun(ä|ae)chst )?(erst|zuerst|vorher)( noch)? (alle|s(ä|ae)mtliche)'
+        - '(?i)(seid|sind|ist) (ihr |wir |damit |also |der bootstrap )*noch nicht (durch|fertig|abgeschlossen)'
+  - type: prompt
+    name: judge_bs_11_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Ja, Bootstrap-Ende ist erreicht: "Der Backlog steht" = jeder Fund hat eine Zeile und jede Zeile traegt ihre Aufloesung (Carveout+Folge-Slice, Reconciliation-Slice oder retroaktive ADR); NICHT "Register leer" - leer wird es erst bei der Graduation, je Sub-Area. grundlagen-bootstrap.md §Harness-Bootstrap-Ende vs Workflow-Beginn (Z. 202-230).
+        Beispiel fuer eine RICHTIGE Antwort: Ja, der Bootstrap ist damit abgeschlossen und ihr könnt mit den inhaltlichen Slices weitermachen. Entscheidend ist nicht, dass das Register leer wäre, sondern dass jeder Fund eine Zeile hat und jede Zeile ihre Auflösung trägt: F-01 und F-04 haben einen offenen Slice in open/, F-03 und F-05 einen Carveout samt Folge-Slice, F-02 ist über die retroaktive ADR schon aufgelöst. Beim Bootstrap-Ende ist die Datei im Gegenteil voll. Leer wird sie erst bei der Graduation der jeweiligen Sub-Area.
+        Beispiel fuer eine FALSCHE Antwort: Nein, ihr seid noch nicht durch. Solange vier von fünf Zeilen auf offen stehen, müsst ihr erst alle Zeilen abarbeiten, bevor die Inventur als abgeschlossen gilt. Das Register wird bei der Graduation der Sub-Area leer, und erst dann kann der Workflow mit den inhaltlichen Slices starten. Bis dahin ist der Bootstrap nicht beendet.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

@@ -1,0 +1,37 @@
+id: m06-02-001
+name: Welle-Datei mit Start-Trigger aus der eigenen Slice-Liste
+description: |
+  Prueft Regel M06-02 (modul-06-roadmap.md, Stufe 2): Der Start-Trigger einer
+  Welle darf kein Ergebnis dieser Welle sein. Die Fixture nennt als
+  Start-Trigger einen Slice aus der eigenen Slice-Liste (beobachtbar, aber
+  zirkulaer). Der Agent muss den Trigger als falsch platziert erkennen.
+  Die Regexes pruefen (1) die Diagnose Zirkularitaet (zirkulaer/Kreis/
+  Selbstbezug) und (2) die Begruendung, dass der Trigger aus der eigenen
+  Slice-Liste bzw. ein Ergebnis der Welle selbst ist.
+tags: [m06-02, stufe-2, modul-06]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Ich habe die Welle-Datei welle-parser-haertung angelegt. Passt alles so, oder wuerdest du etwas aendern? Wenn ja, was genau und warum?"
+  files:
+    - path: m06-02-welle-parser-haertung.md
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: start_trigger_zirkulaer
+    config:
+      regex_match:
+        - '(?i)zirkul(ä|ae)r|kreis(schluss|-?bezug|lauf)|selbst-?(bezug|referen)|sich selbst|henne-ei'
+        - '(?i)(slice-?liste|slices?[^.\n]{0,40}(dieser|der|der eigenen|eigenen|derselben)\s+welle|(ergebnis|resultat|teil|bestandteil|folge)\s+(dieser|der|der eigenen|derselben)\s+welle|innerhalb\s+der\s+welle|welle\s+selbst|eigene[nrs]?\s+(slice|welle|ergebnis|arbeit))'
+  - type: prompt
+    name: judge_m06_02_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Start-Trigger `slice-parser-refactor in done/` steht in der Slice-Liste derselben Welle und ist damit ein Ergebnis dieser Welle: als Closure-Trigger richtig, als Start-Trigger zirkulaer; Trigger muss ausserhalb der Welle liegen (modul-06-roadmap.md §Roadmap-Regeln, 3. Punkt, "Der Start-Trigger darf kein Ergebnis dieser Welle sein").
+        Beispiel fuer eine RICHTIGE Antwort: Nein, so wuerde ich die Datei nicht lassen. Der Start-Trigger "slice-parser-refactor liegt in done/" ist zwar beobachtbar, aber der Slice steht in der Slice-Liste genau dieser Welle. Damit haengt der Start der Welle von einem Ergebnis der Welle selbst ab, das ist zirkulaer: die Welle koennte nie starten, bevor sie gelaufen ist. "Alle Slices in done/" gehoert als Bedingung ins Ende der Welle, nicht an den Anfang. Der Start-Trigger sollte etwas ausserhalb der Welle beobachten, etwa einen externen Vorgang oder das Ergebnis einer frueheren Welle.
+        Beispiel fuer eine FALSCHE Antwort: Die Welle-Datei sieht im Grossen und Ganzen sauber aus. Der Start-Trigger ist konkret und beobachtbar, denn ein Slice in done/ laesst sich per Verzeichnisliste pruefen. Ich wuerde nur die Prognose "KW 44" durch ein festes Datum ersetzen und den Aufwand M begruenden. Sonst ist Ziel, Slice-Liste und Closure-Kriterium konsistent, der Trigger kann so bleiben.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

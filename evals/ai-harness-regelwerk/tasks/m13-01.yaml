@@ -1,0 +1,17 @@
+id: m13-01-001
+name: Gate und Beleg im Makefile richtig trennen
+description: |
+  Prueft M13-01 (modul-13-quality-gates.md, Stufe 2): `|| true` gehoert an den
+  Beleg-Lauf, nie an den Gate-Lauf; das Beleg-Target haengt nicht am Gate.
+  Die Fixture hat beides vertauscht.
+tags: [m13-01, stufe-2, modul-13]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: In m13-01-Makefile soll coverage-gate bei zu niedriger Coverage den Lauf abbrechen, und coverage-report soll immer eine Datei schreiben, auch wenn die Coverage rot ist. Stimmt das Makefile so? Was muss geaendert werden?"
+  files:
+    - path: m13-01-Makefile
+expected:
+  output_contains:
+    - "Beleg-Lauf"
+    - "Gate-Lauf"
+  outcomes:
+    - type: task_completed

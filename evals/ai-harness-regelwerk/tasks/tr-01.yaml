@@ -1,0 +1,17 @@
+id: tr-01-001
+name: Commit-Log gegen Traceability-Vorgabe
+description: |
+  Prueft TR-01 (grundlagen-traceability.md, Stufe 2): Jede relevante Aenderung
+  braucht Bezug zu Requirement-ID, Architekturprinzip, ADR-ID, Test/Gate/Demo
+  oder Doku-Update; die ARC-* der Sicht zaehlt nicht (Struktur-ID). Fixture:
+  Commit b72d9a0 traegt nur ARC-3.2, d55a8b3 gar keine ID.
+tags: [tr-01, stufe-2, tr, fixture]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Unser Commit-Hook soll sicherstellen, dass jede Änderung nachvollziehbar an etwas Übergeordnetes gebunden ist. Sieh dir tr-01-commit-log.md an: Welche dieser Commits würden nicht akzeptiert, und warum jeweils?"
+  files:
+    - path: tr-01-commit-log.md
+expected:
+  output_contains:
+    - "Struktur-ID"
+  outcomes:
+    - type: task_completed

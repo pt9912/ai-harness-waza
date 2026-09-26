@@ -1,0 +1,45 @@
+id: m03-02-001
+name: Lastenheft-Historie darf keine ADR/Slice-Verweise tragen
+description: |
+  Prueft Regel M03-02 (modul-03-spec.md, Stufe 3): Das Verweisverbot gilt in jedem
+  Abschnitt inkl. Historie; der Anlass steht als externer CR in der
+  Verweis-Spalte, die Repo-interne Beobachtung in der Closure-Notiz des Slice.
+  Der Prompt enthaelt bewusst das Muster "ADR-0012 / slice-042" als Falle.
+  Fixture: Lastenheft mit Historie-Tabelle.
+  Graders (Regex): (1) Verweis-Spalte traegt einen externen CR/Change Request;
+  (2) Beobachtung am Slice gehoert in die Closure-Notiz; nicht_match: keine
+  Tabellenzeile, die ADR-0012 oder slice-042 enthaelt.
+tags: [m03-02, stufe-3, modul-03]
+inputs:
+  prompt: >-
+    Nach dem AI-Harness-Regelwerk: Ich erhöhe in unserem Lastenheft das
+    Zeilenlimit von LH-FA-020 von 100 auf 500. Anlass war die Entscheidung
+    ADR-0012, aufgefallen ist es bei der Arbeit an slice-042. Bitte schreib
+    mir die neue Zeile für die Historie-Tabelle (siehe Datei) und sag mir, wo
+    der Anlass sonst festgehalten wird.
+  files:
+    - path: m03-02-lastenheft.md
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: historie_verweis_kern
+    config:
+      regex_match:
+        - '(?i)(extern[\wäöüß]*\s+(cr|change[ -]?request)|(cr|change[ -]?request)[^.]{0,60}extern|cr-\d{4}-[\wäöüß]+)'
+        - '(?i)(closure-?\s?(notiz|note|eintrag)[^.]{0,120}slice|slice[^.]{0,120}closure-?\s?(notiz|note|eintrag))'
+      regex_not_match:
+        - '(?im)^\s*\|[^\n]*(adr-?0*12|slice-?0*42)'
+  - type: prompt
+    name: judge_m03_02_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Historie-Zeile traegt nur den externen CR in der Verweis-Spalte (kein ADR-0012, kein slice-042; das Verweisverbot gilt in jedem Abschnitt inkl. Historie). Die Repo-interne Beobachtung (slice-042) steht in der Closure-Notiz des Slice. modul-03-spec.md §Ziel-Form: Akzeptanzkriterium, Absaetze "Das gilt in jedem Abschnitt, auch in der Historie" und "Der Anlass geht damit nicht verloren".
+        Beispiel fuer eine RICHTIGE Antwort: Neue Zeile für die Historie: | 2025-08-19 | LH-FA-020: Zeilenlimit von 100 auf 500 | 1.4 | CR-2025-014 | In die Verweis-Spalte gehört nur der externe Change Request (hier ein Platzhalter), weder ADR-0012 noch slice-042. Das Verweisverbot gilt auch in der Historie. Dass ihr das beim Arbeiten an slice-042 bemerkt habt, haltet ihr in der Closure-Notiz dieses Slice fest.
+        Beispiel fuer eine FALSCHE Antwort: Neue Zeile für die Historie: | 2025-08-19 | LH-FA-020: Zeilenlimit von 100 auf 500 | 1.4 | ADR-0012 | Der Anlass gehört in die Verweis-Spalte, damit man die Entscheidung nachvollziehen kann. Dass es bei slice-042 aufgefallen ist, halten wir zusätzlich in der Closure-Notiz des Slice fest.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

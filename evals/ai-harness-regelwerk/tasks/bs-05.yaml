@@ -1,0 +1,16 @@
+id: bs-05-001
+name: Sechs Sprach-Skelette - eine oder sechs Sub-Areas
+description: |
+  Prueft BS-05 (grundlagen-bootstrap.md, Stufe 3): Sub-Areas, die permanent
+  dieselben Trigger erzeugen und dieselbe Modus-Aussage tragen, sind eine
+  (Aggregation); trennen erst, wenn eine Haelfte eine eigene Adaption /
+  Inventur-Linie / Modus-Aussage bekommt (z. B. Alt-Port nach Brownfield).
+  Unterschiedliche Formatter (gofmt vs. black) rechtfertigen keine Trennung.
+tags: [bs-05, stufe-3, bs]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Unser Repo hat sechs Sprach-Skelette (go/, python/, rust/, ...). Alle sind Greenfield und folgen derselben Spec. Ein Kollege will jede Sprache als eigene Sub-Area führen, weil die Formatter verschieden sind (gofmt, black, ...). Ist das sinnvoll? Und unter welcher Bedingung würde sich die Antwort für go/ ändern?"
+expected:
+  output_contains:
+    - "Aggregation"
+  outcomes:
+    - type: task_completed

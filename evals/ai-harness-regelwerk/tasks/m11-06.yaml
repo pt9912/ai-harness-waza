@@ -1,0 +1,15 @@
+id: m11-06-001
+name: Standard-Tool ersetzt selbstgebautes Gate
+description: |
+  Prueft M11-06 (modul-11-verification.md, Stufe 3): Ein Skript wird nur
+  retired, wenn das Werkzeug eine Obermenge ist (gleiche Kandidaten-Menge,
+  Bedingungen, ADR-Schwelle), nachgewiesen per Break-Test, nicht per Datenblatt.
+tags: [m11-06, stufe-3, modul-11]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Es gibt jetzt ein Standard-Tool, das Closure-Notes auf Mindestlaenge prueft; laut Datenblatt deckt es alles ab, was unser eigenes Skript kann. Sein Default ist mindestens 1 Satz, unser ADR verlangt 2. Kann ich das eigene Skript loeschen und nur noch das Tool nutzen?"
+expected:
+  output_contains:
+    - "Obermenge"
+    - "Break-Test"
+  outcomes:
+    - type: task_completed

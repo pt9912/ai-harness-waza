@@ -1,0 +1,12 @@
+slice: slice-31
+recorded_at: 2026-03-02T09:14:00+01:00
+model:
+  name: claude-sonnet-latest
+  version: latest
+  seed: 0
+runtime:
+  image_hash: sha256:9f2c0d5b7a41e8c63d0b1a5e94f7c2d8e6a3b0c17f5d49e2a8b6c3d1f07e4a92
+  env: { tz: UTC, locale: C.UTF-8, network: none, cpu_count: 2 }
+  timestamp_masking: iso8601-to-placeholder
+inputs_ref: inputs/
+expectations_ref: expectations/

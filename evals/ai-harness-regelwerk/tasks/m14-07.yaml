@@ -1,0 +1,15 @@
+id: m14-07-001
+name: Gate-Container mit Bind-Mount hinterlaesst root-Dateien
+description: |
+  Prueft M14-07 (modul-14-docker-harness.md, Stufe 3): Der Pruefaufruf ist
+  hermetisch, kein Bind-Mount des Arbeitsbaums; Quellen per COPY beim Build,
+  Ergebnisse ueber stdout, host-seitig ausgepackt.
+tags: [m14-07, stufe-3, modul-14]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Unser Gate laeuft als `docker run --rm -v \"$(pwd)\":/src gate-image` und erzeugt das Verzeichnis build/ mit root:root-Besitz auf dem Host. Ein Kollege schlaegt vor, nach dem Lauf einfach `chown` aufzurufen. Wie sollte der Prueflauf stattdessen aufgebaut sein?"
+expected:
+  output_contains:
+    - "stdout"
+    - "hermetisch"
+  outcomes:
+    - type: task_completed

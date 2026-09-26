@@ -1,0 +1,36 @@
+id: kl-03-001
+name: Carveout in der 2x2-Matrix
+description: |
+  Prueft KL-03 (grundlagen-klassifikation.md, Stufe 2): Carveouts gehoeren (neben Spec, ADR) zu
+  Inferential + Feedforward (Kontext vor der Handlung), nicht zu den Gates (Computational + Feedback).
+  Grader (Regex): (1) Carveout -> Inferential + Feedforward, (2) Gates -> Computational + Feedback
+  (Kontrast). regex_not_match faengt die Fehlzuordnung "Carveout ist Computational/Feedback" ab.
+  Prompt fragt nicht mehr nach "beiden Achsen", damit die blosse Achsen-Erklaerung nicht besteht.
+tags: [kl-03, stufe-2, klassifikation]
+inputs:
+  prompt: 'Nach dem AI-Harness-Regelwerk: In welchen Quadranten der 2x2-Matrix der Harness-Kontrollen gehört ein dokumentierter Carveout? Und wo liegen im Vergleich dazu die Gates?'
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: carveout_quadrant
+    config:
+      regex_match:
+        - '(?i)carveout[^\s.,;:()]*[\s\S]{0,120}?(inferential[^.\n]{0,40}feedforward|feedforward[^.\n]{0,40}inferential)'
+        - '(?i)gates?[^.\n]{0,120}(computational[^.\n]{0,40}feedback|feedback[^.\n]{0,40}computational)'
+      regex_not_match:
+        - '(?i)carveout[^\s.,;:()]*\s+([^\s.,;:()]+\s+){0,3}(ist|sind|liegt|liegen|geh(ö|oe)rt|geh(ö|oe)ren|z(ä|ae)hlt|z(ä|ae)hlen|=|→|:)\s+([^\s.,;:()]+\s+){0,4}(computational|feedback)'
+        - '(?i)carveout[^\s.,;:()]*[^.\n]{0,60}(nicht|kein[^\s.,;:()]*|statt|anstelle)\s+([^\s.,;:()]+\s+){0,2}(inferential|feedforward)'
+  - type: prompt
+    name: judge_kl_03_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Carveout liegt in Inferential + Feedforward (Kontext vor der Handlung, zusammen mit Spec und ADR), nicht bei den Gates (Computational + Feedback) (KL §2x2-Matrix, "Lesart", Punkt "Inferential + Feedforward": "Das sind Spec, ADR, Carveouts").
+        Beispiel fuer eine RICHTIGE Antwort: Ein dokumentierter Carveout gehoert in den Quadranten Inferential + Feedforward: Er gibt dem Agenten Kontext, bevor er handelt, genau wie Spec und ADR. Die Gates liegen dagegen im Quadranten Computational + Feedback, sie erkennen falsche Aktionen schnell und deterministisch, nachdem sie passiert sind. Ein Carveout ist also kein Gate, sondern Vorab-Kontext.
+        Beispiel fuer eine FALSCHE Antwort: Ein Carveout gehoert in den Quadranten Computational + Feedback, denn er ist eine dokumentierte Ausnahme von einem Gate und wird deterministisch nachgelagert geprueft. Die Gates liegen im selben Quadranten Computational + Feedback. Inferential und Feedforward sind dagegen Reviews und Spec-Vorgaben, nicht Carveouts.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

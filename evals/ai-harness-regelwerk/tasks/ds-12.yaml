@@ -1,0 +1,39 @@
+id: ds-12-001
+name: Bindepunkte zaehlen und Artefakt-Set
+description: |
+  Prueft DS-12 (grundlagen-durchsetzungsschicht.md, Stufe 3): Es bleiben drei
+  Bindepunkte; CLAUDE.md ist Einstieg, kein vierter Bindepunkt, verweist nur auf
+  AGENTS.md. Die Schicht ist erst mit fuenf Artefakten vollstaendig, darunter
+  eine gemeinsame inhaltsbasierte Nachweis-Quelle fuer Gate-Lauf und Handoff-Gate.
+  Grader (text/regex): (1) Anzahl "drei Bindepunkte"; (2) es fehlt eine
+  (gemeinsame, inhaltsbasierte) Nachweis-Quelle bzw. der Nachweis-Mechanismus
+  (Nachweis-Quelle/-datei/Content-Hash); (3) CLAUDE.md ist Einstieg/verweist
+  nur und ist kein (vierter) Bindepunkt. Negativ: "nichts fehlt".
+tags: [ds-12, stufe-3, ds]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Wir haben einen PreToolUse-Hook, einen Stop-Hook, einen Slash-Command in .claude/commands, die Verdrahtung in .claude/settings.json und eine CLAUDE.md, die unsere verbindlichen Regeln enthält. Ein Kollege sagt, wir hätten damit vier Bindepunkte und die Durchsetzungsschicht sei vollständig. Wie viele Bindepunkte sind es, und fehlt noch etwas?"
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: drei_bindepunkte_nachweis_quelle
+    config:
+      regex_match:
+        - '(?i)((\bdrei\b|\b3\b)[^\n]{0,60}bindepunkt|bindepunkte?[^\n]{0,60}(\bdrei\b|\b3\b))'
+        - '(?i)((fehl\w*|nicht vorhanden|noch kein\w*|nicht vollst(ä|ae)ndig|unvollst(ä|ae)ndig|vermisse\w*)[^\n]{0,150}(nachweis|content[ -]?hash|inhalts[ -]?(hash|basiert))|(nachweis|content[ -]?hash|inhalts[ -]?(hash|basiert))[^\n]{0,150}(fehl\w*|nicht vorhanden|noch kein\w*|nicht vollst(ä|ae)ndig|unvollst(ä|ae)ndig))'
+        - '(?i)(claude\.md[^\n]{0,150}(einstieg|verweis|kein\w* (vierte\w* )?bindepunkt|nicht als (vierte\w* )?bindepunkt|kein\w* vierte\w*)|(einstieg|verweist|verweis|vierte\w*)[^\n]{0,150}claude\.md)'
+      regex_not_match:
+        - '(?i)(nichts fehlt|fehlt nichts|ist vollst(ä|ae)ndig, nichts)'
+  - type: prompt
+    name: judge_ds_12_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Es bleiben DREI Bindepunkte (Tool-Call-Gate, Handoff-Gate, Workflow-Skelett); CLAUDE.md ist Einstieg, kein Bindepunkt, verweist nur auf AGENTS.md und legt nichts fest. Vollstaendig erst mit fuenf Artefakten - es fehlt die gemeinsame inhaltsbasierte Nachweis-Quelle fuer Gate-Lauf und Handoff-Gate. grundlagen-durchsetzungsschicht.md §Drei Bindepunkte und §Das vollstaendige Artefakt-Set (Z. 22-43, 89-105).
+        Beispiel fuer eine RICHTIGE Antwort: Es sind nur drei Bindepunkte: Tool-Call-Gate (PreToolUse), Handoff-Gate (Stop-Hook) und das Workflow-Skelett (der Slash-Command). Die CLAUDE.md ist kein vierter Bindepunkt, sondern der Einstieg, der nur auf die AGENTS.md verweist und selbst nichts festlegt. Vollständig ist die Schicht außerdem noch nicht: Es fehlt eine gemeinsame, inhaltsbasierte Nachweisquelle, auf die sich Gate-Lauf und Handoff-Gate beide stützen.
+        Beispiel fuer eine FALSCHE Antwort: Es sind vier Bindepunkte: PreToolUse-Hook, Stop-Hook, Slash-Command und die CLAUDE.md mit den verbindlichen Regeln. Da auch die Verdrahtung in settings.json vorhanden ist, ist die Durchsetzungsschicht vollständig, es fehlt nichts. Der Kollege hat also recht.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

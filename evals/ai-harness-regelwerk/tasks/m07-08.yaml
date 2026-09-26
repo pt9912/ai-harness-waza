@@ -1,0 +1,18 @@
+id: m07-08-001
+name: Carveout mit veralteter Pruefung trotz gueltigem Trigger
+description: |
+  Prueft Regel M07-08 (modul-07-carveouts.md, Stufe 2): Ein Carveout, dessen
+  letzte Pruefung mehr als 90 Tage zurueckliegt, ist ein HIGH-Warnsignal,
+  auch wenn der Trigger nominell noch gilt. Fixture: Letzte Pruefung
+  2026-05-27, Stichtag 2026-09-25 (121 Tage).
+tags: [m07-08, stufe-2, modul-07]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Heute ist der 25.09.2026. Schau dir den Carveout CO-005 an (Datei). Der Trigger ist unveraendert sinnvoll und der Folge-Slice ist eingeplant. Ist daran trotzdem etwas ein Problem, und wie schwer wiegt es?"
+  files:
+    - path: m07-08-co-005-export-coverage.md
+expected:
+  output_contains:
+    - "HIGH-Warnsignal"
+    - "90 Tage"
+  outcomes:
+    - type: task_completed

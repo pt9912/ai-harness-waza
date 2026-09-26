@@ -1,0 +1,35 @@
+id: kl-08-001
+name: Zweites Auftreten desselben Versagens
+description: |
+  Prueft KL-08 (grundlagen-klassifikation.md, Stufe 2): Steering-Loop-Schwellwerte. 1x = Vorfall
+  (notieren), 2x = Symptom (kategorisieren, beobachten), erst 3x = Luecke im Harness (Guide oder Sensor
+  nachziehen). Der Mensch entscheidet, wo der Harness waechst.
+  Grader (Regex): (1) noch nicht sofort bauen / abwarten, (2) zweites Auftreten = Symptom,
+  (3) kategorisieren/beobachten, (4) erst das dritte Auftreten ist eine Luecke im Harness.
+tags: [kl-08, stufe-2, klassifikation]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Der Agent hat in diesem Sprint zum zweiten Mal denselben Verstoss gegen eine ADR begangen (Import aus der falschen Schicht). Sollen wir jetzt sofort eine neue ArchUnit-Regel dafuer bauen, oder was ist der richtige Umgang?"
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: steering_loop_schwelle
+    config:
+      regex_match:
+        - '(?i)(noch\s+nicht|nicht\s+(sofort|jetzt|gleich|direkt|schon|voreilig)|\bnein\b|(zu\s+)?fr(ü|ue)h\b|abwarten|nicht\s+([^\s.,;:()]+\s+){0,3}(bauen|anlegen|schreiben|erstellen|einf(ü|ue)hren))'
+        - '(?i)symptom'
+        - '(?i)(kategori[sz]|beobacht|einordn|klassifizier|notier|erfass|dokumentier)'
+        - '(?i)(dritte[nsm]?\s+([^\s.,;:()]+\s+){0,2}(mal|auftreten|vorfall|verstoß|verstoss|vorkommen|wiederholung|fall)|(3|drei)\s*(x|×|mal)|dreimal|beim\s+dritten|erst\s+(beim|ab|nach|wenn)\s+([^\s.,;:()]+\s+){0,3}(dritt|3))'
+  - type: prompt
+    name: judge_kl_08_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Nein, noch nicht bauen. 2x = Symptom: kategorisieren und beobachten; erst das dritte Auftreten ist eine Luecke im Harness (dann Guide/Sensor nachziehen, hier ArchUnit-Regel fuer ADR-Verstoss). Der Mensch entscheidet, wo der Harness waechst (KL §Steering Loop).
+        Beispiel fuer eine RICHTIGE Antwort: Noch nicht bauen. Ein zweiter Verstoss derselben Art ist erst ein Symptom: Wir kategorisieren ihn im Beobachtungs-Register und behalten ihn im Auge. Erst wenn er ein drittes Mal auftritt, ist es eine Luecke im Harness, und dann ist die ArchUnit-Regel fuer den Schichten-Import die richtige Antwort. Der Mensch entscheidet, wo der Harness waechst.
+        Beispiel fuer eine FALSCHE Antwort: Ja, baut die ArchUnit-Regel gleich jetzt. Zwei Verstoesse gegen dieselbe ADR sind ein klares Symptom, dass der Harness eine Luecke hat. Eine Regel fuer den Import aus der falschen Schicht ist billig und deterministisch, man kann den Vorfall spaeter noch kategorisieren und beobachten.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

@@ -1,0 +1,17 @@
+id: hd-14-001
+name: Verweis auf eine Konventions-Adaption
+description: |
+  Prueft HD-14 (grundlagen-harness-dateien.md, Stufe 3): Von aussen wird der
+  Index-Anker `harness/conventions.md#mr-<NNN>` verlinkt, nicht die
+  Eintrags-Datei (wandert per git mv nach conventions/done/). Der Anker muss
+  explizit als `<a id="mr-<NNN>"></a>` in der MR-Zelle gesetzt sein und
+  adressiert die Kennung, nicht den Titel.
+tags: [hd-14, stufe-3, hd]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Ein offener Slice soll auf unsere repo-lokale Adaption MR-004 verweisen. Deren Eintrag liegt gerade in harness/conventions/MR-004-retry-policy.md. Wie schreibe ich den Verweis im Slice, und was muss ich dafür in der Übersichtsdatei sicherstellen?"
+expected:
+  output_contains:
+    - "conventions.md#mr-"
+    - '<a id="mr-'
+  outcomes:
+    - type: task_completed

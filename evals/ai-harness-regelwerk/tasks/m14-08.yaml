@@ -1,0 +1,36 @@
+id: m14-08-001
+name: Gate-Stage per docker build ausloesen
+description: |
+  Prueft M14-08 (modul-14-docker-harness.md, Stufe 2): Ist die Gate-Stage selbst
+  das Gate, sind --no-cache-filter <stage> und der Verzicht auf -q Pflicht.
+  Die Fixture nutzt einen self-hosted Runner (persistenter Layer-Cache), damit
+  das gecachte Gruen trotz Verstoss erklaerbar ist.
+  Grader (text, regex): (1) --no-cache-filter fuer die Stage (nicht nur
+  --no-cache); (2) -q/--quiet entfernen bzw. darauf verzichten.
+tags: [m14-08, stufe-2, modul-14]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Der Lint-Job in m14-08-ci-lint.yml ist gruen, obwohl ein Kollege absichtlich einen Lint-Verstoss eingebaut hat. Und in frueheren roten Laeufen stand im Log nur 'exit code: 1' ohne Befunde. Was ist an dem Job falsch, und was aendere ich?"
+  files:
+    - path: m14-08-ci-lint.yml
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: no_cache_filter_und_kein_q
+    config:
+      regex_match:
+        - "(?i)no-?cache-?filter"
+        - "(?i)(ohne|entfern\\w*|entfall\\w*|weglass\\w*|verzicht\\w*|streich\\w*|kein(e|en)?|nicht|raus)[^.\\n]{0,60}(-q\\b|--quiet|-q`)|(-q\\b|--quiet)[^.\\n]{0,80}(entfern|entfall|weglass|weg\\b|raus|streich|ohne|nicht|verzicht|l(ö|oe)sch)"
+  - type: prompt
+    name: judge_m14_08_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Ist die Gate-Stage selbst das Gate (`docker build --target lint-gate`), sind `--no-cache-filter <stage>` (sonst gecachtes Gruen) und der Verzicht auf `-q` (sonst nur "exit code: 1") Pflicht (modul-14 §Zwei Wege, die Pruefung auszuloesen, Tabelle "Griff").
+        Beispiel fuer eine RICHTIGE Antwort: Der Job nutzt die Gate-Stage direkt per docker build, und auf dem self-hosted Runner bleibt der Layer-Cache bestehen. Das gruene Ergebnis ist deshalb vermutlich ein gecachtes Gruen: Die Stage wird nicht neu ausgefuehrt. Ergaenze `--no-cache-filter lint-gate`, damit genau diese Stage jedes Mal laeuft, waehrend die uebrigen Layer gecacht bleiben. Ausserdem musst du das `-q` weglassen, denn mit -q zeigt ein roter Build nur "exit code: 1" und die Befunde des Lint-Werkzeugs fehlen im Log.
+        Beispiel fuer eine FALSCHE Antwort: Der Lint-Job nutzt den Docker-Cache, deshalb bleibt er gruen. Setze `--no-cache` beim docker build, dann wird alles komplett neu gebaut. Das kostet Zeit, ist aber der sichere Weg. Das -q ist unkritisch, es unterdrueckt nur Fortschrittsausgaben; die Befunde stehen im Werkzeug-Report.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

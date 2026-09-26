@@ -1,0 +1,19 @@
+id: m07-02-001
+name: Drei Ausnahmen auf demselben Pfad - Werkzeug-Wahl
+description: |
+  Prueft Regel M07-02 (modul-07-carveouts.md, Stufe 3): Trichter mit
+  Granularitaet vor Temporalitaet. Drei Carveout-Entwuerfe im selben
+  Geltungsbereich sind ein Cluster und gehoeren als BF-Sub-Area-Markierung
+  in den Adaptions-Block von harness/conventions.md, nicht als Carveout-
+  Kaskade.
+tags: [m07-02, stufe-3, modul-07]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Wir haben drei Carveout-Entwuerfe fuer unser Parser-Modul geschrieben (siehe Datei), jeweils komplett mit Folge-Slice. Sollen wir die so anlegen, oder ist etwas anderes das richtige Werkzeug? Wo wuerde das dann festgehalten?"
+  files:
+    - path: m07-02-carveout-entwuerfe.md
+expected:
+  output_contains:
+    - "BF-Sub-Area-Markierung"
+    - "conventions.md"
+  outcomes:
+    - type: task_completed

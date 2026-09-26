@@ -1,0 +1,15 @@
+id: rr-13-001
+name: User Stories im Given-When-Then-Format ablegen
+description: |
+  Prueft RR-13 (grundlagen-referenz-richtung.md, Stufe 3): Genre-Falle. Die Form (Given/When/Then)
+  ist kein Beleg fuer ein Stratum; User Stories sind Slice-Klasse (Refinement) und gehoeren unter
+  docs/plan/planning/, nicht nach spec/.
+tags: [rr-13, stufe-3, referenz-richtung]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Wir schreiben User Stories mit Akzeptanzkriterien im Given/When/Then-Format, genau wie die Anforderungen im Lastenheft. Ich wuerde sie deshalb unter spec/user-stories/ ablegen. Ist das der richtige Ort, und wenn nicht, wohin gehoeren sie und warum?"
+expected:
+  output_contains:
+    - "docs/plan/planning"
+    - "Slice-Klasse"
+  outcomes:
+    - type: task_completed

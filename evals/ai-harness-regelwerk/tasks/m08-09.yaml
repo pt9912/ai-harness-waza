@@ -1,0 +1,16 @@
+id: m08-09-001
+name: Skill-Dateien pro Rolle oder pro Urteilstyp
+description: |
+  Prueft Regel M08-09 (modul-08-agentenrollen.md, Stufe 2): Nur der Reviewer
+  laeuft ueber eine Skill-Datei; Skills wachsen pro Urteilstyp, nicht pro
+  Rolle (closure-note-reviewer.md neben reviewer.md, keine siebte Rolle);
+  zusaetzliche Skill-Dateien fuer Template-/Briefing-Rollen sind Attrappen.
+tags: [m08-09, stufe-2, modul-08]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Wir wollen fuer alle sechs Rollen (Planner, Architect, Implementer, Reviewer, Verifier, Validator) je eine eigene Skill-Datei anlegen. Ausserdem soll ein Agent kuenftig die Closure-Notizen der Slices beurteilen. Wie setzen wir das auf, welche Dateien brauchen wir wirklich?"
+expected:
+  output_contains:
+    - "Attrappe"
+    - "closure-note-reviewer.md"
+  outcomes:
+    - type: task_completed

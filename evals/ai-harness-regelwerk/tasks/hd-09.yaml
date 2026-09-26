@@ -1,0 +1,38 @@
+id: hd-09-001
+name: Sensors-Tabelle - Aufruf in der Target-Zelle
+description: |
+  Prueft HD-09 (grundlagen-harness-dateien.md, Stufe 2): Die Target-Zelle der
+  Sensors-Tabelle traegt nur den nackten Target-Namen; der Aufruf mit Argument
+  gehoert in die Nachbarspalte, sonst meldet der Deklarations-Sensor still
+  gate-undocumented. Fixture: Zeile mit `make verify-slice SLICE=<id>` in der
+  Target-Zelle (verlinkte Zelle `coverage` ist korrekt).
+  Grader (text/regex): (1) Target-Zelle darf nur den Target-Namen (verify-slice)
+  tragen, ohne make/Argument; (2) der Aufruf/das Argument (SLICE=<id>) gehoert in
+  eine andere Spalte (Vertrag/Nachbarspalte).
+tags: [hd-09, stufe-2, hd, fixture]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Unser Deklarations-Check meldet gate-undocumented für verify-slice, obwohl die Sensors-Tabelle in hd-09-harness-readme.md eine Zeile dafür hat. Woran liegt das und was muss ich ändern?"
+  files:
+    - path: hd-09-harness-readme.md
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: target_zelle_nur_name
+    config:
+      regex_match:
+        - '(?i)((nur|allein|alleine|ausschlie(ß|ss)lich|blo(ß|ss)\w*|nackt\w*|rein\w*|pur\w*|schlicht\w*)[^\n]{0,40}(verify-slice|target[ -]?name|name des targets|kennung|target)|(verify-slice`?|target[ -]?name)[^\n]{0,40}(allein|alleine|nur|ohne)|(ohne|kein\w*)[^\n]{0,30}(make|argument\w*|slice=))'
+        - '(?i)((aufruf|argument\w*|slice=|make verify-slice)[^\n]{0,150}(vertrag|nachbar\w*|daneben|andere[nr]? spalte|benachbart\w*|zweite[nr]? spalte|separate\w* spalte|spalte)|(vertrag|nachbar\w*|daneben|andere[nr]? spalte|benachbart\w*|separate\w* spalte)[^\n]{0,150}(aufruf|argument\w*|slice=))'
+  - type: prompt
+    name: judge_hd_09_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Die Target-Zelle traegt nur den nackten Target-Namen; der Aufruf mit Argument (`SLICE=<id>`) gehoert in die Nachbarspalte. Sonst meldet der Deklarations-Sensor still `gate-undocumented`. Eine verlinkte Target-Zelle ist nicht betroffen. grundlagen-harness-dateien.md §harness/README.md als Einstiegspunkt (Z. 203-211).
+        Beispiel fuer eine RICHTIGE Antwort: Der Sensor sucht in der Target-Zelle nach der Kennung, und in der Zeile steht `make verify-slice SLICE=<id>`, was keine Kennung ist. Deshalb meldet er still gate-undocumented. In die Target-Zelle gehört ausschließlich der Name `verify-slice`. Den vollständigen Aufruf mit dem SLICE-Argument schiebst du in die Vertrag-Spalte daneben. Die verlinkte Zelle bei coverage ist dagegen in Ordnung.
+        Beispiel fuer eine FALSCHE Antwort: Das Target verify-slice ist vermutlich im Makefile nicht definiert, oder die Zeile ist nicht verlinkt. Verlinke die Zelle auf sensors/verify-slice.md, so wie bei coverage, dann findet der Deklarations-Check die Zeile. Danach den Check erneut laufen lassen.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

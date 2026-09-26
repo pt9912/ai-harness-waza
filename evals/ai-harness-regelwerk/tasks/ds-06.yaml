@@ -1,0 +1,15 @@
+id: ds-06-001
+name: Stop-Hook bei dauerhaft rotem Gate
+description: |
+  Prueft DS-06 (grundlagen-durchsetzungsschicht.md, Stufe 2): Ein Handoff-Gate
+  braucht einen Loop-Guard: erkennt, dass es in derselben Runde schon einmal
+  blockiert hat, und gibt sich beim zweiten Anlauf frei (sonst Endlosschleife
+  bei dauerhaft rotem Gate). Nicht: blockieren bis gruen.
+tags: [ds-06, stufe-2, ds]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Unser Stop-Hook lässt den Agenten nicht 'fertig' melden, solange ein Gate rot ist. Ein Gate ist strukturell dauerhaft rot (als Carveout dokumentiert). Der Agent hängt jetzt in einer Endlosschleife aus Blockieren und erneutem Versuch. Wie muss der Hook gebaut sein, damit das nicht passiert?"
+expected:
+  output_contains:
+    - "Loop-Guard"
+  outcomes:
+    - type: task_completed

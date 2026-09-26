@@ -1,0 +1,15 @@
+id: bs-07-001
+name: Baseline-Migration ist kein Brownfield
+description: |
+  Prueft BS-07 (grundlagen-bootstrap.md, Stufe 3): GF/BF regeln die Achse
+  Doc <-> Code. Eine Regelwerks-Migration (adoptierte Norm <-> ausgefuelltes
+  Artefakt) ist kein Brownfield-Fall; zustaendig ist der Freshness-Audit, keine
+  Bestandsinventur/Reconciliation-Backlog.
+tags: [bs-07, stufe-3, bs]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Wir heben unser Repo auf eine neue Version der adoptierten Regelwerk-Baseline. Code und Doku des Repos stimmen bereits überein. Ein Teammitglied sagt, das sei ein Brownfield-Fall, wir müssten eine Inventur des Bestands machen und ein Reconciliation-Backlog anlegen. Stimmt das? Was ist stattdessen zu tun?"
+expected:
+  output_contains:
+    - "Freshness-Audit"
+  outcomes:
+    - type: task_completed

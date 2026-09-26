@@ -1,0 +1,15 @@
+id: m15-04-001
+name: Cache-Hit-Ratio faellt - Kosten oder Angriff
+description: |
+  Prueft M15-04 (modul-15-observability.md, Stufe 3): Eine einzelne
+  cache.hit_ratio reicht nicht; getrennte Hit-/Miss-Counter unterscheiden
+  Kosten-Indikator von Cache-Miss-Spike (Sicherheits-Indikator, Injection).
+tags: [m15-04, stufe-3, modul-15]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Unser Dashboard zeigt nur die Metrik cache.hit_ratio. Sie ist gestern von 80 % auf 40 % gefallen. Kann ich daraus ableiten, ob das nur ein Kostenproblem ist oder ob etwas anderes dahintersteckt? Was fehlt gegebenenfalls?"
+expected:
+  output_contains:
+    - "Cache-Miss-Spike"
+    - "Injection"
+  outcomes:
+    - type: task_completed

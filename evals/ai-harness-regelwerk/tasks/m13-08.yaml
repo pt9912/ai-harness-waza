@@ -1,0 +1,15 @@
+id: m13-08-001
+name: Tool-Call-Waechter wird per bash -c umgangen
+description: |
+  Prueft M13-08 (modul-13-quality-gates.md, Stufe 3): Bei Umgehung ueber eine
+  Sub-Shell wird der Payload rekursiv derselben Pruefung unterworfen (Tiefenlimit,
+  darueber fail-closed), nicht die Denylist erweitert; Haertung als neuer MR-<NNN>.
+tags: [m13-08, stufe-3, modul-13]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Unser Guard fuer Tool-Calls blockiert `rm -rf`. Ein Agent hat ihn jetzt zum dritten Mal umgangen, diesmal mit `bash -c \"rm -rf build\"`. Der Vorschlag im Team lautet, bash und sh in der Denylist zu sperren. Was ist der richtige Weg?"
+expected:
+  output_contains:
+    - "Tiefenlimit"
+    - "fail-closed"
+  outcomes:
+    - type: task_completed

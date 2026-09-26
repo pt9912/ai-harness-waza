@@ -1,0 +1,35 @@
+id: m12-08-001
+name: Manifest-Feld slice nach Rotation
+description: |
+  Prueft M12-08 (modul-12-replay-evaluierung.md, Stufe 2): `slice` im Manifest
+  haelt die erzeugende Closure fest; spaetere Aenderungen (Rotation) stehen
+  datiert im CHANGELOG.md des Sets, nicht im Feld slice.
+  Grader (text, regex): (1) Entscheidung: Feld nicht fortschreiben/aendern;
+  (2) Aenderung gehoert in den CHANGELOG des Sets; (3) Begruendung: das Feld
+  ist der Ursprungs-/Traceability-Anker (Stamm erzeug/ursprung/anker/traceab).
+tags: [m12-08, stufe-2, modul-12]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Unser Golden Set wurde in Slice 42 um einen weiteren Fall ergaenzt. In manifest.yaml steht noch `slice: slice-17`. Soll ich das Feld auf slice-42 aendern, und wo halte ich die Aenderung sonst fest?"
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: slice_bleibt_changelog
+    config:
+      regex_match:
+        - "(?i)\\bnein\\b|nicht\\s+[^.\\n]{0,40}(ä|ae)nder|nicht\\s+[^.\\n]{0,40}(fort|(ü|ue)ber)schreib|nicht\\s+[^.\\n]{0,40}(anpass|aktualis)|unver(ä|ae)ndert|beibehalt|belass|stehen\\s+lass|bleibt\\s+(so|stehen|auf|slice|unver)"
+        - "(?i)change-?log"
+        - "(?i)erzeug|urspr(ü|ue)ng|traceab|anker|entstand|entstehung|hervorgebracht|urheber|angelegt hat"
+  - type: prompt
+    name: judge_m12_08_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Nein, `slice` nicht fortschreiben; das Feld haelt die Closure fest, die das Set erzeugt hat; Aenderungen stehen datiert im Set-eigenen CHANGELOG.md (modul-12 Feldtabelle `slice` und §Regeln "Rotation").
+        Beispiel fuer eine RICHTIGE Antwort: Nein, lass `slice: slice-17` unveraendert stehen. Das Feld dokumentiert die Closure, aus der das Golden Set urspruenglich entstanden ist, und dient als Traceability-Anker zurueck auf den Plan. Wuerdest du es bei jeder Erweiterung fortschreiben, ginge dieser Bezug verloren. Die Ergaenzung in Slice 42 traegst du stattdessen datiert in die CHANGELOG.md des Sets ein, mit Datum und dem, was sich geaendert hat.
+        Beispiel fuer eine FALSCHE Antwort: Ja, setze das Feld auf `slice: slice-42`, damit die Traceability zum aktuellen Stand des Sets stimmt. Der Manifest-Eintrag soll immer die letzte Closure widerspiegeln, die das Golden Set veraendert hat. Zusaetzlich kannst du die Aenderung in der CHANGELOG.md vermerken, das ist aber optional.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

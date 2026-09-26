@@ -14,6 +14,8 @@ WAZA        = docker run --rm $(IMAGE)
 # Container localhost:11434 des Hosts erreicht. Der Key ist ein Platzhalter.
 OLLAMA_URL      ?= http://localhost:11434/v1
 OLLAMA_PROVIDER ?= openai
+# Fester Judge fuer die prompt-Grader (unabhaengig vom getesteten Modell).
+OLLAMA_JUDGE    ?= kimi-k2.7-code:cloud
 OLLAMA_ENV       = -e COPILOT_PROVIDER=$(OLLAMA_PROVIDER) -e COPILOT_BASE_URL=$(OLLAMA_URL) \
                    -e COPILOT_WIRE_API=completions -e COPILOT_API_KEY=ollama
 
@@ -51,9 +53,9 @@ run-copilot: image ## Evals mit echtem Modell (braucht GITHUB_TOKEN)
 	@test -n "$$GITHUB_TOKEN" || { echo "GITHUB_TOKEN nicht gesetzt"; exit 1; }
 	@$(call RUN_WITH_RESULTS,-e GITHUB_TOKEN,run $(EVAL_YAML) --context-dir $(FIXTURES) -v --output results/copilot.json)
 
-run-ollama: image ## Evals mit Ollama: make run-ollama OLLAMA_MODEL=<name> [TASK=<glob>]
-	@test -n "$(OLLAMA_MODEL)" || { echo "Aufruf: make run-ollama OLLAMA_MODEL=<name> [TASK=<glob>]  (Modelle: ollama list)"; exit 1; }
-	@$(call RUN_WITH_RESULTS,--network host $(OLLAMA_ENV),run $(EVAL_YAML) --context-dir $(FIXTURES) -v --model '$(OLLAMA_MODEL)' $(if $(TASK),--task '$(TASK)') --output results/ollama-$(subst /,_,$(subst :,_,$(OLLAMA_MODEL))).json)
+run-ollama: image ## Evals mit Ollama: make run-ollama OLLAMA_MODEL=<name> [TASK="<glob> ..."]
+	@test -n "$(OLLAMA_MODEL)" || { echo "Aufruf: make run-ollama OLLAMA_MODEL=<name> [TASK=\"<glob> ...\"]  (Modelle: ollama list)"; exit 1; }
+	@$(call RUN_WITH_RESULTS,--network host $(OLLAMA_ENV),run $(EVAL_YAML) --context-dir $(FIXTURES) -v --model '$(OLLAMA_MODEL)' --judge-model '$(OLLAMA_JUDGE)' $(foreach t,$(TASK),--task '$(t)') --output results/ollama-$(subst /,_,$(subst :,_,$(OLLAMA_MODEL))).json)
 
 compare: image ## Ergebnisse vergleichen: make compare A=results/a.json B=results/b.json
 	@test -f "$(A)" -a -f "$(B)" || { echo "Aufruf: make compare A=<datei> B=<datei>"; exit 1; }

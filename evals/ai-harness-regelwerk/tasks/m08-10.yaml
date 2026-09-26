@@ -1,0 +1,18 @@
+id: m08-10-001
+name: Reviewer-HIGH gegen behauptete Lockerung im Slice-Plan
+description: |
+  Prueft Regel M08-10 (modul-08-agentenrollen.md, Stufe 3): Von drei
+  legitimen Verdikten trifft hier das erste zu (ADR gilt, Plan hat falsch
+  behauptet): Plan-Korrektur mit Plan-Diff und ADR-konforme Neu-
+  Implementierung. Herabstufen des Findings ist der falsche vierte Pfad.
+tags: [m08-10, stufe-3, modul-08]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Reviewer und Implementer sind sich im PR-Thread (Datei) nicht einig. Der Implementer sagt, das HIGH sei zu hart und wuerde am besten auf MEDIUM gesetzt, damit gemergt werden kann. Wie wird der Konflikt richtig aufgeloest, und welches Artefakt wird dabei uebergeben?"
+  files:
+    - path: m08-10-review-thread-adr-0001.md
+expected:
+  output_contains:
+    - "Plan-Diff"
+    - "Plan-Korrektur"
+  outcomes:
+    - type: task_completed

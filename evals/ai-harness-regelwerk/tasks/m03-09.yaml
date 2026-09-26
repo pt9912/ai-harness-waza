@@ -1,0 +1,39 @@
+id: m03-09-001
+name: Architektur-Sicht nach Umbenennung aktualisieren
+description: |
+  Prueft Regel M03-09 (modul-03-spec.md, Stufe 2): Die Architektur-Sicht hat keine
+  Historie, nur den Frische-Marker `Letzte Aenderung` im Kopf; die Spezifikation
+  dagegen hat Historie und kein Kopf-Datum. Fixture: architecture.md.
+  Graders (Regex): (1) Kopf-Datum "Letzte Aenderung" wird auf 2025-08-19 gesetzt;
+  (2) es wird ausdruecklich keine Historie gefuehrt (keine Historie-Tabelle).
+tags: [m03-09, stufe-2, modul-03]
+inputs:
+  prompt: >-
+    Nach dem AI-Harness-Regelwerk: Wir haben die Komponente "Cache" in
+    "Session-Store" umbenannt (Pfad bleibt gleich). Bitte aktualisiere die
+    Architektur-Datei (siehe Anhang) entsprechend und sag, wie die Änderung
+    dort dokumentiert wird. Heute ist der 2025-08-19.
+  files:
+    - path: m03-09-architecture.md
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: architektur_sicht_kern
+    config:
+      regex_match:
+        - '(?i)((letzte[\wäöüß]*\s*(ä|ae)nderung|frische|freshness|kopf|header)[^.]{0,120}2025-08-19|2025-08-19[^.]{0,100}(letzte[\wäöüß]*\s*(ä|ae)nderung|frische|freshness|kopf|header))'
+        - '(?i)(kein[\wäöüß]*\s+([\wäöüß]+\s+){0,2}(historie|protokoll|changelog|(ä|ae)nderungsprotokoll|(ä|ae)nderungshistorie)|ohne\s+([\wäöüß]+\s+){0,2}(historie|protokoll)|(historie|protokoll|changelog)[^.]{0,50}(gibt\s+es\s+nicht|entf(ä|ae)llt|f(ü|ue)hrt\s+(die\s+)?sicht\s+nicht|nicht\s+(vorgesehen|gef(ü|ue)hrt|n(ö|oe)tig|anlegen|f(ü|ue)hren|ben(ö|oe)tigt)))'
+  - type: prompt
+    name: judge_m03_09_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Komponente umbenennen (Tabelle + Sequenz), Kopfzeile "Letzte Aenderung" auf 2025-08-19 setzen; keine Historie fuehren (Sicht hat nur den Frische-Marker im Kopf, kein Protokoll). modul-03-spec.md §Ziel-Form: Architektur-Sicht, Bullet "Keine Historie, nur Letzte Aenderung im Kopf".
+        Beispiel fuer eine RICHTIGE Antwort: In der Tabelle und im Sequenztext wird ARC-002 von Cache in Session-Store umbenannt, der Pfad src/cache/ bleibt. Dokumentiert wird die Änderung ausschließlich im Kopf: Dort setzt du `Letzte Änderung` auf 2025-08-19. Die Architektur-Sicht führt keine Historie, sie hat nur diesen Marker; jede Änderung folgt ohnehin aus einer Änderung weiter oben im Stack.
+        Beispiel fuer eine FALSCHE Antwort: Umbenannt wird in der Komponenten-Tabelle und im Sequenztext. Zusätzlich legst du unten eine Historie-Tabelle an: | 2025-08-19 | ARC-002 von Cache in Session-Store umbenannt |. Das Kopf-Datum Letzte Änderung 2025-08-19 setzt du ebenfalls, damit der Frische-Marker zur Historie passt.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

@@ -1,0 +1,18 @@
+id: m06-11-001
+name: Beobachtungs-Zaehler - ein Vorgang zaehlt einmal
+description: |
+  Prueft Regel M06-11 (modul-06-roadmap.md, Stufe 2): Zwei Funde im selben
+  Vorgang sind eine Gelegenheit; ein Vorkommen ohne abgeschlossenen Vorgang
+  bewegt den Zaehler nicht (benannt, nicht gezaehlt). Die Fixture enthaelt
+  vier Funde, aber nur zwei abgeschlossene Vorgaenge.
+tags: [m06-11, stufe-2, modul-06]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Wir haben das Beobachtungs-Register-Verzeichnis fuer die Parser-Fehlermeldungen (siehe Datei) und die Welle schliesst bald. Wie hoch ist der Zaehler dieser Beobachtung, und muss sie beim Lese-Schritt der Closure schon als regelreif behandelt werden?"
+  files:
+    - path: m06-11-beobachtung-fehler-ohne-kontext.md
+expected:
+  output_contains:
+    - "Gelegenheit"
+    - "benannt"
+  outcomes:
+    - type: task_completed

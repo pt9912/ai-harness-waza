@@ -1,0 +1,17 @@
+id: m12-10-001
+name: Replay-Manifest fuer LLM-Lauf ohne Seed-Parameter
+description: |
+  Prueft M12-10 (modul-12-replay-evaluierung.md, Stufe 2): Beim Inferenz-Modell
+  entfaellt model.seed (wenn die API keinen anbietet), prompt_context kommt
+  hinzu, model.name ohne gleitenden Alias, model.version als Release-Snapshot.
+tags: [m12-10, stufe-2, modul-12]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Das ist das Replay-Manifest fuer unseren LLM-Zusammenfassungs-Lauf (m12-10-manifest.yaml). Die API bietet keinen Seed-Parameter an. Reicht das Manifest so fuer ein reproduzierbares Replay, oder was muss ich aendern?"
+  files:
+    - path: m12-10-manifest.yaml
+expected:
+  output_contains:
+    - "prompt_context"
+    - "system_prompt_hash"
+  outcomes:
+    - type: task_completed

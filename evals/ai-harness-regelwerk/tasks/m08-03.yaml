@@ -1,0 +1,40 @@
+id: m08-03-001
+name: Rollenwechsel in der Wellen-Closure
+description: |
+  Prueft Regel M08-03 (modul-08-agentenrollen.md, Stufe 3): Bei der
+  Wellen-Closure tragen nur Schritt 1, 2 und 3b einen Rollenwechsel; alle
+  anderen Schritte laufen im Planner-Kontext. Uebergabe-Artefakte:
+  repo-weiter Verifikations-Beleg, Audit-Vorlage -> Verdikt, Steering-Loop-
+  Eintrag mit Zielort.
+  Die Regexes pruefen (1) Trigger pruefen: Verifier -> Planner, (2)
+  Verifikations-Beleg, (3) Audit-Vorlage, (4) Verkoerperung ueber Architect
+  mit Steering-Loop-Eintrag/Zielort, (5) dass der Rest (Lese-Schritt,
+  Closure-Notiz, Archivieren, Self-Close, Roadmap) im Planner bleibt.
+tags: [m08-03, stufe-3, modul-08]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Wir wollen die Rollen-Uebergaben fuer die Closure einer Welle sauber aufsetzen. Bei welchen der Closure-Schritte (Trigger pruefen, Trigger-Audit, Lese-Schritt, Verkoerperung, Closure-Notiz mit git mv, Archivieren, Self-Close-Commit, Roadmap fortschreiben) wechselt tatsaechlich die Rolle, und welches Artefakt wird jeweils uebergeben? Der Rest soll wo laufen?"
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: rollenwechsel_closure
+    config:
+      regex_match:
+        - '(?i)verifier[^.]{0,200}planner|trigger-?\s?pr(ü|ue)f\w*[^.]{0,200}verifier'
+        - '(?i)verifikations?-?\s?(beleg|nachweis)|(repo-?\s?weite[rn]?|fullbuild|replay)[^.]{0,60}(beleg|nachweis|ergebnis|hash)'
+        - '(?i)audit-?\s?vorlage'
+        - '(?i)(verk(ö|oe)rper\w*[^.]{0,250}architect|architect[^.]{0,250}verk(ö|oe)rper\w*)[^.]{0,300}(steering-?\s?loop|zielort)|(steering-?\s?loop|zielort)[^.]{0,250}architect'
+        - '(?i)(rest|(ü|ue)brig\w*|(alle\s+)?(anderen|weiteren|sonstigen)|3a|3c|lese-?\s?schritt|archivier\w*|self-?\s?close\w*|roadmap)[^.]{0,250}planner|planner[^.]{0,120}(rest|(ü|ue)brig\w*|(alle\s+)?(anderen|weiteren)|bleibt|beh(ä|ae)lt)'
+  - type: prompt
+    name: judge_m08_03_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Rollenwechsel nur bei Schritt 1 (Trigger pruefen: Verifier -> Planner, repo-weiter Verifikations-Beleg), Schritt 2 (Trigger-Audit: Planner -> Architect -> Planner, Audit-Vorlage -> Verdikt) und Schritt 3b (Verkoerperung: Planner -> Architect -> Planner, Steering-Loop-Eintrag mit Zielort); 3a, 3c, 4, 5, 6 laufen im Planner-Kontext (modul-08-agentenrollen.md §Rollen-Sequenz für eine Welle, Tabelle und "Nur 1, 2 und 3b tragen einen Rollenwechsel").
+        Beispiel fuer eine RICHTIGE Antwort: Ein Rollenwechsel findet nur an drei Stellen statt. Beim Trigger pruefen uebergibt der Verifier an den Planner einen repo-weiten Verifikations-Beleg (fullbuild-Hash, Replay-Ergebnis). Beim Trigger-Audit geht die Audit-Vorlage vom Planner zum Architect und kommt als Verdikt zurueck. Bei der Verkoerperung wandert ein Steering-Loop-Eintrag mit Zielort vom Planner zum Architect und wieder zurueck. Alles uebrige, also Lese-Schritt, Closure-Notiz mit git mv, Archivieren, Self-Close-Commit und Roadmap, laeuft im Kontext des Planners ohne Uebergabe.
+        Beispiel fuer eine FALSCHE Antwort: Praktisch jeder Closure-Schritt ist ein Rollenwechsel. Der Verifier prueft den Trigger, der Reviewer erstellt die Audit-Vorlage, der Lese-Schritt geht an den Reviewer, die Verkoerperung an den Implementer und das Archivieren an den Validator. Der Self-Close-Commit und die Roadmap gehen an einen Release-Agenten. Der Planner sammelt nur am Ende die Ergebnisse ein.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

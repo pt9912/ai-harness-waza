@@ -1,0 +1,37 @@
+id: m10-06-001
+name: Reviewer-Skill mit rein generischer HIGH-Liste
+description: |
+  Prueft M10-06 (modul-10-review-harness.md, Stufe 2): Die Klassifikation im
+  Reviewer-Skill muss repo-konkret sein; die HIGH-Liste nennt mindestens zwei
+  repo-spezifische Regeln, die ein generischer Skill nicht abdeckt. Die Fixture
+  enthaelt nur eine generische OWASP-artige Liste.
+  Grader (text, regex): (1) Kritik "generisch statt repo-spezifisch/repo-konkret"
+  (Wortstaemme, Bindestrich optional); (2) Zahlenvorgabe "mindestens zwei"
+  (bzw. "zwei repo-spezifische ...") fuer die HIGH-Liste.
+tags: [m10-06, stufe-2, modul-10]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Schau dir m10-06-reviewer.md an. Reicht die Klassifikation in diesem Reviewer-Skill fuer unser Repo aus? Was wuerdest du daran aendern?"
+  files:
+    - path: m10-06-reviewer.md
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: klassifikation_repo_konkret_mind_zwei
+    config:
+      regex_match:
+        - "(?i)(repo|projekt)[ -]?(spezifisch|konkret|eigen|bezogen)|(auf|fuer|für)\\s+(unser\\w*\\s+)?(repo|projekt)\\s+(zugeschnitten|angepasst|abgestimmt)"
+        - "(?i)(mindestens|wenigstens|zumindest|mind\\.)\\s+(zwei|2)\\b|\\b(zwei|2)\\s+(\\w+[ -]){0,2}(repo|projekt)[ -]?(spezifisch|konkret|eigen|bezogen)"
+  - type: prompt
+    name: judge_m10_06_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Klassifikation muss repo-konkret sein; die HIGH-Liste muss mindestens zwei repo-spezifische Regeln nennen, die ein generischer Skill nicht abdeckt (modul-10 §Ziel-Form: Reviewer-Skill, Punkt "Klassifikation repo-konkret").
+        Beispiel fuer eine RICHTIGE Antwort: Nein, so genuegt die Klassifikation nicht. Die HIGH-Stufe besteht nur aus allgemeinen OWASP-Klassiker wie SQL-Injection oder Path Traversal, die jeder generische Reviewer ohnehin kennt. Bei einem echten Diff aus unserem Repo wuerde damit keine einzige HIGH-Regel anschlagen. Der Skill sollte in der HIGH-Liste mindestens zwei repoeigene Regeln festschreiben, etwa aus den Hard Rules in AGENTS.md, die ein generischer Skill nicht abdeckt (z. B. Verstoss gegen eine Accepted-ADR oder ein Bruch der Schichtgrenze). Zusaetzlich wuerde ich MEDIUM und LOW ebenfalls konkret fuer das Repo auffuellen und INFO kurz halten.
+        Beispiel fuer eine FALSCHE Antwort: Ja, die Klassifikation ist in Ordnung. Die HIGH-Liste deckt mit SQL-Injection, Secrets im Code und Path Traversal die gaengigen Schwachstellen ab, die Stufen MEDIUM, LOW und INFO sind sauber abgegrenzt. Eine Sektion mit repo-spezifischen Sonderregeln waere Overengineering und wuerde den Skill nur unnoetig aufblaehen; ein generischer Katalog nach OWASP reicht fuer den Reviewer voellig aus.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

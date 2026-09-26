@@ -1,0 +1,41 @@
+id: m04-07-001
+name: Angefochtenes Rollen-Verdikt endet als ADR
+description: |
+  Prueft Regel M04-07 (modul-04-adrs.md, Stufe 3; Konflikt-Pfad modul-08): Ein
+  Rollen-Konflikt endet als ADR, wenn sein Verdikt bestritten wird; die
+  Entscheidung wird immutabel, Widerspruch braucht eine Folge-ADR mit neuer
+  Evidenz (statt Wiederholung).
+  Graders (Regex): (1) das Ergebnis wird als ADR festgehalten; (2) spaeterer
+  Widerspruch geht ueber Folge-ADR/supersedes; (3) es braucht neue Evidenz.
+tags: [m04-07, stufe-3, modul-04]
+inputs:
+  prompt: >-
+    Nach dem AI-Harness-Regelwerk: Unser Reviewer-Agent hat einen Slice
+    abgelehnt, der Implementer-Agent bestreitet das Verdikt. Auch das Verdikt
+    des Architects, das dazu vorliegt, akzeptiert der Implementer nicht, und
+    die beiden einigen sich nicht. Wie wird das Ergebnis dieses Streits
+    festgehalten, und was passiert, wenn der Implementer in zwei Wochen erneut
+    widerspricht?
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: verdikt_adr_kern
+    config:
+      regex_match:
+        - '(?i)(als\s+(eine\s+)?(neue\s+)?adr|in\s+(einer|eine|der)\s+(neuen\s+)?adr|adr\b[^.]{0,60}(fest|dokumentier[\wäöüß]*|endet|terminal|abschlie|immutabel|unver(ä|ae)nderlich|angenommen)|(endet|festgehalten|festhalt[\wäöüß]*|dokumentiert|m(ü|ue)ndet|angenommen)[^.]{0,60}adr)'
+        - '(?i)(folge-?adr|follow-?up-?adr|nachfolge-?adr|neue\s+adr|supersed[\wäöüß]*|supersede[\wäöüß]*)'
+        - '(?i)(evidenz|neu[\wäöüß]*\s+(belege?|beweis[\wäöüß]*|erkenntnis[\wäöüß]*|argument[\wäöüß]*|fakten|daten))'
+  - type: prompt
+    name: judge_m04_07_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Der Streit endet als ADR (Architect nimmt sein Verdikt als ADR an, damit wird die Entscheidung immutabel). Widerspruch danach nur ueber eine Folge-ADR (supersedes) mit neuer Evidenz statt Wiederholung; die abweichende Position steht in "Verglichene Alternativen". modul-04-adrs.md §Kernidee, zweiter Bullet; modul-08-agentenrollen.md §Konflikt-Pfad ("Und wenn das Verdikt selbst bestritten wird?").
+        Beispiel fuer eine RICHTIGE Antwort: Der Architect nimmt sein Verdikt als ADR an; damit endet der Streit nicht durch Rechthaben, sondern weil die Entscheidung unveränderlich wird, und die abweichende Position des Implementers steht unter den verglichenen Alternativen. Widerspricht der Implementer in zwei Wochen erneut, reicht Wiederholung nicht: Er muss eine Folge-ADR mit supersedes anstoßen und dafür neue Belege liefern.
+        Beispiel fuer eine FALSCHE Antwort: Das Ergebnis wird im Review-Kommentar des Slice festgehalten und der Streit an den Tech Lead eskaliert, der final entscheidet. Widerspricht der Implementer in zwei Wochen erneut, wird das Finding herabgestuft und der Slice neu bewertet, bis beide zufrieden sind; eine ADR ist dafür nicht vorgesehen.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

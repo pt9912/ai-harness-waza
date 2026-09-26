@@ -1,0 +1,15 @@
+id: m1-01-001
+name: ADR-Verstoss im Code - Review oder Verifikation
+description: |
+  Prueft M1-01 (modul-01-entwicklungszyklus.md, Stufe 3): Review prueft Code
+  gegen Plan und ADR; wenn der Plan die ADR-Verletzung nicht antizipiert hat,
+  sieht Review sie nicht. Verifikation prueft gegen DoD und Spec (und dort
+  referenzierte ADRs) - deshalb getrennte Rollen.
+tags: [m1-01, stufe-3, modul-01]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Der Code eines Slice verstößt gegen die akzeptierte ADR-0009. Der Slice-Plan erwähnt ADR-0009 nirgends, und der Review hat nichts beanstandet. Ist das ein Fehler des Reviewers? Welche Stufe des Zyklus hätte den Verstoß stattdessen finden können?"
+expected:
+  output_contains:
+    - "DoD"
+  outcomes:
+    - type: task_completed

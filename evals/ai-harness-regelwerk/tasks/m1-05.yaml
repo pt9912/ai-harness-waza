@@ -1,0 +1,16 @@
+id: m1-05-001
+name: Rang-Achsen und Rang-Anzahl der Source-Precedence
+description: |
+  Prueft M1-05 (modul-01-entwicklungszyklus.md, Stufe 3): Zwei Rang-Achsen,
+  beide absteigend (vertragliche Bindung, Schreib-Frequenz), Reihenfolge nie
+  umdrehen (oft geaenderte AGENTS.md darf die selten geaenderte Spec nicht
+  ueberschreiben); neun Raenge sind ein Maximum, mehr = Mehrfach-
+  Repraesentation.
+tags: [m1-05, stufe-3, modul-01]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Unsere Quellenrangfolge hat schon neun Ränge. Jetzt wollen wir für eine Sonderdoku einen zehnten Rang einführen. Außerdem wird unsere AGENTS.md ständig aktualisiert und ist damit am aktuellsten; wir überlegen, sie deshalb über die Spec zu stellen. Dürfen wir beides so machen?"
+expected:
+  output_contains:
+    - "Maximum"
+  outcomes:
+    - type: task_completed

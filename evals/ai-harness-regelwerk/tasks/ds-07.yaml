@@ -1,0 +1,38 @@
+id: ds-07-001
+name: Handoff-Gate in der Fruehphase
+description: |
+  Prueft DS-07 (grundlagen-durchsetzungsschicht.md, Stufe 3): Das Handoff-Gate
+  ist bootstrap-aware: es erzwingt nur Gates, die schon existieren; ein harter
+  Handoff-Gate ab Schritt 0 mit allen geplanten Gates bekaempft die weiche
+  Fruehphase des Harness-Bootstraps.
+  Grader (text/regex): (1) Ablehnung des Vorhabens (keine gute Idee / nein);
+  (2) Kern: Gate erzwingt nur bereits existierende/vorhandene Gates. Negativ:
+  Zustimmung ("Ja"/"ist eine gute Idee") als Antwortanfang bzw. Urteil.
+tags: [ds-07, stufe-3, ds]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Neues Repo, das Makefile hat erst das Target test. Geplant sind sechs weitere Gates (lint, sast, coverage, ...). Das Team will den Stop-Hook von Anfang an so einrichten, dass er alle sieben Gates verlangt, damit nichts vergessen wird. Ist das eine gute Idee?"
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: nur_existierende_gates
+    config:
+      regex_match:
+        - '(?i)(keine (gute|sinnvolle) idee|nicht (sinnvoll|empfehlenswert|ratsam|zielf(ü|ue)hrend|gut|klug)|\bnein\b|besser (nicht|w(ä|ae)re)|davon (ist )?abzuraten|w(ü|ue)rde ich nicht|nicht empfohlen|sollte(n)? (man |ihr |ihr das |das )?nicht)'
+        - '(?i)((nur|lediglich|ausschlie(ß|ss)lich)[^.\n]{0,80}(existier\w*|vorhanden\w*|bestehend\w*|vorliegend\w*|bereits (da|angelegt|eingerichtet|definiert)|schon (da|angelegt|eingerichtet|definiert|gibt|existier\w*|vorhanden))|(existier\w*|vorhanden\w*|bestehend\w*)[^.\n]{0,40}(nur|lediglich)|(die|was) (es )?(schon|bereits) gibt|bootstrap[ -]?(aware|bewusst))'
+      regex_not_match:
+        - '(?i)^\s*ja\b'
+        - '(?i)\b(ist|w(ä|ae)re) (das |es )?(eine |durchaus eine |grunds(ä|ae)tzlich eine )(gute|sinnvolle) idee'
+  - type: prompt
+    name: judge_ds_07_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Keine gute Idee: Der Handoff-Gate muss bootstrap-aware sein, d. h. nur die Gates erzwingen, die schon existieren (hier nur `test`); ein harter Gate ab Schritt 0 mit allen sieben bekaempft die weiche Fruehphase des Harness-Bootstraps. grundlagen-durchsetzungsschicht.md §Vier Design-Eigenschaften, Punkt 4 (Z. 59-63).
+        Beispiel fuer eine RICHTIGE Antwort: Nein, das ist keine gute Idee. Der Stop-Hook sollte nur die Gates verlangen, die zum jetzigen Zeitpunkt tatsächlich vorhanden sind, hier also nur test, und dann mit der Reife des Repos mitwachsen. Ein harter Handoff-Gate ab Schritt 0 mit allen sieben Gates würde die weiche Frühphase des Bootstraps ausbremsen, weil er dauerhaft rot wäre. Erst binden, wenn es etwas zu binden gibt.
+        Beispiel fuer eine FALSCHE Antwort: Ja, das ist eine gute Idee. Ein Handoff-Gate, das von Anfang an alle sieben Gates verlangt, ist fail-closed und stellt sicher, dass kein Gate vergessen wird. Man sollte den Stop-Hook mit Content-Hash-Nachweis und Loop-Guard absichern, dann bleibt das Team von Beginn an diszipliniert.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

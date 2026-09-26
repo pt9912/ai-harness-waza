@@ -1,0 +1,17 @@
+id: m10-08-001
+name: Review-Report ohne Findings und ohne Negativbefunde
+description: |
+  Prueft M10-08 (modul-10-review-harness.md, Stufe 2): Das Output-Schema
+  verlangt pro betrachtetem Bereich eine Negativbefund-Zeile; eine leere
+  Findings-Liste ist nicht von "nicht angesehen" unterscheidbar.
+tags: [m10-08, stufe-2, modul-10]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Der Reviewer-Agent hat den Report m10-08-review-slice-14.md geliefert. Er meldet keine Findings. Kann ich das Review als bestanden werten und den Slice mergen?"
+  files:
+    - path: m10-08-review-slice-14.md
+expected:
+  output_contains:
+    - "Negativbefund-Zeile"
+    - "ohne Befund"
+  outcomes:
+    - type: task_completed

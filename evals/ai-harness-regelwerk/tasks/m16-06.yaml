@@ -1,0 +1,15 @@
+id: m16-06-001
+name: Prompt-Injection nachtraeglich erkennen
+description: |
+  Prueft M16-06 (modul-16-produktiver-betrieb.md, Stufe 3): Erkennung von
+  Prompt-Injection ist eine Telemetrie-Frage; Pflichtspuren sind Eingabe-Logging,
+  Tool-Call-Audit-Log und Output-vs-Eingabe-Konsistenz-Marker; Modell-Haertung allein genuegt nicht.
+tags: [m16-06, stufe-3, modul-16]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Es besteht der Verdacht, dass unser Agent gestern durch manipulierten Eingabetext zu einer ungewollten Aktion gebracht wurde. Wir haben den Systemprompt gehaertet, protokollieren aber sonst nichts Besonderes. Koennen wir den Vorfall nachtraeglich zuverlaessig erkennen, und was muessten wir einfuehren?"
+expected:
+  output_contains:
+    - "Telemetrie-Frage"
+    - "Tool-Call-Audit"
+  outcomes:
+    - type: task_completed

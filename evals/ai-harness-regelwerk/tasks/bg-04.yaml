@@ -1,0 +1,16 @@
+id: bg-04-001
+name: Commit-Message mit Struktur-IDs
+description: |
+  Prueft BG-04 (grundlagen-begriffe.md, Stufe 2): SPEC-<NNN> und ARC-<NNN> sind Struktur-IDs
+  ohne Zusage; nach aussen (Commit, PR) gehoeren Anforderungs-ID und ADR-Nummer.
+  Fixture enthaelt SPEC-014 und ARC-006 in der Refs-Zeile.
+tags: [bg-04, stufe-2, begriffe]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Ich will die Commit-Message im Entwurf so committen. Passt die Refs-Zeile, oder wuerdest du etwas aendern?"
+  files:
+    - path: bg-04-commit-entwurf.md
+expected:
+  output_contains:
+    - "Struktur-ID"
+  outcomes:
+    - type: task_completed

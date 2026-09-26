@@ -18,7 +18,7 @@ Alle Targets führen genau einen waza-Befehl im Container aus (nach `make image`
 | `make spec-verify` | `waza spec verify` | Deckt die Eval-Suite die Trigger aus der `SKILL.md` ab? |
 | `make run` | `waza run` (Mock, `--skip-graders`) | Gerüsttest offline; bewertet nichts |
 | `make run-copilot` | `waza run` (copilot-sdk) | Echter Lauf mit Modell; braucht `GITHUB_TOKEN` |
-| `make run-ollama OLLAMA_MODEL=… [TASK=…]` | `waza run` (Ollama als Provider) | Echter Lauf mit einem Ollama-Modell, auch `:cloud`-Modelle; kein Key nötig |
+| `make run-ollama OLLAMA_MODEL=… [TASK="…"] [OLLAMA_JUDGE=…]` | `waza run` (Ollama als Provider) | Echter Lauf mit einem Ollama-Modell, auch `:cloud`-Modelle; kein Key nötig |
 | `make compare A=… B=…` | `waza compare` | Zwei Ergebnisdateien vergleichen |
 | `make waza-help` | `waza --help` | Hilfe |
 | `make shell` | – (bash im Container) | Shell im Container |
@@ -47,7 +47,11 @@ Ollama muss auf dem Host laufen (`ollama list` zeigt die Modelle).
 ```bash
 make run-ollama OLLAMA_MODEL='kimi-k2.7-code:cloud'                        # alle Tasks
 make run-ollama OLLAMA_MODEL='kimi-k2.7-code:cloud' TASK='source-precedence*'   # ein Task
+make run-ollama OLLAMA_MODEL='glm-5.3-flash:cloud' TASK="m09-08* m02-11*"       # mehrere Muster
 ```
+
+Die `prompt`-Grader (LLM-Judge) nutzen `OLLAMA_JUDGE` (Standard `kimi-k2.7-code:cloud`), unabhängig vom
+getesteten Modell (`--judge-model`).
 
 - Bei `:cloud`-Modellen gehen Prompts und gelesene Regelwerk-Auszüge an ollama.com.
 - Kleine lokale Modelle scheitern am Kontext: `Qwen3-4B` meldete 10.830 Prompt-Tokens gegen 4096 Kontext.
@@ -65,9 +69,19 @@ skills/ai-harness-regelwerk/
 evals/ai-harness-regelwerk/
   eval.yaml                       echtes Modell (copilot-sdk)
   eval.mock.yaml                  Offline-Gerüsttest
-  tasks/*.yaml                    Testaufgaben
+  tasks/*.yaml                    85 Tasks (12 Einstiegs-Tasks + 73 aus den Regeln der 25 Regelwerk-Dateien)
   fixtures/                       Testdateien
 ```
+
+### Prüfung der Tasks
+
+- Jeder der 73 regelbasierten Tasks nennt im `description`-Feld Regel-ID und Quelldatei.
+- Die 39 im Review beanstandeten Tasks haben pro Task `graders:` mit einem `text`-Grader (Regex: Wortstamm,
+  Umlaut-/ASCII-Varianten, Kernaussage) und einem `prompt`-Grader (LLM-Judge, `continue_session: true`,
+  Referenzantwort plus je eine richtige und falsche Beispielantwort). Beide müssen bestehen.
+- Die übrigen Tasks prüfen mit `expected.output_contains` (case-insensitiv).
+- Die Regexes wurden mit `waza grade` gegen Beispielantworten geprüft (richtig besteht, falsch fällt durch).
+  Gegen echte Modellantworten sind sie noch nicht kalibriert.
 
 `regelwerk/` und `templates/` liegen nicht im Repo. Sie werden beim Build aus dem ZIP entpackt
 und stehen im Image unter `/workspace/skills/ai-harness-regelwerk/`.
@@ -80,5 +94,5 @@ und stehen im Image unter `/workspace/skills/ai-harness-regelwerk/`.
 
 - Skill und Tasks ändern: Dateien im Repo bearbeiten, dann erneut `make …` (das Image wird dabei neu gebaut).
 - `waza init`, `waza new` und `waza dev` haben kein Make-Target, da sie Dateien im Repo schreiben würden.
-- Die Erwartungen in `tasks/*.yaml` (z. B. `output_contains`) sind Annahmen und nach dem ersten echten Lauf zu kalibrieren.
+- Die Erwartungen in `tasks/*.yaml` (Regex und Begriffe) sind Annahmen und nach echten Läufen zu kalibrieren; Regexes sind die häufigste Quelle falscher Fehlschläge.
 - Der Mock-Executor gibt nur den Prompt zurück; nur `make run-copilot` misst echtes Verhalten.

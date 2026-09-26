@@ -1,0 +1,20 @@
+id: m05-14-001
+name: Sub-Area-Abschnitt im Slice-Plan bei reinem Refactor
+description: |
+  Prueft Regel M05-14 (modul-05-planning-harness.md, Stufe 3): Die zwei
+  Vorpruefungen (Sub-Area-Wahl, Beobachtungen sichten) stehen in jedem Slice-Plan;
+  nur der bedingte Modus-Begruendungsblock entfaellt bei reinem Refactor ohne neue
+  Sub-Area-Beruehrung - nicht der ganze Abschnitt.
+tags: [m05-14, stufe-3, modul-05]
+inputs:
+  prompt: >-
+    Nach dem AI-Harness-Regelwerk: Ich plane einen reinen Refactor-Slice, der
+    interne Klassen umbenennt und dabei keine neue Sub-Area beruehrt. Im
+    Slice-Plan gibt es den Abschnitt zu Sub-Areas und Modus. Kann ich den
+    ganzen Abschnitt weglassen, oder was davon bleibt trotzdem stehen?
+expected:
+  output_contains:
+    - "Beobachtungen sichten"
+    - "Sub-Area-Wahl"
+  outcomes:
+    - type: task_completed

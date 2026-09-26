@@ -1,0 +1,15 @@
+id: m13-03-001
+name: Hard Rules ohne Aufloesungs-Trigger
+description: |
+  Prueft M13-03 (modul-13-quality-gates.md, Stufe 3): Neue Hard Rule traegt
+  Aufloesungs-Trigger oder "permanent"; fuer den Altbestand gilt kein
+  Nachruesten (ein nachgetragener Trigger waere erfunden).
+tags: [m13-03, stufe-3, modul-13]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: In unserer AGENTS.md stehen 12 aeltere Hard Rules ohne jede Angabe, wann sie wegfallen koennen. Ich soll sie aufraeumen und fuer jede einen passenden Zeitpunkt nachtragen. Ausserdem will ein Kollege eine neue Hard Rule aufnehmen. Wie gehe ich bei beidem vor?"
+expected:
+  output_contains:
+    - "Altbestand"
+    - "permanent"
+  outcomes:
+    - type: task_completed

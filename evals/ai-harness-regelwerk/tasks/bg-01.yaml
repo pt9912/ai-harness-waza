@@ -1,0 +1,13 @@
+id: bg-01-001
+name: Artefaktkette ohne Validierung
+description: |
+  Prueft BG-01 (grundlagen-begriffe.md, Stufe 2): Die Artefaktkette des Entwicklungszyklus
+  enthaelt keine Validierung, weil sie kein Repo-Artefakt hinterlaesst; ihr Ort ist die Rollen-Sequenz.
+tags: [bg-01, stufe-2, begriffe]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Ich dokumentiere den Entwicklungszyklus unseres Teams als Kette von Artefakten, von der Spec bis zur Closure. Liste mir die Glieder der Kette in der richtigen Reihenfolge auf und sag mir, wo die Validierung ihren Platz hat."
+expected:
+  output_contains:
+    - "Rollen-Sequenz"
+  outcomes:
+    - type: task_completed

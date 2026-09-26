@@ -1,0 +1,39 @@
+id: m06-08-001
+name: Slice-Closure im Repo ohne Wellen
+description: |
+  Prueft Regel M06-08 (modul-06-roadmap.md, Stufe 3): Wellenlos heisst nicht
+  waechterlos. Zaehler, Lese-Schritt (Anker seit slice-<Kennung>) und
+  Trigger-Audit laufen bei der Slice-Closure vor dem git mv; die Paarungen
+  danach; das Archiv als slice-<Kennung>-archiv.zip nach den Paarungen.
+  Die Regexes pruefen (1) Zaehler/Lese-Schritt/Trigger-Audit vor dem git mv,
+  (2) Paarungen nach dem git mv, (3) Archiv nach den Paarungen, (4) den
+  Archivnamen slice-<Kennung>-archiv.zip und (5) flache Ablage neben dem Stub
+  in done/.
+tags: [m06-08, stufe-3, modul-06]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Unser Repo arbeitet ganz ohne Wellen, nur mit einzelnen Slices. Ein Slice ist fertig und die Closure-Notiz ist geschrieben. Welche Schritte laufen jetzt noch, in welcher Reihenfolge relativ zum git mv nach done/, und wie werden die Zeitdokumente des Slice archiviert (Name und Ablageort des Archivs)?"
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: reihenfolge_und_archiv
+    config:
+      regex_match:
+        - '(?i)(z(ä|ae)hler|lese-?\s?schritt|trigger-?\s?audit)[^.]{0,200}(vor\s+dem|bevor|vorher|davor|vorab)[^.]{0,30}(git\s?)?(mv|move|verschieb)|vor\s+dem\s+(git\s?)?(mv|move|verschieb)[^.]{0,200}(z(ä|ae)hler|lese-?\s?schritt|trigger-?\s?audit)'
+        - '(?i)paarung\w*[^.]{0,120}(nach\s+dem|danach|nachher|anschlie(ß|ss)end|erst\s+nach|hinterher)|(nach\s+dem\s+(git\s?)?(mv|move|verschieb)\w*|danach)[^.]{0,120}paarung'
+        - '(?i)archiv\w*[^.]{0,160}(nach|hinter)\s+(den\s+|allen\s+)?paarung|paarung\w*[^.]{0,140}(dann|danach|zuletzt|anschlie(ß|ss)end|vor\s+dem\s+archiv\w*|vor\s+archiv\w*)[^.]{0,80}archiv'
+        - '(?i)slice-[^\s]{0,40}-archiv\.zip'
+        - '(?i)flach|neben\s+dem\s+(gek(ü|ue)rzten\s+)?stub|neben\s+(der|dem)\s+(slice-?)?(datei|stub)|direkt\s+(in|unter)\s+`?done'
+  - type: prompt
+    name: judge_m06_08_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Vor dem git mv: Zaehler und Lese-Schritt (Anker `seit slice-<Kennung>`) sowie Trigger-Audit; nach dem git mv: alle drei Paarungen; danach Archivieren nach `done/slice-<Kennung>-archiv.zip`, flach neben dem Stub (modul-06-roadmap.md §Wann Arbeit eine Welle braucht, Tabelle "Träger im Repo ohne Wellen", Zeilen 45-50; identisch modul-05 Z.89).
+        Beispiel fuer eine RICHTIGE Antwort: Auch ohne Wellen bleibt die Closure nicht wachterlos. Vor dem git mv nach done/ laufen der Zaehler-Eintrag, der Lese-Schritt mit dem Anker "seit slice-<Kennung>" und das Trigger-Audit. Die drei Paarungen kommen erst nach dem git mv, denn sie suchen ja in done/. Danach wird archiviert, also nach den Paarungen, weil diese den Volltext noch lesen muessen. Das Archiv heisst done/slice-<Kennung>-archiv.zip und liegt flach neben dem gekuerzten Stub.
+        Beispiel fuer eine FALSCHE Antwort: Ohne Wellen ist die Closure einfacher. Zuerst wird die Datei mit git mv nach done/ verschoben, danach laufen Zaehler, Lese-Schritt und Trigger-Audit. Die Paarungen kommen ganz am Ende. Die Zeitdokumente werden direkt vor dem git mv in ein Archiv gepackt, das nach dem Muster done/welle-<id>/archiv.zip in einem Unterordner abgelegt wird.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

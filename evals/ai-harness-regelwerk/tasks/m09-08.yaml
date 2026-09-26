@@ -1,0 +1,38 @@
+id: m09-08-001
+name: Commit-Reihenfolge beim Abschluss nach done/
+description: |
+  Prueft Regel M09-08 (modul-09-implementierung.md, Stufe 3): git mv und
+  Inhaltsaenderung nie im selben Commit (Rename-Detection, 50 %-Schwelle);
+  beim Uebergang nach done/ umgekehrt zum Regelfall: erst Commit mit
+  Closure-Notiz, dann der reine git mv.
+  Die Regexes pruefen (1) getrennte Commits (zwei/drei/separat), (2) die
+  Reihenfolge: Closure-Notiz zuerst, der reine Move danach, (3) die
+  Begruendung Rename-Erkennung/Similarity/log --follow.
+tags: [m09-08, stufe-3, modul-09]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Ich will den Slice abschliessen, siehe Commit-Plan in der Datei. In wie vielen Commits sollte das Verschieben und die Closure-Notiz landen, in welcher Reihenfolge, und warum?"
+  files:
+    - path: m09-08-commit-plan-slice-031.md
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: commit_trennung_reihenfolge
+    config:
+      regex_match:
+        - '(?i)(zwei|2|drei|3|getrennte?[nrs]?|separate?[nrs]?|eigene[nr]?)\s+(getrennte?[nrs]?\s+|separate?[nrs]?\s+|eigene[nr]?\s+)?commits?|nicht\s+(im|in\s+einem)\s+(selben|gleichen|einzigen)\s+commit|nie\s+(im|in\s+einem)\s+(selben|gleichen|einzigen)\s+commit|(move|verschieb\w*|git\s?mv)[^.]{0,60}(getrennt|separat|eigene[nm]?\s+commit)'
+        - '(?i)(closure-?\s?notiz|notiz)\w*[^.]{0,120}(zuerst|zun(ä|ae)chst|davor|vorher|vorab|zuvor|als\s+erstes|vor\s+dem\s+(reinen\s+)?(git\s?)?(mv|move|verschieb)\w*|im\s+(ersten|vorherigen|vorigen|fr(ü|ue)heren)\s+commit|umgekehrt)|(zuerst|zun(ä|ae)chst|als\s+erstes|erst|commit\s+(1|eins)|1\.)\s*[:,]?\s*(kommt\s+|folgt\s+|landet\s+|geht\s+)?(die\s+|der\s+|ein\s+|eine\s+|in\s+einem\s+)?(eigene[nr]?\s+)?(commit\s+)?(mit\s+)?(der\s+|die\s+)?(reine[nr]?\s+)?(inhalts\w*\s+)?(closure-?\s?notiz|notiz)'
+        - '(?i)rename|umbenenn|50\s?%|similarity|(ä|ae)hnlichkeit|log\s+--follow|--follow|historie|verfolg'
+  - type: prompt
+    name: judge_m09_08_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Move und Inhaltsaenderung nie im selben Commit; beim Uebergang nach `done/` umgekehrt zum Regelfall: erst Commit mit Closure-Notiz (denn done/ heisst "Closure-Notiz vorhanden"), dann der reine git mv; Grund: sonst faellt die Rename-Detection unter die 50 %-Similarity-Schwelle und `git log --follow` wird unzuverlaessig (modul-09-implementierung.md §Hard Rules, Punkt "git mv + Inhaltsänderung = zwei Commits"; modul-05 Z.194).
+        Beispiel fuer eine RICHTIGE Antwort: Es sollten getrennte Commits werden, nie Verschieben und Inhalt in einem. Beim Uebergang nach done/ ist die Reihenfolge anders als sonst: Zuerst kommt der Commit mit der Closure-Notiz, denn done/ bedeutet, dass die Notiz schon vorhanden ist. Danach folgt ein reiner git mv ohne jede Inhaltsaenderung. Sonst faellt die Aehnlichkeit unter die 50-Prozent-Schwelle, git erkennt den Rename nicht mehr und die Historie ist nicht mehr sauber nachverfolgbar.
+        Beispiel fuer eine FALSCHE Antwort: Zwei Commits sind richtig, wegen der Rename-Detection. Der Move-Commit bleibt rein, deshalb kommt zuerst der git mv nach done/ und erst danach ein Commit, der die Closure-Notiz ergaenzt. So erkennt git den Rename ueber der 50-Prozent-Schwelle und log --follow funktioniert weiter. Der Plan mit einem einzigen Commit ist daher falsch.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

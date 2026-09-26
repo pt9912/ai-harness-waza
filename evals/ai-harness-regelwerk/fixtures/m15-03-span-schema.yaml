@@ -1,0 +1,15 @@
+# Audit-Span-Schema fuer Agenten-Laeufe
+attributes:
+  - name: slice.id
+    required: true
+    incident_question: "Welchem Slice ist der Tool-Call zuzuordnen?"
+  - name: agent.role
+    required: true
+    incident_question: "Welche Rolle hat den Call ausgeloest?"
+  - name: tool.name
+    required: true
+    incident_question: "Welches Werkzeug wurde aufgerufen?"
+  - name: host.uptime
+    required: false
+  - name: process.pid
+    required: false

@@ -1,0 +1,9 @@
+name: lint
+on: [pull_request]
+jobs:
+  lint:
+    runs-on: [self-hosted, linux]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint gate
+        run: docker build -q --target lint-gate -t app-lint .

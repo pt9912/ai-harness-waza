@@ -1,0 +1,15 @@
+id: m11-04-001
+name: DoD-Testbehauptung nur mit gruenem Test verlinkt
+description: |
+  Prueft M11-04 (modul-11-verification.md, Stufe 3): Ein gruener Test allein
+  bestaetigt einen sicherheitskritischen DoD-Punkt nicht; Bewusstes Brechen
+  (Fix zuruecknehmen, Test muss aus dem richtigen Grund rot laufen) liefert den Rot-Beleg.
+tags: [m11-04, stufe-3, modul-11]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: In der DoD eines Slice steht 'Auth-Bypass real getestet' und verlinkt auf test_auth_bypass, der gruen ist. Als Verifier: Kann ich den Punkt so bestaetigen, oder was muss ich zusaetzlich tun?"
+expected:
+  output_contains:
+    - "Bewusstes Brechen"
+    - "Rot-Beleg"
+  outcomes:
+    - type: task_completed

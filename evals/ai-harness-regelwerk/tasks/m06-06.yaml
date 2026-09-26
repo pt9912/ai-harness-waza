@@ -1,0 +1,37 @@
+id: m06-06-001
+name: Wann Arbeit eine Welle braucht
+description: |
+  Prueft Regel M06-06 (modul-06-roadmap.md, Stufe 2): Das Welle-Kriterium ist
+  das Mehr gegenueber den Slice-DoDs (repo-weite Belege), nicht die Groesse.
+  Fall (a): einzelner Slice ohne Mehr laeuft ohne Welle. Fall (b): Ein-Slice-
+  Buendel mit repo-weitem Replay-Trigger bleibt Welle.
+  Die Regexes pruefen je Teilfall die Entscheidung: (a) keine Welle (im
+  selben Satz wie Fall a / Export / gross), (b) Welle (im selben Satz wie
+  Fall b / Replay / Golden Set, positive Formulierung), dazu die Begruendung
+  ueber das Mehr (repo-weit / ueber die DoD hinaus).
+tags: [m06-06, stufe-2, modul-06]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Wir haben zwei Vorhaben. (a) Ein einzelner, recht grosser Slice, der eine neue Export-Faehigkeit baut; er hat eine eigene DoD und sonst nichts. (b) Ein einzelner kleiner Slice, dessen Abschluss erst gilt, wenn der Replay-Lauf gegen das Golden Set repo-weit gruen ist. Brauchen die beiden jeweils eine Welle in der Roadmap?"
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: welle_entscheidung_je_fall
+    config:
+      regex_match:
+        - '(?i)(\(a\)|fall a|vorhaben a|erste[rns]?\s+(vorhaben|fall|slice)|export|gro(ß|ss)e[rn]?\s+slice)[^.\n]{0,220}(ohne\s+(eigene\s+)?welle|kein(e|er|en)?\s+(eigene[nr]?\s+)?welle|welle\s+(ist\s+)?(nicht\s+n(ö|oe)tig|unn(ö|oe)tig|(ü|ue)berfl(ü|ue)ssig)|nicht\s+(als|in\s+einer)\s+welle)'
+        - '(?i)(\(b\)|fall b|vorhaben b|zweite[rns]?\s+(vorhaben|fall|slice)|replay|golden)[^.\n]{0,220}((braucht|bleibt|ist|wird|erfordert|rechtfertigt|bildet)\s+((doch|dennoch|trotzdem|weiterhin|schon|klar|sehr|damit|also|durchaus|dagegen|hingegen|demgegen(ü|ue)ber|aber|allerdings|gleichwohl|nach\s+wie\s+vor|trotz\s+\w+\s+gr(ö|oe)(ß|ss)e)\s+)*(eine\s+|als\s+|die\s+)?(eigene\s+)?welle|welle\s+(liegt\s+vor|(ist\s+)?(n(ö|oe)tig|erforderlich|sinnvoll|gerechtfertigt)|bleibt)|ja[,:]?\s[^.\n]{0,40}welle)'
+        - '(?i)repo-?\s?weit|(ü|ue)ber\s+(die\s+|seine\s+|deren\s+)?(slice-?)?dods?\s+hinaus|mehr\s+(als|gegen(ü|ue)ber)\s+(die\s+|den\s+)?(slice-?)?dod|kein\w*\s+dod\s+(allein\s+)?belegt'
+  - type: prompt
+    name: judge_m06_06_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): (a) einzelner grosser Slice ohne Mehr: laeuft ohne Welle (Groesse ist nicht das Kriterium); (b) Ein-Slice-Buendel mit repo-weitem Replay-Beleg bleibt Welle (modul-06-roadmap.md §Wann Arbeit eine Welle braucht, Punkte 1 und 3: "Ein-Slice-Bündel bleibt eine Welle, wenn sein Trigger repo-weite Belege fordert").
+        Beispiel fuer eine RICHTIGE Antwort: Nur eines der beiden Vorhaben braucht eine Welle. (a) Der grosse Export-Slice laeuft ohne Welle: Die Groesse der Arbeit ist nicht das Kriterium, und sein Abschluss waere nur die eigene DoD, also nichts, was ueber den Slice hinaus etwas belegt. (b) Der kleine Slice bleibt dagegen eine Welle, weil sein Abschluss einen repo-weiten Replay-Beleg fordert, den keine einzelne Slice-DoD liefert. Massgeblich ist also dieses Mehr gegenueber den DoDs, nicht der Umfang.
+        Beispiel fuer eine FALSCHE Antwort: Ich wuerde es nach Groesse entscheiden. (a) Der grosse Export-Slice braucht eine Welle in der Roadmap, weil er viel Arbeit ist und mehrere Teams betrifft. (b) Der kleine Slice braucht keine Welle: Ein repo-weiter Replay-Lauf gegen das Golden Set ist nur ein Gate und zaehlt nicht als eigene Closure-Bedingung, das laeuft ohne Welle mit.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

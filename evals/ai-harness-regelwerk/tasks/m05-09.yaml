@@ -1,0 +1,45 @@
+id: m05-09-001
+name: Slice erledigen, dessen Gegenstand schon ein geschlossener Slice lieferte
+description: |
+  Prueft Regel M05-09 (modul-05-planning-harness.md, Stufe 3): Ein geschlossener
+  Slice nimmt nichts mehr an (kein `Uebernimmt:`); hat er den Gegenstand geliefert,
+  ist es die Wegfall-Haelfte: `Gegenstand: entfallen: <Grund>` mit dem
+  geschlossenen Slice als Grund. Die Wellen-Zugehoerigkeit wandert mit: Eintrag
+  im Drift-Log der Roadmap. Fixture: slice-020 in open/ mit Welle W3.
+  Graders (Regex): (1) Vorschlag wird abgelehnt (geschlossener Slice nimmt nichts
+  an / Nein); (2) slice-020 traegt `Gegenstand: entfallen` (nicht uebernommen);
+  (3) Eintrag im Drift-Log der Roadmap.
+tags: [m05-09, stufe-3, modul-05]
+inputs:
+  prompt: >-
+    Nach dem AI-Harness-Regelwerk: slice-020 liegt noch in open/ (siehe
+    Datei). Wir haben festgestellt, dass slice-018, der schon laengst in done/
+    liegt, denselben Inhalt bereits mitgeliefert hat. Ein Kollege will bei
+    slice-018 eintragen, dass er slice-020 uebernimmt, und slice-020 dann nach
+    done/ schieben. Passt das so? Was muss in slice-020 stehen, bevor es nach
+    done/ geht, und was ist sonst noch zu erledigen?
+  files:
+    - path: m05-09-slice-020.md
+expected:
+  outcomes:
+    - type: task_completed
+graders:
+  - type: text
+    name: slice_entfallen_kern
+    config:
+      regex_match:
+        - '(?i)(\bnein\b|(geschlossen[\wäöüß]*|done)[^.]{0,80}(nimmt|nehmen|kann)[^.]{0,30}(nichts|nicht|kein[\wäöüß]*)|(nicht|kein[\wäöüß]*|nie)[^.]{0,40}(übernimmt|uebernimmt|übernehm[\wäöüß]*|uebernehm[\wäöüß]*|übernahme|uebernahme))'
+        - '(?i)gegenstand\W{0,6}entfallen'
+        - '(?i)drift[- ]?log'
+  - type: prompt
+    name: judge_m05_09_001
+    config:
+      model: kimi-k2.7-code:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Nein. Ein geschlossener Slice (slice-018) nimmt nichts mehr an, kein `Uebernimmt:` dort. slice-020 bekommt in §7 eine Zeile `Gegenstand: entfallen: <Grund>` mit slice-018 als Grund; jedes Risiko aus §6 (R1, R2) braucht einen Ausgang, Liefer-Punkte der DoD bleiben leer, Closure-Notiz/Register-Zeile abhaken; die Wellen-Zugehoerigkeit (Welle W3) wandert mit: Eintrag im Drift-Log der Roadmap als "in einem anderen aufgegangen" mit Datum und Grund. modul-05-planning-harness.md §Ein Slice, dessen Gegenstand ein anderer uebernimmt (Bedingungen 1 und 3, Absatz "Entfaellt der Gegenstand ganz").
+        Beispiel fuer eine RICHTIGE Antwort: Nein, so passt das nicht. Ein geschlossener Slice wie slice-018 nimmt nichts mehr an, dort kann kein Übernimmt-Eintrag stehen. Stattdessen bekommt slice-020 in Abschnitt 7 die Zeile "Gegenstand: entfallen: bereits durch slice-018 geliefert"; die Risiken R1 und R2 brauchen je einen Ausgang, die Liefer-Punkte der DoD bleiben leer. Weil slice-020 in Welle W3 steht, wird die Umplanung außerdem im Drift-Log der Roadmap vermerkt.
+        Beispiel fuer eine FALSCHE Antwort: Ja, das passt. slice-018 bekommt ein Übernimmt: slice-020, und in slice-020 steht in Abschnitt 7 "Gegenstand: übernommen von slice-018". Danach geht es nach done/, und der Wellenplan wird im Drift-Log angepasst.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

@@ -1,0 +1,16 @@
+id: rr-04-001
+name: Slice-Header mit Roadmap-Verweis
+description: |
+  Prueft RR-04 (grundlagen-referenz-richtung.md, Stufe 2): Ein Slice nennt nie die Roadmap; er traegt
+  ein Welle:-Feld (auch "ohne Welle"). Was von aussen auf die Roadmap zeigt, zeigt auf einen Meilenstein.
+  Fixture: Slice-Header mit Roadmap-Verweis statt Welle:-Feld.
+tags: [rr-04, stufe-2, referenz-richtung]
+inputs:
+  prompt: "Nach dem AI-Harness-Regelwerk: Schau dir den Header von slice-019.md an. Ist die Planungs-Einordnung dort so korrekt angegeben, oder muss etwas geaendert werden? Wenn ja, wie genau?"
+  files:
+    - path: rr-04-slice-019.md
+expected:
+  output_contains:
+    - "Welle:"
+  outcomes:
+    - type: task_completed
