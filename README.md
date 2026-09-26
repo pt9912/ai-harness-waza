@@ -13,6 +13,7 @@ Alle Targets führen genau einen waza-Befehl im Container aus (nach `make image`
 | Target | waza-Befehl | Zweck |
 |---|---|---|
 | `make image` | – (docker build) | Image bauen: waza aus dem Quellcode, Regelwerk-ZIP mit SHA256-Prüfung, Skills/Evals per `COPY` |
+| `make schema-check` | – (Python-Validator im Container) | Tasks, Evals und Config gegen die JSON-Schemas der waza-Version prüfen; dazu Fixtures vorhanden, eindeutige Task-IDs, Regex-Syntax und RE2-Tauglichkeit (Heuristik) |
 | `make check` | `waza check` | Skill-Readiness: Compliance, Token-Budget, Links |
 | `make tokens` | `waza tokens count` | Token-Zählung der Skill-Dateien |
 | `make spec-verify` | `waza spec verify` | Deckt die Eval-Suite die Trigger aus der `SKILL.md` ab? |
@@ -63,6 +64,7 @@ getesteten Modell (`--judge-model`).
 ```
 Dockerfile                        waza-Build, Regelwerk-ZIP (URL + SHA256), Stage `project`
 Makefile
+tools/schema_check.py             Validator für `make schema-check`
 .waza.yaml                        waza-Projektdefaults
 skills/ai-harness-regelwerk/
   SKILL.md                        Wrapper (einziger eigener Skill-Inhalt)
@@ -83,6 +85,7 @@ evals/ai-harness-regelwerk/
 - Die Regexes wurden mit `waza grade` gegen Beispielantworten geprüft (richtig besteht, falsch fällt durch) und
   nach einem Lauf mit GLM (`glm-5.3-flash:cloud`, Judge Kimi, ein Trial: 73/85 bestanden) an den echten Antworten
   nachjustiert (8 Tasks). Mit mehr Modellen und Trials sind weitere Anpassungen zu erwarten.
+- `make schema-check` prüft die Regex-Syntax nur mit Pythons `re` und einer Liste bekannter RE2-Unterschiede; ob Go sie akzeptiert, zeigt erst ein Waza-Lauf (`waza grade`).
 - `waza grade` funktioniert nicht mit `prompt`-Gradern ("requires an execution engine"); für eine Nachprüfung
   von Regexes muss man die Judges aus einer Kopie der Tasks entfernen.
 

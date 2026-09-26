@@ -30,9 +30,11 @@ RUN git lfs pull \
 # ---- Laufzeit-Image ----------------------------------------------------------
 FROM debian:bookworm-slim AS runtime
 RUN apt-get update \
- && apt-get install -y --no-install-recommends ca-certificates git python3 python-is-python3 \
+ && apt-get install -y --no-install-recommends ca-certificates git python3 python-is-python3 python3-yaml python3-jsonschema \
  && rm -rf /var/lib/apt/lists/*
 COPY --from=waza-build /out/waza /usr/local/bin/waza
+# JSON-Schemas derselben waza-Version fuer `make schema-check`
+COPY --from=waza-build /src/schemas/*.schema.json /opt/waza/schemas/
 ENV WAZA_NO_UPDATE_CHECK=1
 WORKDIR /workspace
 ENTRYPOINT ["waza"]
@@ -42,6 +44,7 @@ FROM runtime AS project
 COPY .waza.yaml /workspace/.waza.yaml
 COPY skills/ /workspace/skills/
 COPY evals/ /workspace/evals/
+COPY tools/ /opt/waza/tools/
 # Regelwerk + Templates kommen aus dem verifizierten ZIP, nicht aus dem Repo.
 COPY --from=regelwerk-fetch /out/regelwerk/ /workspace/skills/ai-harness-regelwerk/regelwerk/
 COPY --from=regelwerk-fetch /out/templates/ /workspace/skills/ai-harness-regelwerk/templates/

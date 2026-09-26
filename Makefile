@@ -29,13 +29,16 @@ docker rm $$ctr >/dev/null; exit $$rc
 endef
 
 .DEFAULT_GOAL := help
-.PHONY: help image check tokens spec-verify run run-copilot run-ollama compare shell waza-help clean
+.PHONY: help image schema-check check tokens spec-verify run run-copilot run-ollama compare shell waza-help clean
 
 help: ## Diese Hilfe
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-16s %s\n", $$1, $$2}'
 
 image: ## Image bauen (waza aus Quellcode, Regelwerk-ZIP verifiziert, Skills/Evals per COPY)
 	docker build --target project -t $(IMAGE) .
+
+schema-check: image ## Tasks/Evals/Config gegen waza-JSON-Schemas pruefen (+ Fixtures, IDs, Regex)
+	docker run --rm --entrypoint python3 $(IMAGE) /opt/waza/tools/schema_check.py
 
 check: image ## Skill-Readiness pruefen (Compliance, Token-Budget)
 	$(WAZA) check $(SKILL_DIR)
