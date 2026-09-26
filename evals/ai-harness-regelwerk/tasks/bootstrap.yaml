@@ -1,13 +1,48 @@
 id: bootstrap-001
-name: Harness-Bootstrap
-description: Trigger fuer den Bootstrap eines Adopter-Repos.
-tags: [trigger, bootstrap]
+name: Bootstrap - Baseline vendoren, nur Gruendungsdokumente
+description: |
+  Prueft die Bootstrap-Schritt-Sequenz (modul-02-harness-bootstrap.md
+  §Greenfield-Bootstrap: Schritt-Sequenz, Schritte 0-2 und "Anmerkung zum
+  Instanziierungs-Zeitpunkt" / "Anmerkung zur vendored Baseline", v6.10.0):
+  Zuerst Modus pro Sub-Area (Schritt 0) und Baseline/Repo-Klasse/ID-Schema
+  (Schritt 1); Baseline wird als Regelwerk UND Templates committet vendored
+  nach .harness/baseline/<tag>/{regelwerk,templates}/ mit SHA256SUMS, nicht
+  pro Lauf gefetcht; beim Bootstrap entstehen nur die Gruendungsdokumente,
+  wiederkehrende Artefakte (slice, welle, carveout, review-report, weitere
+  ADRs) nicht als Blanko-Kopien.
+  Ohne Regelwerk empfiehlt ein Modell typischerweise "Regelmanifest
+  (AGENTS.md) zuerst, Struktur, Tooling, CI" und findet den Plan im Kern in
+  Ordnung. Das ist hier falsch: Es fehlt die Modus-/Baseline-Entscheidung
+  vorab, das feste Vendoring-Ziel .harness/baseline/<tag>/ und die
+  Abgrenzung Gruendungsdokumente vs. Pro-Instanz-Artefakte.
+    Bewertung: Der LLM-Judge entscheidet; die Regex ist nur eine Plausibilitaetspruefung.
+tags:
+- trigger
+- bootstrap
+- modul-02
 inputs:
-  prompt: >-
-    Wie bootstrappe ich ein neues Repository nach dem AI-Harness-Regelwerk
-    (Harness-Bootstrap)? Womit fange ich an?
+  prompt: 'Nach dem AI-Harness-Regelwerk: Siehe Bootstrap-Plan in der Datei fuer unser neues, leeres Repo. Was daran ist falsch oder falsch angeordnet, und wie sieht die richtige Vorgehensweise fuer den Anfang aus (womit beginne ich, was wird wo abgelegt, was entsteht beim Bootstrap noch nicht)?'
+  files:
+  - path: bootstrap-001-bootstrap-plan.md
 expected:
-  output_contains:
-    - "Bootstrap"
   outcomes:
-    - type: task_completed
+  - type: task_completed
+graders:
+- type: text
+  name: vendoring_ziel
+  config:
+    regex_match:
+    - (?i)\.harness/baseline
+- type: prompt
+  name: judge_bootstrap_001
+  config:
+    model: minimax-m3:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Der Bootstrap beginnt nicht mit AGENTS.md, sondern mit Schritt 0 (Modus pro Sub-Area entscheiden; im leeren Repo Greenfield fuer Konventionen, Spec, Architektur, ADR) und Schritt 1 (Baseline-Auswahl, Repo-Klasse, ID-Schema). Schritt 2: Die Baseline wird committet vendored, Regelwerk UND Templates parallel nach `.harness/baseline/<tag>/{regelwerk,templates}/` samt `SHA256SUMS`, netzlos materialisiert, nicht pro Lauf per curl gefetcht. Beim Bootstrap entstehen nur die Gruendungsdokumente (lastenheft, spezifikation, architecture, harness/conventions.md, harness/README.md, AGENTS.md, roadmap, ADR 0001); wiederkehrende Artefakte (slice, welle, carveout, review-report, weitere ADRs) werden NICHT als Blanko-Kopien vorab angelegt, sondern pro Instanz aus der vendored Baseline kopiert; die vendored Baseline ist ihre einzige Referenz-Form (modul-02-harness-bootstrap.md §Greenfield-Bootstrap: Schritt-Sequenz, "Anmerkung zum Instanziierungs-Zeitpunkt" und "Anmerkung zur vendored Baseline"; v6.10.0).
+      Beispiel fuer eine RICHTIGE Antwort: Der Plan ist falsch angeordnet. Zuerst muessen Modus (Greenfield) und Baseline samt Repo-Klasse und ID-Schema feststehen, das gehoert nicht ans Ende. Die Baseline wird dann mit Regelwerk und Templates committet unter .harness/baseline/<tag>/ vendored, mit SHA256SUMS, nicht bei jedem Lauf per curl geholt. Die Blanko-Vorlagen fuer slice, carveout, review-report und weitere ADRs entfallen; beim Bootstrap entstehen nur die Gruendungsdokumente, alles Wiederkehrende wird erst bei Bedarf aus der vendored Baseline kopiert.
+      Beispiel fuer eine FALSCHE Antwort: Guter Plan, nur die Reihenfolge leicht umstellen: erst Git-Grundgeruest und AGENTS.md, dann Struktur, Tooling, CI. Die Vorlagen kann man in docs/templates/ ablegen und das Regelwerk per Skript aktuell halten. Kein Hinweis auf Vendoring unter .harness/baseline und keine Trennung Gruendungsdokumente vs. wiederkehrende Artefakte.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz: Sie nennt das committete Vendoring der Baseline (Regelwerk und Templates) unter .harness/baseline/<tag>/ statt Per-Lauf-Download UND lehnt die Blanko-Kopien wiederkehrender Artefakte beim Bootstrap ab (nur Gruendungsdokumente), und sie stellt Modus/Baseline-Wahl vor die Inhaltsarbeit. Formulierung, Synonyme und zusaetzliche korrekte Details sind unerheblich. Die Antwort besteht NICHT, wenn sie einen dieser Kernpunkte verfehlt oder der Referenz widerspricht.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+timeout_seconds: 300

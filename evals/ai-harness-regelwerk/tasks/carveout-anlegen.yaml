@@ -1,16 +1,48 @@
 id: carveout-anlegen-001
-name: Carveout anlegen (Trigger + richtiger Abschnitt)
+name: Carveout-Haeufung gehoert in eine BF-Sub-Area-Markierung
 description: |
-  Der Skill muss bei einem Carveout ausgeloest werden; der Agent soll das
-  Carveout-Modul und die Vorlage heranziehen, nicht das ganze Regelwerk.
-tags: [trigger, carveout]
+  Prueft die Werkzeug-Wahl bei Diskrepanz (modul-07-carveouts.md
+  §Werkzeug-Wahl bei Diskrepanz: Carveout, BF-Markierung oder ADR, sowie
+  "Regeln gegen typische Fehlannahmen" Punkt "Jede entdeckte Diskrepanz ist
+  ein eigener Carveout", v6.10.0): Mehrere Ausnahmen im selben
+  Geltungsbereich oder ein "Code existiert vor Doku"-Muster gehoeren nicht
+  in eine Carveout-Kaskade, sondern in eine BF-Sub-Area-Markierung mit
+  Graduation-Plan als Modus-Deklaration im Adaptions-Block von
+  harness/conventions.md; massgeblich ist das Symptom (gemeinsamer
+  Geltungsbereich), kein harter Schwellwert.
+  Ohne Regelwerk raet ein Modell typischerweise: pro Datei ein Carveout
+  nach Vorlage anlegen, nur mit messbarem Trigger und Folge-Slice, oder die
+  Ausnahmen zu einem Sammel-Carveout bzw. einer ADR zusammenfassen. Das ist
+  hier falsch: Die Haeufung im selben Pfad verlangt die Sub-Area-Markierung
+  (Brownfield mit Graduation-Trigger), nicht weitere CO-Dateien.
+    Bewertung: Der LLM-Judge entscheidet; die Regex ist nur eine Plausibilitaetspruefung.
+tags:
+- trigger
+- carveout
+- modul-07
 inputs:
-  prompt: >-
-    Wir weichen in einem Slice bewusst vom Plan ab und muessen das als Carveout
-    festhalten. Welche Abschnitte des AI-Harness-Regelwerks gelten, und welche
-    Vorlage nehme ich?
+  prompt: 'Nach dem AI-Harness-Regelwerk: Siehe Diskrepanz-Notizen in der Datei. dev-b schlaegt vor, drei weitere Carveouts (CO-010 bis CO-012) anzulegen. Ist das der richtige Weg, oder welches Werkzeug des Regelwerks nehmen wir stattdessen, und wo wird es festgehalten?'
+  files:
+  - path: carveout-anlegen-001-diskrepanzen.md
 expected:
-  output_contains:
-    - "carveout"
   outcomes:
-    - type: task_completed
+  - type: task_completed
+graders:
+- type: text
+  name: bf_markierung
+  config:
+    regex_match:
+    - (?i)(BF|brownfield)[\s-]*(sub-?area)?[\s-]*(markierung|modus)|sub-?area[\s-]*markierung|graduation
+- type: prompt
+  name: judge_carveout_anlegen_001
+  config:
+    model: minimax-m3:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Bereits drei aktive Carveouts (CO-004, CO-007, CO-009) plus ein neuer Fund haben denselben Geltungsbereich `internal/parser/` und folgen aus einem "Code existiert vor Doku"-Muster. Das ist ein Cluster: Kein weiterer Carveout, keine Carveout-Kaskade. Richtig ist eine BF-Sub-Area-Markierung (Brownfield) mit Graduation-Plan/Graduation-Trigger als Modus-Deklaration im Adaptions-Block von `harness/conventions.md`. Massgeblich ist das Symptom (gemeinsamer Geltungsbereich), es gibt keinen harten Schwellwert fuer die Carveout-Zahl. Erst Granularitaet (Cluster oder einzelne Diskrepanz?), dann Temporalitaet (ein Carveout nur bei ernst erreichbarem Trigger; sonst ADR). (modul-07-carveouts.md §Werkzeug-Wahl bei Diskrepanz und "Regeln gegen typische Fehlannahmen"; modul-02-harness-bootstrap.md §Kernidee, Anzeichen 3; v6.10.0).
+      Beispiel fuer eine RICHTIGE Antwort: Nein, keine weiteren Carveouts. CO-004, CO-007, CO-009 und die neuen Funde liegen alle in internal/parser/; das ist ein Cluster im selben Geltungsbereich mit Code-vor-Doku-Muster. Dafuer nimmt man eine BF-Sub-Area-Markierung mit Graduation-Plan, festgehalten als Modus-Deklaration im Adaptions-Block von harness/conventions.md. Eine Carveout-Kaskade waere verschleierte Sub-Area-Brownfield.
+      Beispiel fuer eine FALSCHE Antwort: Ja, je ein Carveout pro Datei ist richtig, aber jeder braucht einen messbaren Trigger statt 'sobald wir Zeit haben' und einen Folge-Slice (Vorlage carveout.template.md, docs/plan/carveouts/CO-<NNN>-...). Alternativ: alles in einen Sammel-Carveout oder eine ADR zusammenfassen.
+      Kriterium: Die Antwort lehnt weitere Einzel-Carveouts fuer diesen Cluster ab und nennt die BF-Sub-Area-Markierung (Brownfield-Modus fuer die Sub-Area mit Graduation-Plan/-Trigger) als richtiges Werkzeug, festgehalten in harness/conventions.md. Formulierung, Synonyme und zusaetzliche korrekte Details sind unerheblich. Die Antwort besteht NICHT, wenn sie weitere Carveouts (auch mit besserem Trigger) empfiehlt, stattdessen einen Sammel-Carveout oder eine ADR nennt oder die Kernentscheidung offen laesst.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+timeout_seconds: 300

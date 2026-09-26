@@ -1,14 +1,21 @@
 id: hd-09-001
-name: Sensors-Tabelle - Aufruf in der Target-Zelle
+name: Retiriertes Gate - Zeile und Sensor-Datei
 description: |
-  Prueft HD-09 (grundlagen-harness-dateien.md, Stufe 2): Die Target-Zelle der
-  Sensors-Tabelle traegt nur den nackten Target-Namen; der Aufruf mit Argument
-  gehoert in die Nachbarspalte, sonst meldet der Deklarations-Sensor still
-  gate-undocumented. Fixture: Zeile mit `make verify-slice SLICE=<id>` in der
-  Target-Zelle (verlinkte Zelle `coverage` ist korrekt).
-  Grader (text/regex): (1) Target-Zelle darf nur den Target-Namen (verify-slice)
-  tragen, ohne make/Argument; (2) der Aufruf/das Argument (SLICE=<id>) gehoert in
-  eine andere Spalte (Vertrag/Nachbarspalte).
+  Prueft HD-09 (grundlagen-harness-dateien.md v6.10.0, §harness/README.md als
+  Einstiegspunkt, Absaetze "Kein Verzeichnis-Lifecycle: ein retiriertes Gate ist
+  weg" und "Deshalb wird die Datei direkt adressiert"): Es gibt kein
+  `sensors/done/` und kein Archiv; die Zeile verschwindet aus der Sensors-Tabelle,
+  die Datei harness/sensors/<target>.md wird geloescht (kein Status-/Datumsfeld,
+  kein Deprecated-Vermerk; die Historie haelt git). Lebende Artefakte (AGENTS.md,
+  Spec) mit Link auf die Datei werden nachgezogen (der rote Link-Sensor ist das
+  gewollte Signal); einfrierende Artefakte (geschlossener Slice, Review-Report)
+  nennen `make <target>` als Token und werden nicht angefasst. Fixtures: README
+  mit verlinkter mutation-Zeile, grep-Ausgabe der Verweise.
+  Ohne Regelwerk antwortet ein Modell typischerweise: Zeile als deprecated/retired
+  markieren, Datei in ein Archiv-Verzeichnis (archive/ oder done/) verschieben, damit
+  die Historie erhalten bleibt, und alle Verweise (auch im geschlossenen Slice) darauf
+  umbiegen. Das ist hier falsch, weil das Regelwerk kein Gate-Archiv kennt, die
+  Historie in git haelt und geschlossene Zeitdokumente nicht nachgezogen werden.
     Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
 tags:
 - hd-09
@@ -16,27 +23,28 @@ tags:
 - hd
 - fixture
 inputs:
-  prompt: 'Nach dem AI-Harness-Regelwerk: Unser Deklarations-Check meldet gate-undocumented für verify-slice, obwohl die Sensors-Tabelle in hd-09-harness-readme.md eine Zeile dafür hat. Woran liegt das und was muss ich ändern?'
+  prompt: 'Nach dem AI-Harness-Regelwerk: Wir schaffen das Gate mutation ab; `make mutation` fliegt mit dem naechsten Merge aus dem Makefile. In hd-09-harness-readme.md steht die Sensors-Tabelle, in hd-09-verweise.txt die Fundstellen im Repo. Wir wuerden die Zeile als deprecated markieren und harness/sensors/mutation.md in ein Archiv-Verzeichnis verschieben, damit die Historie nicht verloren geht. Wie gehen wir mit der Tabellenzeile, der Sensor-Datei und den Verweisen aus den Fundstellen richtig um?'
   files:
   - path: hd-09-harness-readme.md
+  - path: hd-09-verweise.txt
 expected:
   outcomes:
   - type: task_completed
 graders:
 - type: text
-  name: target_zelle_nur_name
+  name: zeile_und_datei_weg
   config:
     regex_match:
-    - (?i)((nur|allein|alleine|ausschlie(ß|ss)lich|blo(ß|ss)\w*|nackt\w*|rein\w*|pur\w*|schlicht\w*)[^\n]{0,40}(verify-slice|target[ -]?name|name des targets|kennung|target)|(verify-slice`?|target[ -]?name)[^\n]{0,40}(allein|alleine|nur|ohne)|(ohne|kein\w*)[^\n]{0,30}(make|argument\w*|slice=))
+    - '(?i)((zeile|datei|sensors/mutation)[^\n]{0,100}(l(ö|oe)sch\w*|entfern\w*|gestrichen|verschwind\w*|wird\s+weg)|(l(ö|oe)sch\w*|entfern\w*|streich\w*)[^\n]{0,60}(zeile|datei))'
 - type: prompt
   name: judge_hd_09_001
   config:
-    model: deepseek-v4.1-flash:cloud
+    model: minimax-m3:cloud
     continue_session: true
     prompt: |
       Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-      Referenz (laut Regelwerk): Die Target-Zelle traegt nur den nackten Target-Namen; der Aufruf mit Argument (`SLICE=<id>`) gehoert in die Nachbarspalte. Sonst meldet der Deklarations-Sensor still `gate-undocumented`. Eine verlinkte Target-Zelle ist nicht betroffen. grundlagen-harness-dateien.md §harness/README.md als Einstiegspunkt (Z. 203-211).
-      Beispiel fuer eine RICHTIGE Antwort: Der Sensor sucht in der Target-Zelle nach der Kennung, und in der Zeile steht `make verify-slice SLICE=<id>`, was keine Kennung ist. Deshalb meldet er still gate-undocumented. In die Target-Zelle gehört ausschließlich der Name `verify-slice`. Den vollständigen Aufruf mit dem SLICE-Argument schiebst du in die Vertrag-Spalte daneben. Die verlinkte Zelle bei coverage ist dagegen in Ordnung.
-      Beispiel fuer eine FALSCHE Antwort: Das Target verify-slice ist vermutlich im Makefile nicht definiert, oder die Zeile ist nicht verlinkt. Verlinke die Zelle auf sensors/verify-slice.md, so wie bei coverage, dann findet der Deklarations-Check die Zeile. Danach den Check erneut laufen lassen.
-      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Referenz (laut Regelwerk): Ein retiriertes Gate ist weg: Es gibt kein `sensors/done/` und kein Archiv-Verzeichnis. Die Zeile verschwindet aus der Sensors-Tabelle, die Datei `harness/sensors/mutation.md` wird geloescht, ohne Deprecated-/Status-/Datumsfeld; was das Gate war, haelt `git`. Lebende Artefakte (AGENTS.md, Spec), die auf die Datei verlinken, werden nachgezogen (Verweis entfernen); der dabei rot werdende Link-Sensor ist das gewollte Signal. Einfrierende Zeitdokumente (geschlossener Slice, Review-Report) nennen `make mutation` als Token und werden nicht angefasst. grundlagen-harness-dateien.md §harness/README.md als Einstiegspunkt (Absaetze "Kein Verzeichnis-Lifecycle: ein retiriertes Gate ist weg" und "Deshalb wird die Datei direkt adressiert"), v6.10.0.
+      Beispiel fuer eine RICHTIGE Antwort: Ein Archiv oder einen deprecated-Status gibt es fuer Gates im Harness nicht. Loescht die Zeile aus der Sensors-Tabelle und loescht harness/sensors/mutation.md; die Historie steht in git, ein Status- oder Datumsfeld gibt es ohnehin nicht. Die Verweise in AGENTS.md und spec/spezifikation.md sind lebende Dokumente und muessen nachgezogen, also entfernt werden; dass der Link-Check sonst rot wird, ist gewollt. Slice-031 und der Review-Report sind eingefroren und nennen nur `make mutation` als Token, die bleiben unveraendert.
+      Beispiel fuer eine FALSCHE Antwort: Markiert die Zeile als deprecated und verschiebt die Datei nach harness/sensors/archive/ oder done/, damit die Historie erhalten bleibt. Danach biegt ihr alle Verweise, auch in slice-031 und im Review-Report, auf den Archivpfad um, damit keine Links brechen.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz: Zeile und Datei werden geloescht (kein Archiv, kein deprecated-Status), und die Verweise werden nach lebend/eingefroren unterschieden (lebende nachziehen, geschlossene Zeitdokumente nicht anfassen). Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie ein Archiv, einen deprecated-Vermerk oder das Umbiegen geschlossener Dokumente empfiehlt, der Referenz sonst widerspricht oder nur Randbegriffe nennt.
       Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

@@ -1,6 +1,0 @@
-scan:
-  roots: ["."]
-modules: [links, anchors]
-ids:
-  patterns:
-    - {regex: 'ADR-\d{4}', target: docs/plan/adr/}

@@ -1,0 +1,9 @@
+scan:
+  roots: ["."]
+  ignore: ["**/*.template.md", ".tmp/**"]
+modules: [links, anchors, ids, reviews]
+ids:
+  patterns:
+    - {regex: 'ADR-\d{4}', target: docs/plan/adr/}
+reviews:
+  reviews-dir: docs/reviews

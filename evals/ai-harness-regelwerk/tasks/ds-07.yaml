@@ -1,41 +1,45 @@
 id: ds-07-001
-name: Handoff-Gate in der Fruehphase
+name: Handoff-Gate - Grenze des Inhalts-Nachweises
 description: |
-  Prueft DS-07 (grundlagen-durchsetzungsschicht.md, Stufe 3): Das Handoff-Gate
-  ist bootstrap-aware: es erzwingt nur Gates, die schon existieren; ein harter
-  Handoff-Gate ab Schritt 0 mit allen geplanten Gates bekaempft die weiche
-  Fruehphase des Harness-Bootstraps.
-  Grader (text/regex): (1) Ablehnung des Vorhabens (keine gute Idee / nein);
-  (2) Kern: Gate erzwingt nur bereits existierende/vorhandene Gates. Negativ:
-  Zustimmung ("Ja"/"ist eine gute Idee") als Antwortanfang bzw. Urteil.
-    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
-tags:
-- ds-07
-- stufe-3
-- ds
+  Prueft DS-07 (grundlagen-durchsetzungsschicht.md §Nachweis ueber Inhalt und
+  §Grenzen - ehrlich benannt, v6.10.0): Der Inhalts-Nachweis (Content-Hash) des
+  Handoff-Gates hat eine Luecke bei frischem Klon bzw. geloeschtem State mit
+  cleanem Tree - dort ist kein Nachweis pruefbar und CI ist das Netz; die Grenze
+  muss benannt werden, eine Garantie-Aussage darueber hinaus ist eine Harness-Luege.
+  Ohne Regelwerk antwortet ein Modell typischerweise, die Zusicherung sei im
+  Kern in Ordnung und der Hook muesse nur strenger werden (bei fehlendem State
+  blockieren bzw. Gates selbst nachlaufen lassen), oder es empfiehlt allgemein
+  "mehr Tests". Das ist hier unvollstaendig: laut Regelwerk ist die Luecke
+  systembedingt, wird nicht im Hook geschlossen, sondern von CI aufgefangen, und
+  die README-Garantie muss auf die Grenze zurueckgenommen werden.
+tags: [ds-07, stufe-3, ds]
 inputs:
-  prompt: 'Nach dem AI-Harness-Regelwerk: Neues Repo, das Makefile hat erst das Target test. Geplant sind sechs weitere Gates (lint, sast, coverage, ...). Das Team will den Stop-Hook von Anfang an so einrichten, dass er alle sieben Gates verlangt, damit nichts vergessen wird. Ist das eine gute Idee?'
+  prompt: >-
+    Nach dem AI-Harness-Regelwerk: Siehe Datei (Hook-README und Log). Im Log
+    vom 4. Maerz hat der Stop-Hook den Agenten durchgelassen, obwohl er keine
+    Gate-Ausfuehrung belegen konnte. Ist die "Garantie" im README so
+    korrekt? Was aendern wir am README, und was faengt den Fall ab?
+  files:
+    - path: ds-07-handoff-gate-readme.md
 expected:
   outcomes:
-  - type: task_completed
+    - type: task_completed
 graders:
-- type: text
-  name: nur_existierende_gates
-  config:
-    regex_match:
-    - (?i)(keine (gute|sinnvolle) idee|nicht (sinnvoll|empfehlenswert|ratsam|zielf(ü|ue)hrend|gut|klug)|\bnein\b|besser (nicht|w(ä|ae)re)|davon (ist )?abzuraten|w(ü|ue)rde ich nicht|nicht empfohlen|sollte(n)? (man |ihr |ihr das |das )?nicht)
-    regex_not_match:
-    - (?i)^\s*ja\b
-    - (?i)\b(ist|w(ä|ae)re) (das |es )?(eine |durchaus eine |grunds(ä|ae)tzlich eine )(gute|sinnvolle) idee
-- type: prompt
-  name: judge_ds_07_001
-  config:
-    model: deepseek-v4.1-flash:cloud
-    continue_session: true
-    prompt: |
-      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-      Referenz (laut Regelwerk): Keine gute Idee: Der Handoff-Gate muss bootstrap-aware sein, d. h. nur die Gates erzwingen, die schon existieren (hier nur `test`); ein harter Gate ab Schritt 0 mit allen sieben bekaempft die weiche Fruehphase des Harness-Bootstraps. grundlagen-durchsetzungsschicht.md §Vier Design-Eigenschaften, Punkt 4 (Z. 59-63).
-      Beispiel fuer eine RICHTIGE Antwort: Nein, das ist keine gute Idee. Der Stop-Hook sollte nur die Gates verlangen, die zum jetzigen Zeitpunkt tatsächlich vorhanden sind, hier also nur test, und dann mit der Reife des Repos mitwachsen. Ein harter Handoff-Gate ab Schritt 0 mit allen sieben Gates würde die weiche Frühphase des Bootstraps ausbremsen, weil er dauerhaft rot wäre. Erst binden, wenn es etwas zu binden gibt.
-      Beispiel fuer eine FALSCHE Antwort: Ja, das ist eine gute Idee. Ein Handoff-Gate, das von Anfang an alle sieben Gates verlangt, ist fail-closed und stellt sicher, dass kein Gate vergessen wird. Man sollte den Stop-Hook mit Content-Hash-Nachweis und Loop-Guard absichern, dann bleibt das Team von Beginn an diszipliniert.
-      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
-      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+  - type: text
+    name: luecke_ci_netz
+    config:
+      regex_match:
+        - (?i)\bCI\b
+  - type: prompt
+    name: judge_ds_07_001
+    config:
+      model: minimax-m3:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Die Garantie im README ist zu stark und damit selbst eine Harness-Luege. Der Inhalts-Nachweis (Content-Hash) hat eine bekannte Luecke bei frischem Klon bzw. geloeschtem State mit cleanem Tree: dort ist kein Nachweis pruefbar. Diese Grenze muss im README benannt werden (Pflicht), und das Netz dafuer ist CI (nicht der Hook). Fundstelle: grundlagen-durchsetzungsschicht.md §Vier Design-Eigenschaften Punkt 2 und §Grenzen - ehrlich benannt (v6.10.0).
+        Beispiel fuer eine RICHTIGE Antwort: Nein, die Garantie stimmt so nicht. Der Nachweis ist ein Content-Hash ueber den Arbeitsbaum; bei frischem Klon (State fehlt, Tree clean) laesst sich nichts pruefen, wie das Log vom 4. Maerz zeigt. Das README muss diese Grenze ausdruecklich nennen, statt mehr zu versprechen, sonst ist die Zusicherung eine Harness-Luege. Aufgefangen wird der Fall nicht durch den Hook, sondern durch CI, die die Gates auf dem Stand erneut laufen laesst.
+        Beispiel fuer eine FALSCHE Antwort: Die Garantie ist im Kern richtig, aber der Hook sollte bei fehlender gates.sha strikt blockieren und die Gates selbst nachlaufen lassen. Ausserdem sollte man .claude/state ins Repo committen und ein Audit-Log fuehren. Dann ist der Fall geschlossen und die Garantie kann stehen bleiben.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz, nennt also (1) die Garantie ist zu stark bzw. der Nachweis hat hier eine Luecke (frischer Klon/State weg, kein Nachweis pruefbar) und (2) CI ist das Netz dafuer, wobei die Grenze im README benannt werden soll. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht (z. B. die Garantie bestaetigt oder die Luecke allein im Hook schliessen will), CI als Netz nicht nennt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+timeout_seconds: 300

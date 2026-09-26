@@ -51,7 +51,7 @@ make run-ollama OLLAMA_MODEL='kimi-k2.7-code:cloud' TASK='source-precedence*'   
 make run-ollama OLLAMA_MODEL='glm-5.3-flash:cloud' TASK="m09-08* m02-11*"       # mehrere Muster
 ```
 
-Die `prompt`-Grader (LLM-Judge) nutzen `OLLAMA_JUDGE` (Standard `deepseek-v4.1-flash:cloud`), unabhängig vom
+Die `prompt`-Grader (LLM-Judge) nutzen `OLLAMA_JUDGE` (Standard `minimax-m3:cloud`), unabhängig vom
 getesteten Modell (`--judge-model`).
 
 - Bei `:cloud`-Modellen gehen Prompts und gelesene Regelwerk-Auszüge an ollama.com.
@@ -78,15 +78,15 @@ evals/ai-harness-regelwerk/
 ### Prüfung der Tasks
 
 - Jeder der 73 regelbasierten Tasks nennt im `description`-Feld Regel-ID und Quelldatei.
-- 42 Tasks haben pro Task `graders:` mit einem `prompt`-Grader (LLM-Judge, `continue_session: true`, Referenzantwort,
+- 49 Tasks haben pro Task `graders:` mit einem `prompt`-Grader (LLM-Judge, `continue_session: true`, Referenzantwort,
   bei den überarbeiteten Tasks zusätzlich je eine richtige und falsche Beispielantwort). **Der Judge entscheidet.** Der
   `text`-Grader (höchstens die Kernaussage-Regex plus `regex_not_match`) ist nur eine Plausibilitätsprüfung; alle
   Regexes bestehen auf sämtlichen vom Judge bestandenen echten Antworten aus den Läufen mit v6.9.0 und v6.10.0.
   Beide Grader müssen bestehen.
-- Die übrigen 43 Tasks prüfen mit `expected.output_contains` (case-insensitiv) bzw. haben keinen Judge.
+- Die übrigen 36 Tasks prüfen mit `expected.output_contains` (case-insensitiv) bzw. haben keinen Judge.
 - Die Regexes wurden mit `waza grade` gegen Beispielantworten geprüft (richtig besteht, falsch fällt durch) und
   nach einem Lauf mit GLM (`glm-5.3-flash:cloud`, Judge Kimi, ein Trial: 73/85 bestanden) an den echten Antworten
-  nachjustiert (8 Tasks). Mit v6.10.0 (Judge Deepseek): 78/85 bestanden, alle 42 Judges bestanden; die vier vorher
+  nachjustiert (8 Tasks). Mit v6.10.0 (damals Judge Deepseek): 78/85 bestanden, alle 42 Judges bestanden; die vier vorher
   bemängelten Stellen des Regelwerks (v6.9.0) sind korrigiert und die zugehörigen Tasks `bg-01`, `hd-13`, `rr-13` bestehen jetzt. Mit mehr Modellen und Trials sind weitere Anpassungen zu erwarten.
 - `make schema-check` prüft die Regex-Syntax nur mit Pythons `re` und einer Liste bekannter RE2-Unterschiede; ob Go sie akzeptiert, zeigt erst ein Waza-Lauf (`waza grade`).
 - `waza grade` funktioniert nicht mit `prompt`-Gradern ("requires an execution engine"); für eine Nachprüfung
@@ -105,3 +105,11 @@ und stehen im Image unter `/workspace/skills/ai-harness-regelwerk/`.
 - `waza init`, `waza new` und `waza dev` haben kein Make-Target, da sie Dateien im Repo schreiben würden.
 - Die Erwartungen in `tasks/*.yaml` (Regex und Begriffe) sind Annahmen und nach echten Läufen zu kalibrieren; Regexes sind die häufigste Quelle falscher Fehlschläge.
 - Der Mock-Executor gibt nur den Prompt zurück; nur `make run-copilot` misst echtes Verhalten.
+
+## Vorwissen-Tasks
+
+Elf Tasks wurden von einem Modell ohne Regelwerk bestanden (Baseline `--no-skills`, GLM) und danach auf eine
+Regelwerk-spezifische Entscheidung geschärft. Kontrolle (GLM, Judge `minimax-m3:cloud`, ein Lauf): mit Skill
+bestehen alle elf; ohne Skill fallen acht durch. Offen: `ds-07` besteht weiter mit reinem Vorwissen; bei `sp-05`
+verhindert nur die Regex ein Bestehen ohne Regelwerk; bei `carveout-anlegen` und `tr-04` bestand das Modell ohne
+Skill über eine Suche im Regelwerk. `--no-skills` entfernt nur den Skill, nicht die Dateien im Image.

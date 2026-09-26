@@ -1,39 +1,44 @@
 id: sp-05-001
-name: Regeln in CLAUDE.md
+name: Lastenheft Accepted - neue Anforderung und Berichtigungen
 description: |
-  Prueft SP-05 (grundlagen-source-precedence.md, Stufe 3): Der Werkzeug-Einstieg (CLAUDE.md) hat
-  keinen Rang, verweist nur und legt nichts fest; Regeln, die nur dort stehen, sind Waisen und
-  gehoeren nach AGENTS.md. Fixture: CLAUDE.md mit drei Regeln, die AGENTS.md nicht kennt (force-push, pathlib, Sprache);
-  die Zeile "make verify" verweist auf AGENTS.md und ist keine Waise.
-  Grader (Regex): (1) Urteil "nicht in Ordnung / muss geaendert werden", (2) die Regeln sind Waisen
-  bzw. gehoeren nach AGENTS.md (umziehen/verschieben/uebernehmen).
-    Bewertung: Der LLM-Judge entscheidet; die verbleibende Regex ist nur eine Plausibilitaetspruefung der Kernaussage.
+  Prueft die Lastenheft-Aenderungsregel in grundlagen-source-precedence.md §Spec-Stratifizierung
+  (Absaetze "Wann die CR-Pflicht beginnt" und "Die eine Ausnahme ist die Tatsachenberichtigung",
+  v6.10.0; Form-Details in templates/spec/lastenheft.template.md §7 Historie). Ab Status Accepted ist
+  JEDE Aenderung eine Vertragsaenderung, auch das blosse Hinzufuegen einer neuen LH-*. Einzige Ausnahme:
+  Tatsachenberichtigung, die in der Historie als solche ausgewiesen ist, keine Aussage einer Anforderung
+  beruehrt und in "Verweis" `—` traegt. Fixture: Lastenheft (Accepted) mit drei Aenderungswuenschen:
+  neue Anforderung (CR noetig), falscher Auftraggeber-Name im Zweck-Abschnitt (Berichtigung ohne CR),
+  falsche Frist in einer Anforderung (beruehrt Aussage, CR trotz "Tippfehler"-Etikett).
+  Ohne Regelwerk antwortet ein Modell typischerweise: eine rein additive neue Anforderung sei unkritisch
+  bzw. jede offensichtliche Korrektur gegen den Vertrag duerfe direkt rein. Das ist hier falsch, weil
+  "neu" keine Ausnahme ist und eine Zahlenkorrektur in einer Anforderung deren Aussage beruehrt.
+  Bewertung: Der LLM-Judge entscheidet; die Regex ist nur eine Plausibilitaetspruefung.
 tags:
 - sp-05
 - stufe-3
 - source-precedence
 inputs:
-  prompt: 'Nach dem AI-Harness-Regelwerk: Pruefe die CLAUDE.md in unserem Repo. AGENTS.md enthaelt nur den Projektueberblick und die Make-Targets. Ist der Inhalt der CLAUDE.md so in Ordnung, oder muss etwas geaendert werden?'
+  prompt: 'Nach dem AI-Harness-Regelwerk: Unser Lastenheft hat den Status Accepted. Kollege Meier hat in der Datei drei Aenderungswuensche notiert. Welche davon duerfen wir direkt im Lastenheft umsetzen, fuer welche brauchen wir einen vorgelagerten Vorgang, und was tragen wir jeweils in die Historie ein? Auftraggeber und Entwickler sind bei uns dieselbe Person.'
   files:
-  - path: sp-05-claude.md
+  - path: sp-05-lastenheft-aenderungen.md
 expected:
   outcomes:
   - type: task_completed
 graders:
 - type: text
-  name: claude_md_regeln_umziehen
+  name: berichtigung_ohne_cr_ausgewiesen
   config:
     regex_match:
-    - (?i)(nicht\s+(so\s+)?(in\s+ordnung|ok\b|korrekt|richtig|zul(ä|ae)ssig|konform)|\bnein\b|muss\s+([^\s.,;:()]+\s+){0,2}ge(ä|ae)ndert|ge(ä|ae)ndert\s+werden|(ü|ue)berarbeit|angepasst\s+werden|umgezogen|umzuziehen|umziehen|verschoben)
+    - (?i)(tatsachenberichtigung|berichtigung)[^\n]{0,250}(ausgewiesen|historie|verweis|kein\w*\s+(change[- ]request|cr))|(ausgewiesen|historie|verweis)[^\n]{0,250}berichtigung
 - type: prompt
   name: judge_sp_05_001
   config:
-    model: deepseek-v4.1-flash:cloud
+    model: minimax-m3:cloud
     continue_session: true
     prompt: |
       Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-      Referenz (laut Regelwerk): Nein, nicht in Ordnung: CLAUDE.md ist der Werkzeug-Einstieg, hat keinen Rang, verweist nur und legt nichts fest. Regeln, die in keiner gerankten Quelle stehen, sind Waisen und werden nach AGENTS.md umgezogen (Reihenfolge: belegen, umziehen, erst dann kuerzen); kein Sensor, Review-Griff (SP §Source Precedence "Das Dritte ist der Werkzeug-Einstieg", "Vollstaendigkeit", "Pruefffrage", "Reihenfolge beim Aufraeumen"; durchsetzungsschicht §Artefakt-Set nennt es "Wurzel-Einstiegsdatei").
-      Beispiel fuer eine RICHTIGE Antwort: Nein, so ist die CLAUDE.md nicht in Ordnung. Sie ist nur der Einstieg des Werkzeugs, hat keinen Rang und darf verweisen, aber nichts festlegen. Die drei Regeln zu force-push, pathlib und Sprache stehen in keiner gerankten Quelle, es sind Waisen. Sie muessen zuerst belegt und dann nach AGENTS.md umgezogen werden; erst danach darf die CLAUDE.md gekuerzt werden.
-      Beispiel fuer eine FALSCHE Antwort: Ja, die CLAUDE.md ist in Ordnung. Sie ist der Werkzeug-Einstieg und darf ruhig eigene Regeln enthalten, etwa das force-push-Verbot und die pathlib-Vorgabe. Sie verweist ausserdem sauber auf AGENTS.md. Es muss nichts geaendert werden, hoechstens kann man die Regeln ergaenzend dort dokumentieren.
-      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Referenz (laut Regelwerk): Ab Status Accepted ist JEDE Aenderung am Lastenheft eine Vertragsaenderung, auch das Hinzufuegen einer neuen LH-*; "neu" ist keine Ausnahme. Sie braucht einen Change Request (Fussabdruck: Version-Bump plus Historie-Zeile mit dem CR unter "Verweis"). Fallen Auftraggeber und Entwickler zusammen, traegt der Commit die Trennung: eigener Commit, der ausschliesslich das Lastenheft aendert, vor dem Slice, der es umsetzt; "Verweis" nennt diesen Vorgang. Einzige Ausnahme ist die Tatsachenberichtigung (eine Stelle behauptete etwas anderes als vereinbart): kein CR noetig, wenn sie in der Historie ALS SOLCHE ausgewiesen ist und KEINE Aussage einer Anforderung beruehrt; "Verweis" traegt dann "—". Uebertragen auf die Fixture: (1) neue LH-QA-SUP-010 = CR-pflichtig; (2) falscher Auftraggeber-Name im Zweck-Abschnitt = Tatsachenberichtigung ohne CR, in der Historie als Berichtigung ausgewiesen, Verweis "—"; (3) 14 statt 10 Tage in LH-FA-IDX-003 beruehrt die Aussage einer Anforderung, ist also trotz "Tippfehler"-Etikett eine Vertragsaenderung mit CR (grundlagen-source-precedence.md §Spec-Stratifizierung, "Wann die CR-Pflicht beginnt" und "Die eine Ausnahme ist die Tatsachenberichtigung", v6.10.0; templates/spec/lastenheft.template.md §7 Historie).
+      Beispiel fuer eine RICHTIGE Antwort: Nur der Namensfehler im Zweck-Abschnitt darf ohne Change Request direkt korrigiert werden: Das ist eine Tatsachenberichtigung, die in der Historie ausdruecklich als solche ausgewiesen wird, mit "—" unter Verweis. Die neue LH-QA-SUP-010 braucht einen Change Request, denn ab Accepted ist auch das Hinzufuegen eine Vertragsaenderung. Die 14-auf-10-Tage-Korrektur beruehrt die Aussage einer Anforderung; sie ist keine blosse Berichtigung, sondern ebenfalls eine Vertragsaenderung. Da ihr dieselbe Person seid, gehen die CR-Aenderungen in einen eigenen Commit, der nur das Lastenheft aendert, vor den umsetzenden Slice, mit Version-Bump und Historie-Zeile, die diesen Vorgang nennt.
+      Beispiel fuer eine FALSCHE Antwort: Die neue Anforderung LH-QA-SUP-010 ist rein additiv und aendert nichts Bestehendes, die kann direkt ins Lastenheft. Die beiden Abschreibfehler sind offensichtliche Korrekturen gegen den unterschriebenen Vertrag und duerfen ebenfalls direkt gemacht werden; in die Historie kommt ein Eintrag mit Version-Bump und Verweis auf V-2025-114. Bei den Aenderungen genuegt ein Commit zusammen mit dem Slice.
+      Kriterium: Die Antwort ordnet alle drei Wuensche im Kern wie die Referenz ein: (1) neue Anforderung CR-pflichtig, (2) Namensfehler als ausgewiesene Tatsachenberichtigung ohne CR, (3) Fristkorrektur beruehrt eine Anforderungsaussage und ist CR-pflichtig. Details wie Commit-Reihenfolge oder "—" sind erwuenscht, aber nicht allein entscheidend. Formulierung, Synonyme und Satzreihenfolge sind unerheblich. Die Antwort besteht NICHT, wenn sie (1) oder (3) direkt ohne CR erlaubt oder (2) ebenfalls CR-pflichtig macht bzw. nicht als Berichtigung in der Historie ausweisen laesst.
       Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

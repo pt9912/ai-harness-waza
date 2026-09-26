@@ -1,14 +1,45 @@
 id: agents-md-duplikat-001
-name: AGENTS.md dupliziert keine Modultexte
-description: AGENTS.md traegt Hard Rules und Pointer, dupliziert aber keinen Inhalt (Drift).
-tags: [trigger, agents-md]
+name: Gate-Index steht einmal in harness/README.md, nicht in AGENTS.md
+description: |
+  Prueft die Regel "Der Gate-Index steht einmal, und zwar in harness/README.md
+  §Sensors; AGENTS.md traegt die Regel und den Zeiger, nicht die Liste"
+  (grundlagen-harness-dateien.md §harness/README.md als Einstiegspunkt, v6.10.0;
+  modul-09-implementierung.md §Ziel-Form: AGENTS.md).
+  Ohne Regelwerk antwortet ein Modell typischerweise allgemein "Duplikate
+  vermeiden, AGENTS.md kurz halten, auf Makefile/Doku verweisen" oder es
+  akzeptiert die Zusammenlegung in AGENTS.md. Das ist hier unvollstaendig bzw.
+  falsch: Der feste Ort des Index ist harness/README.md §Sensors, AGENTS.md
+  behaelt nur die Regel (kein behauptetes Gate ohne Deckung) plus Zeiger, und
+  die Begruendung ist die doppelte Bezahlung im Lauf-Kontext (beide Dateien
+  liegen in jedem Lauf) samt Auseinanderlaufen, nicht der Ordnungsgedanke.
+    Bewertung: Der LLM-Judge entscheidet; die Regex ist nur eine Plausibilitaetspruefung.
+tags:
+- trigger
+- agents-md
+- harness-readme
 inputs:
-  prompt: >-
-    Ich moechte in meine AGENTS.md den kompletten Text der Regelwerk-Module
-    kopieren, damit der Agent alles sofort hat. Ist das nach dem
-    AI-Harness-Regelwerk sinnvoll?
+  prompt: 'Nach dem AI-Harness-Regelwerk: Siehe Entwurf in der Datei. Wir wollen die Liste der Quality Gates mit Kurzbeschreibung in AGENTS.md pflegen und die Tabelle woanders loeschen. Wo soll die Liste kuenftig genau stehen, und was steht in AGENTS.md stattdessen? Begruende kurz.'
+  files:
+  - path: agents-md-duplikat-001-agents-entwurf.md
 expected:
-  output_contains:
-    - "Drift"
   outcomes:
-    - type: task_completed
+  - type: task_completed
+graders:
+- type: text
+  name: gate_index_ort
+  config:
+    regex_match:
+    - (?i)harness/readme\.md
+- type: prompt
+  name: judge_agents_md_duplikat_001
+  config:
+    model: minimax-m3:cloud
+    continue_session: true
+    prompt: |
+      Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+      Referenz (laut Regelwerk): Der Gate-Index steht genau einmal, in `harness/README.md` §Sensors (nicht in AGENTS.md). AGENTS.md traegt nur die Regel (kein behauptetes Gate ohne Deckung / kein Target nennen, das im Makefile nicht existiert) und einen Zeiger auf diese Sektion, nicht die Liste. Grund: AGENTS.md und harness/README.md liegen in jedem Lauf-Kontext, ein zweiter Index wird pro Lauf doppelt bezahlt und laeuft auseinander, weil nirgends die Pflicht steht, ihn nachzuziehen (grundlagen-harness-dateien.md §harness/README.md als Einstiegspunkt, "Der Gate-Index steht einmal, und zwar hier"; modul-09-implementierung.md §Ziel-Form: AGENTS.md; v6.10.0). Die Sensors-Tabelle in harness/README.md wird also gerade NICHT geloescht.
+      Beispiel fuer eine RICHTIGE Antwort: Die Liste bleibt in der Sensors-Tabelle von harness/README.md, dort steht der Gate-Index einmal. Die README-Tabelle darf nicht geloescht werden. In AGENTS.md gehoeren nur die Regel, dass kein Gate behauptet wird, das es nicht gibt, und ein Zeiger auf diese Sektion. Beide Dateien liegen in jedem Lauf im Kontext, ein zweiter Index kostet doppelt und laeuft auseinander.
+      Beispiel fuer eine FALSCHE Antwort: Die Liste in AGENTS.md zu pflegen ist in Ordnung, weil jeder Agent sie liest; die README-Tabelle kann dann entfallen. Oder allgemein: Die Wahrheit steht im Makefile, AGENTS.md soll kurz bleiben und darauf verlinken, ohne den festen Ort harness/README.md §Sensors zu nennen.
+      Kriterium: Die Antwort benennt harness/README.md (Sensors-Tabelle) als den einen Ort des Gate-Index, laesst in AGENTS.md nur Regel und Zeiger und lehnt die Verlagerung der Liste nach AGENTS.md ab. Formulierung, Synonyme und zusaetzliche korrekte Details sind unerheblich. Die Antwort besteht NICHT, wenn sie die Liste in AGENTS.md zulaesst, einen anderen Ort als Index nennt oder die Kernentscheidung offen laesst.
+      Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+timeout_seconds: 300

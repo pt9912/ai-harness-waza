@@ -1,0 +1,8 @@
+$ grep -rn "mutation" --include=*.md --include=Makefile . | grep -v "^./harness/sensors/mutation.md"
+
+./Makefile:31:mutation:            ## Mutationstest ueber src/parser/ (wird mit dem naechsten Merge entfernt)
+./harness/README.md:13:| [`mutation`](sensors/mutation.md) | Mutationstest ueber src/parser/; Grenze und Exit-Codes siehe Datei. | ADR-0007 |
+./AGENTS.md:27:Grenzen des Mutationstests: siehe [harness/sensors/mutation.md](harness/sensors/mutation.md).
+./spec/spezifikation.md:88:SPEC-QA-004 wird durch das Gate mutation gestuetzt, Grenze: [harness/sensors/mutation.md](../harness/sensors/mutation.md).
+./docs/plan/planning/done/slice-031.md:22:Beleg: `make mutation` gruen (Commit 4f2a9c1).
+./docs/plan/planning/done/review-report-slice-031.md:9:Gate `make mutation` lief gruen, siehe Closure-Notiz.

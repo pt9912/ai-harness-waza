@@ -1,15 +1,49 @@
 id: gate-luege-001
-name: Gate-Luege - Block aktiv, Modul nicht in modules
-description: Ein entkommentierter Block ohne Eintrag in `modules` ist gueltig, aber wirkungslos.
-tags: [trigger, quality-gates]
+name: Gate-Luege - konfiguriert, aber wirkungslos
+description: |
+  Prueft die Aktivierungsregeln des d-check-Gates (templates/.d-check.yml v6.10.0,
+  Kopfkommentar und Bloecke `ids`/`reviews`; modul-13-quality-gates.md
+  §Hard Rule "kein behauptetes Gate ohne Deckung"): (1) `reviews` ist nur mit
+  `done-dir` aktiv - `done-dir` ist der Aktivierungs-Schalter, ohne ihn oeffnet das
+  Modul keine Datei; (2) die Kennung in Inline-Code (`ADR-0012` in Backticks) ist
+  nur mit `link-policy: always` linkpflichtig, sonst bleibt sie unbeanstandet.
+  Beide Konfigurationen sind gueltig und wirkungslos = Gate-Luege; Gegenprobe:
+  Verstoss einbauen und Befund sehen.
+  Ohne Regelwerk antwortet ein Modell typischerweise: `reviews` steht in `modules`,
+  also prueft das Gate den fehlenden Report, und `ids` meldet die ungelinkte
+  Kennung. Das ist hier falsch: beides bleibt stumm, das Gate behauptet eine
+  Deckung, die es nicht gibt.
+tags: [trigger, quality-gates, d-check]
 inputs:
   prompt: >-
-    Nach dem AI-Harness-Regelwerk: In d-check-modul-nicht-aktiv.yml ist der
-    ids-Block aktiv. Greift die ID-Pruefung? Begruende.
+    Nach dem AI-Harness-Regelwerk: Siehe die beiden Dateien. `make docs-check` ist
+    gruen. Slice 031 liegt in done/ und hat den Review-Haken, aber unter
+    docs/reviews/ liegt kein Report. Ausserdem steht in Slice 040 die Kennung
+    `ADR-0012` in Backticks ohne Link. Meldet d-check mit dieser
+    Konfiguration einen der beiden Faelle? Begruende je Fall und sage, was zu
+    tun ist.
   files:
-    - path: d-check-modul-nicht-aktiv.yml
+    - path: gate-luege-d-check.yml
+    - path: gate-luege-fall.md
 expected:
-  output_contains:
-    - "modules"
   outcomes:
     - type: task_completed
+graders:
+  - type: text
+    name: done_dir_schalter
+    config:
+      regex_match:
+        - (?i)done-dir
+  - type: prompt
+    name: judge_gate_luege_001
+    config:
+      model: minimax-m3:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Keiner der beiden Faelle wird gemeldet. (1) Der fehlende Review-Report: `reviews` steht zwar in `modules`, aber `done-dir` ist der Aktivierungs-Schalter des Moduls; ohne `done-dir` (hier waere `docs/plan/planning/done`) oeffnet das Modul keine Datei. (2) Die Kennung `ADR-0012` in Inline-Code (Backticks): `ids` erzwingt den Link nur ausserhalb von Inline-Code; die Kennung in Inline-Code ist nur mit `link-policy: always` am ids-Muster linkpflichtig, ohne bleibt sie unbeanstandet. Die Konfiguration ist gueltig und wirkungslos, also eine Gate-Luege (Modul 13); Gegenprobe nach dem Aktivieren: einen Verstoss der Klasse einbauen und den Befund sehen. Fundstelle: templates/.d-check.yml (v6.10.0) Kopfkommentar sowie Bloecke `ids` und `reviews`; modul-13-quality-gates.md §Hard Rule.
+        Beispiel fuer eine RICHTIGE Antwort: Nein, in beiden Faellen bleibt das Gate stumm, obwohl die Konfiguration gueltig ist. Bei den Reviews fehlt `done-dir`; das ist der Aktivierungs-Schalter, ohne ihn schaut das Modul in keinen done/-Slice und meldet den fehlenden Report nicht. Bei `ADR-0012` in Backticks fehlt `link-policy: always` im ids-Muster; ohne diese Einstellung bleibt die Kennung in Inline-Code unbeanstandet. Das ist die Gate-Luege: gruen, aber ohne Deckung. Also done-dir und link-policy: always ergaenzen und mit einem eingebauten Verstoss pruefen, dass der Befund erscheint.
+        Beispiel fuer eine FALSCHE Antwort: Ja, `reviews` steht in `modules`, also findet d-check, dass unter docs/reviews kein Report zu Slice 031 liegt, und das Modul `ids` meldet die Kennung ADR-0012, weil sie nicht verlinkt ist. Beide Faelle sollten rot werden; wenn das Gate trotzdem gruen ist, laeuft es vermutlich nicht oder das Docker-Image ist veraltet.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz: beide Faelle bleiben stumm, und sie nennt beide Gruende (fehlendes `done-dir` als Aktivierungs-Schalter UND fehlendes `link-policy: always` fuer Inline-Code-Kennungen). Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht (z. B. einen der Faelle als gemeldet bezeichnet), nur einen der beiden Gruende nennt oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+timeout_seconds: 300

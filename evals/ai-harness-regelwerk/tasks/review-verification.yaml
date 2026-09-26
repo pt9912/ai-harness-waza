@@ -1,14 +1,46 @@
 id: review-verification-001
-name: Review- und Verification-Harness
-description: Trigger fuer Reviewer-Skill und Verification.
+name: Review-Report - Zitierweise im eingefrorenen Report
+description: |
+  Prueft die Zitier-Form des Review-Reports (templates/docs/reviews/review-report.template.md,
+  Block "Zitier-Form", v6.10.0; modul-10-review-harness.md §Reviewer berichtet auch,
+  was er nicht gefunden hat): Der Report friert ein, deshalb "Kennung, nicht Adresse":
+  `slice-<Kennung>` statt Lifecycle-Pfad, `make <target>` statt Link auf die
+  Sensor-Datei, eine Baseline-Stelle als Tag + Pfad in Inline-Code (`v6.10.0` ·
+  `regelwerk/<datei>.md` §<Abschnitt>) statt als Link. Das `Pfad`-Feld auf den
+  geprueften Gegenstand darf den Stand des Laufs festhalten.
+  Ohne Regelwerk antwortet ein Modell typischerweise, die Verlinkung sei gut
+  (evtl. mit Permalinks/Commit-Hashes) oder es bemaengelt nur Formales. Das ist
+  hier falsch: Links auf bewegliche Ziele (in-progress-Pfad, Sensor-Datei,
+  vendorter Baseline-Tag) werden beim naechsten Verschieben bzw. Baseline-Bump
+  rot, der Report ist aber ein eingefrorener Lauf-Beleg.
 tags: [trigger, review, verification]
 inputs:
   prompt: >-
-    Ich will nach dem AI-Harness-Regelwerk einen Review-Harness und einen
-    Verification-Harness aufsetzen. Welche Abschnitte und Vorlagen brauche ich?
+    Nach dem AI-Harness-Regelwerk: Der Reviewer-Agent hat den Report-Entwurf in der
+    Datei geliefert; ich will ihn so unter docs/reviews/ einchecken. Passt die Art,
+    wie der Report auf Slice, Sensor und Regelwerk verweist? Wenn nicht: was
+    aendere ich konkret, und was darf so bleiben?
+  files:
+    - path: review-verification-report-entwurf.md
 expected:
-  output_contains:
-    - "Review"
-    - "Verification"
   outcomes:
     - type: task_completed
+graders:
+  - type: text
+    name: kennung_statt_adresse
+    config:
+      regex_match:
+        - (?i)kennung
+  - type: prompt
+    name: judge_review_verification_001
+    config:
+      model: minimax-m3:cloud
+      continue_session: true
+      prompt: |
+        Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
+        Referenz (laut Regelwerk): Der Report ist ein eingefrorener Lauf-Beleg; was er zitiert, bewegt sich weiter. Deshalb Zitier-Form "Kennung, nicht Adresse": Gegenstand als `slice-064-order-export` (Kennung) statt Link auf den Lifecycle-Pfad in in-progress/ (der Slice wandert nach done/ und ins Archiv); den Sensor als `make arch-check` statt Link auf arch-check.sh; die Baseline-Stelle als Tag + Pfad in Inline-Code, z. B. `v6.10.0` · `regelwerk/modul-10-review-harness.md` §Ziel-Form: Reviewer-Skill, KEIN Link (der vendorte Baum traegt genau einen Tag, ein Bump loescht den alten und der Link faerbt ein eingefrorenes Artefakt rot). Das Pfad-Feld auf den geprueften Gegenstand (internal/handler/order.go:42) darf bleiben, weil es den Stand des Laufs festhaelt. Fundstelle: templates/docs/reviews/review-report.template.md, Block "Zitier-Form" (v6.10.0).
+        Beispiel fuer eine RICHTIGE Antwort: Nein, so nicht. Der Report friert ein, also keine Adressen, sondern Kennungen. Statt des Links auf den in-progress-Pfad schreibst du `slice-064-order-export`, statt des Links auf arch-check.sh `make arch-check`, und die Baseline-Stelle als `v6.10.0` · `regelwerk/modul-10-review-harness.md` §Ziel-Form: Reviewer-Skill in Inline-Code ohne Link, weil beim naechsten Baseline-Bump der Tag-Pfad verschwindet und der Link rot wird. Die Spalte Pfad mit Datei:Zeile darf bleiben, sie beschreibt den geprueften Stand.
+        Beispiel fuer eine FALSCHE Antwort: Die Verlinkung ist gut und nachvollziehbar. Ich wuerde die relativen Links durch Permalinks auf einen Commit-Hash ersetzen, damit sie stabil bleiben, und die Links auf die Baseline auf die GitHub-URL des Tags umstellen. Ausserdem sollte die Spalte Pfad ebenfalls verlinkt werden.
+        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz: die Verweise sind so nicht in Ordnung, sie sollen als Kennung statt Adresse geschrieben werden (Slice als Kennung, Sensor als `make`-Target, Baseline-Stelle als Tag + Pfad in Inline-Code ohne Link), und das Pfad-Feld auf den geprueften Gegenstand darf bleiben. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht (z. B. Links beibehaelt oder Permalinks/URLs empfiehlt), nur einen Teil der drei Verweise korrigiert oder nur Randbegriffe nennt.
+        Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
+timeout_seconds: 300

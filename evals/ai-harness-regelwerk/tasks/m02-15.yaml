@@ -26,7 +26,7 @@ graders:
 - type: prompt
   name: judge_m02_15_001
   config:
-    model: deepseek-v4.1-flash:cloud
+    model: minimax-m3:cloud
     continue_session: true
     prompt: |
       Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
