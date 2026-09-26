@@ -1,35 +1,39 @@
 id: ds-07-001
-name: Handoff-Gate - Grenze des Inhalts-Nachweises
+name: Drei Bindepunkte - Quadranten und der schwaechste
 description: |
-  Prueft DS-07 (grundlagen-durchsetzungsschicht.md §Nachweis ueber Inhalt und
-  §Grenzen - ehrlich benannt, v6.10.0): Der Inhalts-Nachweis (Content-Hash) des
-  Handoff-Gates hat eine Luecke bei frischem Klon bzw. geloeschtem State mit
-  cleanem Tree - dort ist kein Nachweis pruefbar und CI ist das Netz; die Grenze
-  muss benannt werden, eine Garantie-Aussage darueber hinaus ist eine Harness-Luege.
-  Ohne Regelwerk antwortet ein Modell typischerweise, die Zusicherung sei im
-  Kern in Ordnung und der Hook muesse nur strenger werden (bei fehlendem State
-  blockieren bzw. Gates selbst nachlaufen lassen), oder es empfiehlt allgemein
-  "mehr Tests". Das ist hier unvollstaendig: laut Regelwerk ist die Luecke
-  systembedingt, wird nicht im Hook geschlossen, sondern von CI aufgefangen, und
-  die README-Garantie muss auf die Grenze zurueckgenommen werden.
+  Prueft DS-07 (grundlagen-durchsetzungsschicht.md §Drei Bindepunkte, v6.10.0):
+  Tool-Call-Gate = computational feedforward, Handoff-Gate = computational
+  feedback, Workflow-Skelett (Slash-Command) = inferential feedforward; nur die
+  zwei Gates erzwingen, das Skelett ist der schwaechste Bindepunkt, gibt den
+  Ablauf nur vor und kann ignoriert werden. Ein uebersprungener Schritt wird
+  daher nicht durch eine haertere Formulierung im Skelett geschlossen, und
+  "alle drei erzwungen" in der Doku waere falsch.
+  Ohne Regelwerk antwortet ein Modell typischerweise, ein Slash-Command sei
+  "nur ein Prompt" und man solle ihn stark formulieren oder den Stop-Hook um
+  einen Test-Check erweitern, und es ordnet die Stellen nicht (oder falsch) den
+  Quadranten der 2x2-Matrix zu. Das ist hier unvollstaendig: das Regelwerk
+  verlangt die feste Zuordnung aller drei Bindepunkte und die Korrektur der
+  Doku-Aussage, nicht bloss ein schaerferes Skelett.
 tags: [ds-07, stufe-3, ds]
 inputs:
   prompt: >-
-    Nach dem AI-Harness-Regelwerk: Siehe Datei (Hook-README und Log). Im Log
-    vom 4. Maerz hat der Stop-Hook den Agenten durchgelassen, obwohl er keine
-    Gate-Ausfuehrung belegen konnte. Ist die "Garantie" im README so
-    korrekt? Was aendern wir am README, und was faengt den Fall ab?
+    Nach dem AI-Harness-Regelwerk: Siehe Datei (Durchsetzungs-Uebersicht und
+    Vorfall-Notiz). Ordne die drei Stellen, an denen wir den Agenten binden,
+    jeweils einem Quadranten der 2x2-Matrix zu und sag, welche davon wirklich
+    erzwingt und welche nicht. Stimmt der Absatz "alle drei erzwungen", und
+    ist der Vorschlag aus der Vorfall-Notiz die richtige Reaktion auf den
+    uebersprungenen Schritt 2?
   files:
-    - path: ds-07-handoff-gate-readme.md
+    - path: ds-07-durchsetzung-uebersicht.md
 expected:
   outcomes:
     - type: task_completed
 graders:
   - type: text
-    name: luecke_ci_netz
+    name: skelett_inferential_schwaechster
     config:
       regex_match:
-        - (?i)\bCI\b
+        - (?i)(skelett|slash[- ]?command)[^\n]{0,200}(inferential|schw(ö|oe|ä|ae)chst|nicht erzwing)|(inferential|schw(ö|oe|ä|ae)chst)[^\n]{0,200}(skelett|slash[- ]?command)
   - type: prompt
     name: judge_ds_07_001
     config:
@@ -37,9 +41,9 @@ graders:
       continue_session: true
       prompt: |
         Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-        Referenz (laut Regelwerk): Die Garantie im README ist zu stark und damit selbst eine Harness-Luege. Der Inhalts-Nachweis (Content-Hash) hat eine bekannte Luecke bei frischem Klon bzw. geloeschtem State mit cleanem Tree: dort ist kein Nachweis pruefbar. Diese Grenze muss im README benannt werden (Pflicht), und das Netz dafuer ist CI (nicht der Hook). Fundstelle: grundlagen-durchsetzungsschicht.md §Vier Design-Eigenschaften Punkt 2 und §Grenzen - ehrlich benannt (v6.10.0).
-        Beispiel fuer eine RICHTIGE Antwort: Nein, die Garantie stimmt so nicht. Der Nachweis ist ein Content-Hash ueber den Arbeitsbaum; bei frischem Klon (State fehlt, Tree clean) laesst sich nichts pruefen, wie das Log vom 4. Maerz zeigt. Das README muss diese Grenze ausdruecklich nennen, statt mehr zu versprechen, sonst ist die Zusicherung eine Harness-Luege. Aufgefangen wird der Fall nicht durch den Hook, sondern durch CI, die die Gates auf dem Stand erneut laufen laesst.
-        Beispiel fuer eine FALSCHE Antwort: Die Garantie ist im Kern richtig, aber der Hook sollte bei fehlender gates.sha strikt blockieren und die Gates selbst nachlaufen lassen. Ausserdem sollte man .claude/state ins Repo committen und ein Audit-Log fuehren. Dann ist der Fall geschlossen und die Garantie kann stehen bleiben.
-        Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz, nennt also (1) die Garantie ist zu stark bzw. der Nachweis hat hier eine Luecke (frischer Klon/State weg, kein Nachweis pruefbar) und (2) CI ist das Netz dafuer, wobei die Grenze im README benannt werden soll. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht (z. B. die Garantie bestaetigt oder die Luecke allein im Hook schliessen will), CI als Netz nicht nennt oder nur Randbegriffe nennt.
+        Referenz (laut Regelwerk): Die drei Bindepunkte und ihre Quadranten: Tool-Call-Gate (PreToolUse-Hook / Befehls-Guard) = computational FEEDFORWARD (falsche Handlung technisch verhindern); Handoff-Gate (Stop-Hook) = computational FEEDBACK (deterministisch pruefen, dass die Gates wirklich liefen); Workflow-Skelett (Slash-Command, hier /slice) = INFERENTIAL feedforward (gibt den Ablauf vor). Nur die zwei Gates erzwingen; das Workflow-Skelett ist der SCHWAECHSTE Bindepunkt: es erzwingt nicht und ist das einzige der drei, das ein Agent noch ignorieren kann. Damit stimmt "alle drei erzwungen" nicht, der Absatz muss korrigiert werden. Der Vorfall (Schritt 2 uebersprungen, Gates gruen, Stop-Hook gibt frei) ist genau diese Eigenschaft des Skeletts; "Schritt 2 ist zwingend!" im Command-Text bleibt inferential und erzwingt nichts, ist also keine wirksame Reaktion. Fundstelle: grundlagen-durchsetzungsschicht.md §Drei Bindepunkte (Tabelle und Folgeabsatz, v6.10.0).
+        Beispiel fuer eine RICHTIGE Antwort: Tool-Call-Gate (PreToolUse) ist computational feedforward, es verhindert die Handlung vorab. Das Handoff-Gate (Stop-Hook) ist computational feedback, es prueft nachtraeglich deterministisch, dass die Gates liefen. Der Slash-Command /slice ist das Workflow-Skelett und inferential feedforward: er gibt die Schrittfolge nur vor. Erzwungen wird also nur durch die zwei Gates; das Skelett ist der schwaechste Bindepunkt und kann vom Agenten ignoriert werden, wie der Vorfall zeigt. Der Absatz "alle drei erzwungen" ist falsch und muss korrigiert werden. Ein haerterer Satz im Command-Text aendert daran nichts, er bleibt inferential; der uebersprungene Schritt wird nicht dadurch geschlossen.
+        Beispiel fuer eine FALSCHE Antwort: Der Slash-Command ist nur ein Prompt und daher der schwache Punkt, deshalb sollte man Schritt 2 im Text fett und als Pflicht markieren und den Stop-Hook so erweitern, dass er zusaetzlich prueft, ob zu jedem Slice ein Test existiert. Die beiden Hooks sind erzwungen, der Slash-Command eben nur ein Hinweis; ein Quadrant-Schema braucht es dafuer nicht. Mit diesen Aenderungen kann der Absatz "alle drei erzwungen" stehen bleiben.
+        Kriterium: Die Antwort nennt die REGELWERK-SPEZIFISCHEN Details, nicht nur die grobe Einteilung "Hooks stark, Command schwach": (1) Tool-Call-Gate = computational feedforward UND Handoff-Gate = computational feedback (die beiden nicht vertauscht oder beide als "feedforward" bezeichnet); (2) Workflow-Skelett/Slash-Command = inferential feedforward, der schwaechste Bindepunkt, weil er den Ablauf nur vorgibt und ignoriert werden kann; (3) "alle drei erzwungen" ist falsch, es erzwingen nur die zwei Gates; (4) die Formulierungs-Verschaerfung im Command ist keine wirksame Antwort auf den Vorfall (bleibt inferential). Formulierung, Synonyme und Reihenfolge sind unerheblich. Die Antwort besteht NICHT, wenn eine Quadrant-Zuordnung fehlt oder falsch ist, den Absatz "alle drei erzwungen" bestaetigt oder die Verschaerfung des Textes als Loesung ausgibt, auch wenn das Skelett als schwach erkannt wird.
         Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.
 timeout_seconds: 300
