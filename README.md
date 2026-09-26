@@ -42,7 +42,7 @@ Ergebnisse landen per `docker cp` in `./results/`.
 
 ## Referenzantworten vor dem Agenten verbergen
 
-Die Task-Dateien enthalten die Referenzantworten der Judges. Zwei Leckwege, die in Läufen ohne Skill aufgetreten sind:
+Die Task-Dateien enthalten die Referenzantworten der Judges. Vier Leckwege, die in Läufen ohne Skill aufgetreten sind:
 
 1. **Task-Dateien im Image.** Agenten haben sie per `find`/`grep` gefunden und gelesen (`m14-08`, `rr-05`, `sp-13`,
    `tr-04`). Abhilfe: `run-ollama`, `run-ollama-isolated`, `run-ollama-baseline` und `run-copilot` starten über
@@ -54,9 +54,20 @@ Die Task-Dateien enthalten die Referenzantworten der Judges. Zwei Leckwege, die 
    brach mit „failed to resume session" ab). Abhilfe: `make run-ollama-isolated` (und `run-ollama-baseline`) starten
    **jeden Task und Trial in einem eigenen Container** (`tools/run_isolated.sh`, Ergebnisse per
    `tools/merge_results.py` zusammengeführt; `TRIALS`, `JOBS`).
+3. **Internet.** Die Modelle haben `web_fetch`, `bash` und `git clone` und haben das Regelwerk aus
+   `github.com/pt9912/ai-harness-course` geholt (Deepseek: 31 von 255 Baseline-Läufen, 94 % bestanden; ohne diese Läufe
+   29 % statt 37 %; eine Stichprobe ohne Netz fiel von 70 % auf 33 %). Abhilfe: `run-ollama-baseline` setzt
+   `NET_ISOLATE=1`. `tools/run_hidden.sh` startet waza dann in einem leeren Netz-Namespace (`unshare --net`, nur der
+   Container, nicht der Host); Ollama bleibt über ein `socat`-Relay per Unix-Socket erreichbar, `SYS_ADMIN`/`NET_ADMIN`
+   werden danach aus dem Bounding-Set entfernt (kein `nsenter` zurück). Der Container braucht dafür
+   `--cap-add SYS_ADMIN --cap-add NET_ADMIN` (setzt `run_isolated.sh`). Für andere Läufe: `make run-ollama-isolated NET_ISOLATE=1`.
+4. **Fixtures anderer Tasks.** Sie enthalten Regelwerk-Auszüge (z. B. AGENTS.md-Regeln, Carveout-Vorlagen); ein Agent ohne
+   Regelwerk fand sie im Image (`/workspace/evals/base/fixtures`) und zitierte „Hard Rule 3.1". Abhilfe: mit
+   `NET_ISOLATE=1` setzt `run_isolated.sh` auch `HIDE_FIXTURES=1`; `run_hidden.sh` löscht die Fixtures nach dem Start (die
+   Dateien des laufenden Tasks liegen dann schon im Arbeitsverzeichnis des Agenten).
 
-Für Vorwissen-Messungen daher immer `make run-ollama-baseline` (Image ohne Regelwerk, isoliert). Ältere Läufe ohne
-Skill (Baseline mit 85 Tasks, 11-Task-Lauf) sind nur eingeschränkt gültig. Läufe mit Skill sind nicht betroffen (dort
+Für Vorwissen-Messungen daher immer `make run-ollama-baseline` (Image ohne Regelwerk, isoliert, ohne Internet). Ältere
+Läufe ohne Skill (Baseline mit 85 Tasks, 11-Task-Lauf, Matrix `*-baseline-mx.json`) sind nur eingeschränkt gültig. Läufe mit Skill sind nicht betroffen (dort
 kein Judge-Inhalt in den Tool-Ergebnissen gefunden), laufen aber weiter in einem gemeinsamen Container.
 
 ## Ollama als Provider
@@ -71,7 +82,7 @@ make run-ollama OLLAMA_MODEL='kimi-k2.7-code:cloud' TASK='source-precedence*'   
 make run-ollama OLLAMA_MODEL='glm-5.3-flash:cloud' TASK="m09-08* m02-11*"       # mehrere Muster
 ```
 
-Die `prompt`-Grader (LLM-Judge) nutzen `OLLAMA_JUDGE` (Standard `minimax-m3:cloud`), unabhängig vom
+Die `prompt`-Grader (LLM-Judge) nutzen `OLLAMA_JUDGE` (Standard `kimi-k2.7-code:cloud`), unabhängig vom
 getesteten Modell (`--judge-model`).
 
 - Bei `:cloud`-Modellen gehen Prompts und gelesene Regelwerk-Auszüge an ollama.com.

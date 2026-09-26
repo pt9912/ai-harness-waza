@@ -3,14 +3,15 @@ name: Wiederkehrende Anweisungen im Prompt
 description: |
   Prueft M0-02 (modul-00-einfuehrung.md, Stufe 2): Was in jedem Lauf relevant
   ist, gehoert in AGENTS.md oder eine Fitness Function, nicht in den Prompt
-  (der sonst zur Anti-Spec wird).
+  (der sonst zur Anti-Spec wird). Zusatz (modul-09): AGENTS.md allein ist nur
+  halbgesetzt; erst mit Fitness Function ist die Regel durchgesetzt.
     Bewertung: LLM-Judge (statt Vokabel-Abgleich).
 tags:
 - m0-02
 - stufe-2
 - modul-00
 inputs:
-  prompt: 'Nach dem AI-Harness-Regelwerk: Bei jedem Auftrag an den Agenten schreiben wir dieselben Sätze in den Prompt: ''Nutze immer make test'' und ''Ändere nie das Datenbankschema ohne Migration''. Das wird lästig und wir vergessen es manchmal. Wohin gehört so etwas stattdessen?'
+  prompt: 'Nach dem AI-Harness-Regelwerk: Bei jedem Auftrag an den Agenten schreiben wir dieselben Sätze in den Prompt: ''Nutze immer make test'' und ''Ändere nie das Datenbankschema ohne Migration''. Das wird lästig und wir vergessen es manchmal. Wohin gehört so etwas stattdessen, und reicht es, die Sätze dort einfach hinzuschreiben?'
 expected:
   outcomes:
   - type: task_completed
@@ -18,10 +19,10 @@ graders:
 - type: prompt
   name: judge_m0_02_001
   config:
-    model: minimax-m3:cloud
+    model: kimi-k2.7-code:cloud
     continue_session: true
     prompt: |-
       Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
-      Referenz (laut Regelwerk): Was in jedem Lauf relevant ist, gehoert in AGENTS.md oder eine Fitness Function, nicht in den Prompt (der sonst zur Anti-Spec wird). modul-00-einfuehrung.md §Regeln gegen typische Fehlannahmen, 2. Punkt.
-      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Referenz (laut Regelwerk): Was in jedem Lauf relevant ist, gehoert in AGENTS.md oder eine Fitness Function, nicht in den Prompt (der sonst zur Anti-Spec wird). modul-00-einfuehrung.md §Regeln gegen typische Fehlannahmen, 2. Punkt. Reicht die Zeile in AGENTS.md nicht: Eine Hard Rule nur in AGENTS.md (inferential feedforward) ist halbgesetzt; erst mit Fitness Function (computational feedback) ist sie durchgesetzt, beides ist Pflicht (modul-09-implementierung.md §Gegen "Hard Rules schreibe ich in AGENTS.md, und das reicht").
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt oder nicht nennt, dass AGENTS.md allein nicht reicht und die Regel zusaetzlich durch eine Fitness Function (mechanische Pruefung) durchgesetzt werden muss.
       Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

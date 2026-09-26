@@ -14,7 +14,7 @@ tags:
 - stufe-3
 - modul-04
 inputs:
-  prompt: 'Nach dem AI-Harness-Regelwerk: Bitte pruefe den ADR-Entwurf (siehe Datei) auf den Abschnitt "Kontext" und sag mir konkret, was dort zu aendern ist und warum. Die uebrigen Abschnitte sind bereits abgestimmt.'
+  prompt: 'Nach dem AI-Harness-Regelwerk: Bitte pruefe den ADR-Entwurf (siehe Datei) auf den Abschnitt "Kontext" und sag mir konkret, was dort zu aendern ist und warum. Waere aus einem ADR heraus irgendein Verweis auf einen Slice zulaessig, und wenn ja, in welcher Form? Die uebrigen Abschnitte sind bereits abgestimmt.'
   files:
   - path: m04-06-adr-entwurf.md
 expected:
@@ -29,12 +29,12 @@ graders:
 - type: prompt
   name: judge_m04_06_001
   config:
-    model: minimax-m3:cloud
+    model: kimi-k2.7-code:cloud
     continue_session: true
     prompt: |
       Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
       Referenz (laut Regelwerk): Der Kontext referenziert die Anforderung (LH-FA-020), wiederholt sie nicht, und zeigt aufwaerts auf die stabilere Quelle, nie abwaerts auf einen Slice; der Slice-Verweis slice-031-csv-export im Kontext ist deshalb zu entfernen. Stabilitaets-Rang: Vertrag > Technik > Sicht > ADR > Slice, das Lastenheft ist also stabiler als ein Slice. Nach grundlagen-referenz-richtung.md gilt die Kante ADR -> Slice als verboten; nur ein in seiner Zeile markierter Verifikations-Zeiger ("wo verifiziert/entstanden", nie "warum entschieden") ist erlaubt, der unmarkierte Umsetzungs-Hinweis im Kontext hier nicht. modul-04-adrs.md §Ziel-Form: ADR (MADR), erster Bullet; grundlagen-referenz-richtung.md §Referenz-Richtung (SDP).
       Beispiel fuer eine RICHTIGE Antwort: Im Kontext ist die Anforderung LH-FA-020 wörtlich kopiert. Das sollte entfallen: Der Kontext referenziert nur die Anforderung (Bezug LH-FA-020) und wiederholt sie nicht. Außerdem muss der Verweis auf slice-031-csv-export raus. Referenzen laufen nur aufwärts zur stabileren Quelle, das Lastenheft ist stabiler als ein Slice; ein Verweis auf den Slice wäre eine Abwärts-Referenz.
       Beispiel fuer eine FALSCHE Antwort: Der Kontext ist zu lang: Kürze die Anforderung auf den Kern. Der Verweis auf slice-031-csv-export ist dagegen gut, denn er zeigt, wo die Entscheidung umgesetzt wird, und bleibt stehen. Verweise gehen aufwaerts zum Lastenheft, deshalb bleibt der Bezug LH-FA-020 im Kopf.
-      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich; ein Hinweis, dass ein Slice-Verweis hoechstens als in seiner Zeile markierter Verifikations-Zeiger zulaessig waere, ist unschaedlich, solange der vorliegende unmarkierte Verweis im Kontext beanstandet wird. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich; ein Hinweis, dass ein Slice-Verweis hoechstens als in seiner Zeile markierter Verifikations-Zeiger zulaessig waere, ist unschaedlich, solange der vorliegende unmarkierte Verweis im Kontext beanstandet wird. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt oder nicht nennt, dass ein Slice-Verweis aus dem ADR hoechstens als in seiner Zeile markierter Verifikations-Zeiger zulaessig waere ("wo verifiziert/entstanden", nie "warum entschieden").
       Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

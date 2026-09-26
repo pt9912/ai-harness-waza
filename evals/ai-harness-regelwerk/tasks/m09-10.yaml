@@ -14,7 +14,7 @@ tags:
 - stufe-3
 - modul-09
 inputs:
-  prompt: 'Nach dem AI-Harness-Regelwerk: Duerfen wir den PR in der Datei so mergen, weil zwei Reviewer zugestimmt haben und die Begruendung im PR-Kommentar steht? Falls nicht, was muss konkret geaendert werden?'
+  prompt: 'Nach dem AI-Harness-Regelwerk: Duerfen wir den PR in der Datei so mergen, weil zwei Reviewer zugestimmt haben und die Begruendung im PR-Kommentar steht? Falls nicht, was muss konkret geaendert werden? Und wie haette man die nicht testbare Datei exporter.py regelkonform behandeln koennen, ohne die Schwelle zu senken?'
   files:
   - path: m09-10-pr-212-coverage-gate.md
 expected:
@@ -29,12 +29,12 @@ graders:
 - type: prompt
   name: judge_m09_10_001
   config:
-    model: minimax-m3:cloud
+    model: kimi-k2.7-code:cloud
     continue_session: true
     prompt: |
       Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
       Referenz (laut Regelwerk): Nein: (1) Inline-`# noqa` ist verboten (bricht das `noqa-gate`) und muss entfernt werden; Ausnahmen werden mit Begruendung in `pyproject.toml` (allgemein: in eine zentrale Konfigurations-Datei) dokumentiert; (2) Gates duerfen nicht ohne ADR gelockert werden: die Senkung der Schwelle (fail_under 80 -> 70) ist ein ADR, kein PR-Kommentar. Eine befristete Ausnahme fuer einen Teil (einen Layer, einen Pfad) ist keine Senkung, sondern ein Carveout mit Trigger und Folge-Slice (modul-07); die Schwelle selbst bleibt. Die Regel nennt als Bedingung ein ADR; PR-Kommentar und Reviewer-Zustimmung sind keines (modul-09-implementierung.md §Hard Rules, Regelwerk v6.10.0).
-      Beispiel fuer eine RICHTIGE Antwort: Nein, so darf der PR nicht gemergt werden. Die Senkung von fail_under von 80 auf 70 lockert ein Gate, und das braucht ein ADR. Ein PR-Kommentar und die Zustimmung der Reviewer ersetzen das nicht. Ausserdem ist das Inline-noqa in exporter.py verboten und wird vom noqa-Gate abgelehnt. Das noqa muss raus, und eine echte Ausnahme gehoert mit Begruendung in die zentrale Konfiguration.
+      Beispiel fuer eine RICHTIGE Antwort: Nein, so darf der PR nicht gemergt werden. Die Senkung von fail_under von 80 auf 70 lockert ein Gate, und das braucht ein ADR. Ein PR-Kommentar und die Zustimmung der Reviewer ersetzen das nicht. Ausserdem ist das Inline-noqa in exporter.py verboten und wird vom noqa-Gate abgelehnt. Das noqa muss raus, und eine echte Ausnahme gehoert mit Begruendung in die zentrale Konfiguration. Fuer die nicht testbare Datei waere ein Carveout mit Trigger und Folge-Slice der richtige Weg, die Schwelle bliebe bei 80.
       Beispiel fuer eine FALSCHE Antwort: Fast. Das Inline-noqa in exporter.py ist unschoen, das sollte ein Reviewer noch pruefen und nach Moeglichkeit durch eine sauberere Loesung ersetzen. Die Senkung von fail_under auf 70 ist dagegen unproblematisch, weil sie im PR-Kommentar von @mila begruendet ist und zwei Reviewer zugestimmt haben. Nach dem Aufraeumen kann der PR gemergt werden, ein ADR ist dafuer nicht noetig.
-      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt oder nicht den Carveout (mit Trigger und Folge-Slice, Schwelle bleibt) als regelkonforme Alternative nennt.
       Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

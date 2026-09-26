@@ -10,7 +10,7 @@ tags:
 - stufe-2
 - modul-13
 inputs:
-  prompt: 'Nach dem AI-Harness-Regelwerk: In m13-01-Makefile soll coverage-gate bei zu niedriger Coverage den Lauf abbrechen, und coverage-report soll immer eine Datei schreiben, auch wenn die Coverage rot ist. Stimmt das Makefile so? Was muss geaendert werden?'
+  prompt: 'Nach dem AI-Harness-Regelwerk: Pruefe m13-01-Makefile darauf, ob Gate und Beleg der Coverage-Pruefung so getrennt sind, wie das Regelwerk es verlangt. Stimmt das Makefile so? Was muss geaendert werden und warum?'
   files:
   - path: m13-01-Makefile
 expected:
@@ -20,10 +20,10 @@ graders:
 - type: prompt
   name: judge_m13_01_001
   config:
-    model: minimax-m3:cloud
+    model: kimi-k2.7-code:cloud
     continue_session: true
     prompt: |-
       Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.
       Referenz (laut Regelwerk): Nein. `|| true` gehoert an den Beleg-Lauf, nie an den Gate-Lauf; der Beleg-Lauf haengt nicht am Gate-Target (modul-13 §Gate und Beleg — zwei Rollen derselben Prüfung).
-      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt.
+      Kriterium: Die Antwort trifft dieselbe Kernentscheidung wie die Referenz. Formulierung, Synonyme, zusaetzliche korrekte Details und die Reihenfolge der Saetze sind unerheblich. Die Antwort besteht NICHT, wenn sie der Referenz widerspricht, die Kernentscheidung verfehlt oder nur Randbegriffe nennt oder nicht beide Punkte der Referenz nennt (`|| true` nur am Beleg-Lauf; der Beleg haengt nicht am Gate-Target).
       Bei Erfuellung rufe set_waza_grade_pass auf, sonst set_waza_grade_fail mit einer Begruendung in einem Satz.

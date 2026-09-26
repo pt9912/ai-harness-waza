@@ -33,7 +33,7 @@ graders:
 - type: prompt
   name: judge_tr_04_001
   config:
-    model: minimax-m3:cloud
+    model: kimi-k2.7-code:cloud
     continue_session: true
     prompt: |
       Du bewertest die letzte Antwort eines KI-Agenten auf eine Frage zum AI-Harness-Regelwerk.

@@ -11,6 +11,8 @@ ENTRYPOINT_OPT ?= $(HIDE_OPT)
 BASELINE_EXTRA  ?=
 BASELINE_SUFFIX ?=
 TRIALS ?= 1
+# 1 = Container ohne Internet (nur Ollama); Standard nur fuer die Vorwissen-Baseline.
+NET_ISOLATE ?= 0
 JOBS   ?= 3
 ALL_IDS = $(shell grep -h '^id:' evals/$(SKILL)/tasks/*.yaml | sed 's/^id: *//')
 MODEL_FILE = $(subst /,_,$(subst :,_,$(OLLAMA_MODEL)))
@@ -30,7 +32,7 @@ WAZA        = docker run --rm $(IMAGE)
 OLLAMA_URL      ?= http://localhost:11434/v1
 OLLAMA_PROVIDER ?= openai
 # Fester Judge fuer die prompt-Grader (unabhaengig vom getesteten Modell).
-OLLAMA_JUDGE    ?= minimax-m3:cloud
+OLLAMA_JUDGE    ?= kimi-k2.7-code:cloud
 OLLAMA_ENV       = -e COPILOT_PROVIDER=$(OLLAMA_PROVIDER) -e COPILOT_BASE_URL=$(OLLAMA_URL) \
                    -e COPILOT_WIRE_API=completions -e COPILOT_API_KEY=ollama
 
@@ -83,10 +85,10 @@ run-ollama-isolated: image ## Wie run-ollama, aber jeder Task/Trial in eigenem C
 	@mkdir -p results
 	IMAGE='$(RUN_IMAGE)' MODEL='$(OLLAMA_MODEL)' JUDGE='$(OLLAMA_JUDGE)' EVAL_YAML='$(EVAL_YAML)' FIXTURES='$(FIXTURES)' \
 	TASKS='$(if $(TASK),$(TASK),$(ALL_IDS))' TRIALS='$(TRIALS)' JOBS='$(JOBS)' EXTRA='$(EXTRA)' \
-	OUT='results/ollama-$(MODEL_FILE)$(SUFFIX).json' OLLAMA_URL='$(OLLAMA_URL)' OLLAMA_PROVIDER='$(OLLAMA_PROVIDER)' tools/run_isolated.sh
+	NET_ISOLATE='$(NET_ISOLATE)' OUT='results/ollama-$(MODEL_FILE)$(SUFFIX).json' OLLAMA_URL='$(OLLAMA_URL)' OLLAMA_PROVIDER='$(OLLAMA_PROVIDER)' tools/run_isolated.sh
 
-run-ollama-baseline: image-baseline ## Reines Vorwissen: Baseline-Image (kein Regelwerk), --no-skills, isoliert je Task/Trial
-	@$(MAKE) --no-print-directory run-ollama-isolated RUN_IMAGE=$(IMAGE_BASELINE) EVAL_YAML=evals/base/eval.yaml FIXTURES=evals/base/fixtures EXTRA='--no-skills $(BASELINE_EXTRA)' SUFFIX='-baseline$(BASELINE_SUFFIX)'
+run-ollama-baseline: image-baseline ## Reines Vorwissen: Baseline-Image (kein Regelwerk, kein Internet), --no-skills, isoliert je Task/Trial
+	@$(MAKE) --no-print-directory run-ollama-isolated NET_ISOLATE=1 RUN_IMAGE=$(IMAGE_BASELINE) EVAL_YAML=evals/base/eval.yaml FIXTURES=evals/base/fixtures EXTRA='--no-skills $(BASELINE_EXTRA)' SUFFIX='-baseline$(BASELINE_SUFFIX)'
 
 compare: image ## Ergebnisse vergleichen: make compare A=results/a.json B=results/b.json
 	@test -f "$(A)" -a -f "$(B)" || { echo "Aufruf: make compare A=<datei> B=<datei>"; exit 1; }
