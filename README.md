@@ -19,6 +19,7 @@ Alle Targets führen genau einen waza-Befehl im Container aus (nach `make image`
 | `make spec-verify` | `waza spec verify` | Deckt die Eval-Suite die Trigger aus der `SKILL.md` ab? |
 | `make run` | `waza run` (Mock, `--skip-graders`) | Gerüsttest offline; bewertet nichts |
 | `make run-copilot` | `waza run` (copilot-sdk) | Echter Lauf mit Modell; braucht `GITHUB_TOKEN` |
+| `make run-ollama-isolated` / `run-ollama-baseline` | `waza run` je Task/Trial in eigenem Container | Ohne Judge-Spuren früherer Läufe; die Baseline nutzt ein Image ohne Regelwerk (reines Vorwissen) |
 | `make run-ollama OLLAMA_MODEL=… [TASK="…"] [OLLAMA_JUDGE=…]` | `waza run` (Ollama als Provider) | Echter Lauf mit einem Ollama-Modell, auch `:cloud`-Modelle; kein Key nötig |
 | `make compare A=… B=…` | `waza compare` | Zwei Ergebnisdateien vergleichen |
 | `make waza-help` | `waza --help` | Hilfe |
@@ -38,6 +39,25 @@ make compare A=results/copilot.json B=results/anderer-lauf.json
 ```
 
 Ergebnisse landen per `docker cp` in `./results/`.
+
+## Referenzantworten vor dem Agenten verbergen
+
+Die Task-Dateien enthalten die Referenzantworten der Judges. Zwei Leckwege, die in Läufen ohne Skill aufgetreten sind:
+
+1. **Task-Dateien im Image.** Agenten haben sie per `find`/`grep` gefunden und gelesen (`m14-08`, `rr-05`, `sp-13`,
+   `tr-04`). Abhilfe: `run-ollama`, `run-ollama-isolated`, `run-ollama-baseline` und `run-copilot` starten über
+   `tools/run_hidden.sh`; es startet waza, löscht nach wenigen Sekunden `evals/*/tasks` und `evals/*/eval*.yaml`
+   (waza hat die Tasks dann geladen; die Fixtures bleiben). Abschalten: `ENTRYPOINT_OPT=` (leer).
+2. **Session-Logs des Copilot-CLI** (`/root/.copilot/session-state`, `/tmp/copilot-tool-output-*`): Dort steht der
+   Judge-Prompt früherer Tasks/Trials im selben Container. Bei mehreren Trials fanden spätere Läufe die Referenz des
+   ersten (4 von 7 „bestandenen" Läufen ohne Regelwerk). Löschen der Dateien während des Laufs ist riskant (ein Judge
+   brach mit „failed to resume session" ab). Abhilfe: `make run-ollama-isolated` (und `run-ollama-baseline`) starten
+   **jeden Task und Trial in einem eigenen Container** (`tools/run_isolated.sh`, Ergebnisse per
+   `tools/merge_results.py` zusammengeführt; `TRIALS`, `JOBS`).
+
+Für Vorwissen-Messungen daher immer `make run-ollama-baseline` (Image ohne Regelwerk, isoliert). Ältere Läufe ohne
+Skill (Baseline mit 85 Tasks, 11-Task-Lauf) sind nur eingeschränkt gültig. Läufe mit Skill sind nicht betroffen (dort
+kein Judge-Inhalt in den Tool-Ergebnissen gefunden), laufen aber weiter in einem gemeinsamen Container.
 
 ## Ollama als Provider
 

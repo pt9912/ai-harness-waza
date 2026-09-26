@@ -49,3 +49,13 @@ COPY tools/ /opt/waza/tools/
 COPY --from=regelwerk-fetch /out/regelwerk/ /workspace/skills/ai-harness-regelwerk/regelwerk/
 COPY --from=regelwerk-fetch /out/templates/ /workspace/skills/ai-harness-regelwerk/templates/
 RUN mkdir -p /workspace/results
+
+# ---- Baseline-Image: gleiche Tasks, aber weder Skill noch Regelwerk ----------
+# Misst reines Vorwissen (`make run-ollama-baseline`): im Image liegt keine Datei des Regelwerks.
+# Die Evals liegen unter einem neutralen Namen, damit eine Suche nach "regelwerk" im Dateisystem
+# nicht auf die Task-Dateien (mit Referenzantworten der Judges) fuehrt.
+FROM runtime AS project-baseline
+COPY .waza.yaml /workspace/.waza.yaml
+COPY evals/ai-harness-regelwerk/ /workspace/evals/base/
+COPY tools/ /opt/waza/tools/
+RUN mkdir -p /workspace/results
