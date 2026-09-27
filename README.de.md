@@ -1,5 +1,7 @@
 # waza-Evals für das AI-Harness-Regelwerk
 
+🇬🇧 [English](README.md) · 🇩🇪 **Deutsch**
+
 Verhaltenstests für einen dünnen Skill (`skills/ai-harness-regelwerk/SKILL.md`), der auf das
 [AI-Harness-Regelwerk](https://github.com/pt9912/ai-harness-course) (`lab-regelwerk.zip`, v6.10.0) verweist.
 Getestet wird mit [waza](https://github.com/microsoft/waza) (v0.38.7).

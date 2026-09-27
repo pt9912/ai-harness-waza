@@ -1,12 +1,12 @@
 # waza Evals for the AI-Harness Rulebook
 
+🇬🇧 **English** · 🇩🇪 [Deutsch](README.de.md)
+
 Behavioral evals for a thin skill (`skills/ai-harness-regelwerk/SKILL.md`) that references the
 [AI-Harness rulebook](https://github.com/pt9912/ai-harness-course) (`lab-regelwerk.zip`, v6.10.0).
 Tested with [waza](https://github.com/microsoft/waza) (v0.38.7).
 
 Only `make` and `docker` are needed on the host. waza runs inside the container; there is no bind mount.
-
-*(German version: [README.de.md](README.de.md))*
 
 ## Make targets
 
